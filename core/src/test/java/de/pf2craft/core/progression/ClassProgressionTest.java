@@ -82,4 +82,22 @@ class ClassProgressionTest {
         assertThrows(IllegalArgumentException.class, () -> ClassProgressionParser.parse(
                 "{\"name\":\"X\",\"hpPerLevel\":8,\"levels\":{\"1\":{\"proficiencies\":{\"will\":\"bogus\"}}}}"));
     }
+
+    @Test
+    void rejectsUnknownProficiencyKey() {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> ClassProgressionParser.parse(
+                "{\"name\":\"X\",\"hpPerLevel\":8,\"levels\":{\"3\":{\"proficiencies\":{\"percepton\":\"expert\"}}}}"));
+        assertTrue(e.getMessage().contains("percepton") && e.getMessage().contains("3"), e.getMessage());
+        // skill ids stay valid
+        ClassProgressionParser.parse(
+                "{\"name\":\"X\",\"hpPerLevel\":8,\"levels\":{\"1\":{\"proficiencies\":{\"athletics\":\"trained\"}}}}");
+    }
+
+    @Test
+    void rejectsNonBooleanSkillIncrease() {
+        for (String bad : List.of("\"yes\"", "1", "null", "[]")) {
+            assertThrows(IllegalArgumentException.class, () -> ClassProgressionParser.parse(
+                    "{\"name\":\"X\",\"hpPerLevel\":8,\"levels\":{\"3\":{\"skillIncrease\":" + bad + "}}}"), bad);
+        }
+    }
 }
