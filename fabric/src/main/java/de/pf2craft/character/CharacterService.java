@@ -75,7 +75,7 @@ public final class CharacterService {
     private static void complete(MinecraftServer server, ServerPlayerEntity player, CharacterSheet sheet) {
         boolean hadCharacter = CharacterStore.get(player).isPresent();
         CharacterStore.set(player, sheet);
-        if (!hadCharacter) {
+        if (!hadCharacter && !GmRoles.isGm(player)) {
             player.changeGameMode(GameMode.SURVIVAL);
         }
         player.sendMessage(Text.translatableWithFallback("pf2craft.character.imported",

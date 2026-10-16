@@ -19,10 +19,8 @@ public final class CharacterStore {
     }
 
     public static void register() {
-        attachment = AttachmentRegistry.<String>builder()
-                .persistent(Codec.STRING)
-                .copyOnDeath()
-                .buildAndRegister(Pf2Craft.id("character"));
+        attachment = AttachmentRegistry.<String>create(Pf2Craft.id("character"),
+                builder -> builder.persistent(Codec.STRING).copyOnDeath());
     }
 
     public static Optional<CharacterSheet> get(ServerPlayerEntity player) {
