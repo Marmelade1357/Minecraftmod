@@ -1,0 +1,24 @@
+package de.pf2craft.network;
+
+import de.pf2craft.Pf2Craft;
+import java.util.UUID;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.Uuids;
+
+/** Client → server: GM sets one sheet field (hp, ability:&lt;x&gt;, rank:&lt;key&gt;). */
+public record GmEditPayload(UUID target, String field, int value) implements CustomPayload {
+    public static final CustomPayload.Id<GmEditPayload> ID = new CustomPayload.Id<>(Pf2Craft.id("gm_edit"));
+    public static final PacketCodec<RegistryByteBuf, GmEditPayload> CODEC = PacketCodec.tuple(
+            Uuids.PACKET_CODEC, GmEditPayload::target,
+            PacketCodecs.string(32), GmEditPayload::field,
+            PacketCodecs.INTEGER, GmEditPayload::value,
+            GmEditPayload::new);
+
+    @Override
+    public Id<? extends CustomPayload> getId() {
+        return ID;
+    }
+}

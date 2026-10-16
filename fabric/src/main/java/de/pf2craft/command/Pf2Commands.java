@@ -4,13 +4,16 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.pf2craft.GmRoles;
 import de.pf2craft.character.CharacterService;
+import de.pf2craft.character.SheetService;
 import de.pf2craft.core.dice.DiceParseException;
 import de.pf2craft.roll.RollService;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -48,6 +51,15 @@ public final class Pf2Commands {
                                         .executes(ctx -> setGm(ctx, false))))
                         .then(literal("list")
                                 .executes(Pf2Commands::listGms)))
+                .then(literal("hp")
+                        .requires(Pf2Commands::isGmOrOp)
+                        .then(argument("player", EntityArgumentType.player())
+                                .then(argument("amount", IntegerArgumentType.integer())
+                                        .executes(Pf2Commands::changeHp))))
+                .then(literal("sheet")
+                        .requires(Pf2Commands::isGmOrOp)
+                        .then(argument("player", EntityArgumentType.player())
+                                .executes(Pf2Commands::openSheet)))
                 .then(literal("character")
                         .then(literal("import")
                                 .then(argument("id", StringArgumentType.word())
@@ -67,6 +79,26 @@ public final class Pf2Commands {
         ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
         CharacterService.startImport(player, StringArgumentType.getString(ctx, "id"));
         return 1;
+    }
+
+    private static int changeHp(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "player");
+        int amount = IntegerArgumentType.getInteger(ctx, "amount");
+        OptionalInt hp = SheetService.changeHp(ctx.getSource().getServer(), target, amount);
+        if (hp.isEmpty()) {
+            ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.character.none",
+                    "%s has no character.", target.getDisplayName()));
+            return 0;
+        }
+        ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.character.hp_changed",
+                "%s now has %s HP.", target.getDisplayName(), hp.getAsInt()), true);
+        return 1;
+    }
+
+    private static int openSheet(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        ServerPlayerEntity viewer = ctx.getSource().getPlayerOrThrow();
+        ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "player");
+        return SheetService.view(viewer, target.getUuid()) ? 1 : 0;
     }
 
     private static int resetCharacter(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {

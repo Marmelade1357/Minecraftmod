@@ -33,5 +33,10 @@
   "pf2craft.character.imported": "Character imported: %s (%s, level %s)",
   "pf2craft.character.imported_gm": "%s imported %s, level %s",
   "pf2craft.character.reset": "Character of %s was reset.",
-  "pf2craft.character.reset_notice": "Your character was reset. Import a new one."
+  "pf2craft.character.reset_notice": "Your character was reset. Import a new one.",
+  "pf2craft.character.none": "%s has no character.",
+  "pf2craft.character.player_offline": "That player is not online.",
+  "pf2craft.character.levelup_granted": "The GM allows you to level up!",
+  "pf2craft.character.leveled": "%s reached level %s!",
+  "pf2craft.character.hp_changed": "%s now has %s HP."
 }

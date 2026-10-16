@@ -33,5 +33,10 @@
   "pf2craft.character.imported": "Charakter importiert: %s (%s, Stufe %s)",
   "pf2craft.character.imported_gm": "%s hat %s importiert, Stufe %s",
   "pf2craft.character.reset": "Charakter von %s wurde zurückgesetzt.",
-  "pf2craft.character.reset_notice": "Dein Charakter wurde zurückgesetzt. Importiere einen neuen."
+  "pf2craft.character.reset_notice": "Dein Charakter wurde zurückgesetzt. Importiere einen neuen.",
+  "pf2craft.character.none": "%s hat keinen Charakter.",
+  "pf2craft.character.player_offline": "Dieser Spieler ist nicht online.",
+  "pf2craft.character.levelup_granted": "Der SL erlaubt dir einen Stufenaufstieg!",
+  "pf2craft.character.leveled": "%s hat Stufe %s erreicht!",
+  "pf2craft.character.hp_changed": "%s hat jetzt %s TP."
 }

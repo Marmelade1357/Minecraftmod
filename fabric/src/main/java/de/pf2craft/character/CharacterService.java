@@ -81,6 +81,7 @@ public final class CharacterService {
         player.sendMessage(Text.translatableWithFallback("pf2craft.character.imported",
                 "Character imported: %s (%s, level %s)", sheet.name(), sheet.className(), sheet.level())
                 .formatted(Formatting.GREEN), false);
+        SheetService.broadcast(server, player, sheet);
         Text gmNotice = Text.translatableWithFallback("pf2craft.character.imported_gm",
                 "%s imported %s, level %s", player.getName(), sheet.name(), sheet.level());
         for (ServerPlayerEntity other : server.getPlayerManager().getPlayerList()) {
