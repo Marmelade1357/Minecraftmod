@@ -1,0 +1,76 @@
+package de.pf2craft.core.progression;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import de.pf2craft.core.character.CharacterSheet;
+import de.pf2craft.core.character.PathbuilderImporter;
+import de.pf2craft.core.character.Rank;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+/** Cross-checks class data against 261 real Pathbuilder exports. */
+class ClassDataConsistencyTest {
+    private static final ClassRegistry REGISTRY;
+
+    static {
+        try {
+            REGISTRY = new ClassRegistry(List.of(ClassProgressionTest.fighter()));
+        } catch (java.io.IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /** "fixture-file:key" -> reason why the exported rank legitimately exceeds the class table. */
+    private static final Map<String, String> KNOWN_RANK_EXCEPTIONS = Map.of();
+
+    static List<Path> fixtures() throws Exception {
+        Path dir = Paths.get(ClassDataConsistencyTest.class.getResource("/pathbuilder").toURI());
+        try (Stream<Path> files = Files.list(dir)) {
+            return files.filter(p -> p.getFileName().toString().endsWith(".json")).sorted()
+                    .collect(Collectors.toList());
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("fixtures")
+    void classTableMatchesExport(Path fixture) throws Exception {
+        CharacterSheet s = PathbuilderImporter.parse(Files.readString(fixture, StandardCharsets.UTF_8));
+        Optional<ClassProgression> cls = REGISTRY.find(s.className());
+        if (cls.isEmpty()) {
+            return;
+        }
+        Map<String, Rank> expected = cls.get().ranksAt(s.level());
+        for (String key : List.of("perception", "fortitude", "reflex", "will", "class_dc")) {
+            Rank table = expected.getOrDefault(key, Rank.UNTRAINED);
+            Rank actual = s.rank(key);
+            String id = fixture.getFileName() + ":" + key;
+            assertTrue(table.compareTo(actual) <= 0, id + " class table " + table + " > export " + actual);
+            if (!key.equals("class_dc") && !KNOWN_RANK_EXCEPTIONS.containsKey(id)) {
+                assertEquals(table, actual, id);
+            }
+        }
+    }
+
+    @org.junit.jupiter.api.Test
+    void fixturesActuallyCoverFighters() throws Exception {
+        long n = 0;
+        for (Path f : fixtures()) {
+            CharacterSheet s = PathbuilderImporter.parse(Files.readString(f, StandardCharsets.UTF_8));
+            if (REGISTRY.find(s.className()).isPresent()) {
+                n++;
+            }
+        }
+        System.out.println("Fighter fixtures checked: " + n);
+        assertTrue(n >= 2, "no fighter fixtures matched");
+    }
+}

@@ -1,0 +1,183 @@
+{
+  "name": "Fighter",
+  "hpPerLevel": 10,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "expert",
+        "fortitude": "expert",
+        "reflex": "expert",
+        "will": "trained",
+        "simple": "expert",
+        "martial": "expert",
+        "advanced": "trained",
+        "unarmed": "expert",
+        "unarmored": "trained",
+        "light": "trained",
+        "medium": "trained",
+        "heavy": "trained",
+        "class_dc": "trained"
+      },
+      "features": [
+        "Reactive Strike",
+        "Shield Block"
+      ],
+      "featSlots": [
+        "Class Feat"
+      ]
+    },
+    "3": {
+      "proficiencies": {
+        "will": "expert"
+      },
+      "features": [
+        "Bravery"
+      ],
+      "skillIncrease": true
+    },
+    "5": {
+      "features": [
+        "Fighter Weapon Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "7": {
+      "proficiencies": {
+        "perception": "master"
+      },
+      "features": [
+        "Battlefield Surveyor",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "9": {
+      "proficiencies": {
+        "fortitude": "master"
+      },
+      "features": [
+        "Battle Hardened",
+        "Combat Flexibility"
+      ],
+      "skillIncrease": true
+    },
+    "11": {
+      "proficiencies": {
+        "light": "expert",
+        "medium": "expert",
+        "heavy": "expert",
+        "unarmored": "expert",
+        "class_dc": "expert"
+      },
+      "features": [
+        "Armor Expertise",
+        "Fighter Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "13": {
+      "proficiencies": {
+        "simple": "master",
+        "martial": "master",
+        "advanced": "expert",
+        "unarmed": "master"
+      },
+      "features": [
+        "Weapon Legend"
+      ],
+      "skillIncrease": true
+    },
+    "15": {
+      "proficiencies": {
+        "reflex": "master"
+      },
+      "features": [
+        "Greater Weapon Specialization",
+        "Improved Flexibility",
+        "Tempered Reflexes"
+      ],
+      "skillIncrease": true
+    },
+    "17": {
+      "proficiencies": {
+        "light": "master",
+        "medium": "master",
+        "heavy": "master",
+        "unarmored": "master"
+      },
+      "features": [
+        "Armor Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "19": {
+      "proficiencies": {
+        "class_dc": "master"
+      },
+      "features": [
+        "Versatile Legend"
+      ],
+      "skillIncrease": true
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "6": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "12": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "18": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}
