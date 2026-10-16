@@ -1,8 +1,10 @@
 package de.pf2craft.core.character;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -86,17 +88,70 @@ class PathbuilderImporterTest {
         }
     }
 
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("fixtures")
+    void strikeDamageBonusMatchesEveryFixture(Path p) throws Exception {
+        String json = read(p);
+        CharacterSheet s = PathbuilderImporter.parse(json);
+        JsonArray weapons = JsonParser.parseString(json).getAsJsonObject().getAsJsonObject("build")
+                .getAsJsonArray("weapons");
+        for (int i = 0; i < weapons.size(); i++) {
+            JsonObject w = weapons.get(i).getAsJsonObject();
+            assertEquals(w.get("damageBonus").getAsInt(), CharacterMath.strikeDamageBonus(s, i),
+                    w.get("name").getAsString());
+        }
+    }
+
+    @Test
+    void otherAttackBonusIsPlausible() throws Exception {
+        int total = 0;
+        List<String> odd = new java.util.ArrayList<>();
+        for (Path p : fixtures()) {
+            CharacterSheet s = PathbuilderImporter.parse(read(p));
+            for (Strike st : s.strikes()) {
+                total++;
+                if (st.otherAttackBonus() < 0 || st.otherAttackBonus() > 4) {
+                    odd.add(p.getFileName() + ": " + st.name() + " other=" + st.otherAttackBonus());
+                }
+            }
+        }
+        assertTrue(odd.size() * 10 <= total, odd.size() + " of " + total + " strikes: " + odd);
+        System.out.println("Strikes without a fitting STR/DEX split: " + odd.size() + " of " + total
+                + " " + odd);
+    }
+
+    private static String build(String level, String abilities, String extra) {
+        return "{\"success\":true,\"build\":{\"name\":\"X\",\"class\":\"Fighter\",\"level\":" + level
+                + ",\"abilities\":" + abilities + ",\"proficiencies\":{}" + extra + "}}";
+    }
+
+    private static final String GOOD_ABILITIES =
+            "{\"str\":10,\"dex\":10,\"con\":10,\"int\":10,\"wis\":10,\"cha\":10}";
+
+    private static void assertRejected(String json, String messageFragment) {
+        CharacterImportException e = assertThrows(CharacterImportException.class,
+                () -> PathbuilderImporter.parse(json), json);
+        assertTrue(e.getMessage().contains(messageFragment), e.getMessage());
+    }
+
     @Test
     void rejectsBrokenInput() {
-        String[] bad = {
-            "{\"success\":false}", "{}", "[]", "not json",
-            "{\"success\":true,\"build\":{\"name\":\"X\",\"class\":\"Fighter\",\"level\":0,"
-                + "\"abilities\":{},\"proficiencies\":{}}}",
-            "{\"success\":true,\"build\":{\"name\":\"X\",\"class\":\"Fighter\",\"level\":1,"
-                + "\"dualClass\":\"Wizard\",\"abilities\":{},\"proficiencies\":{}}}",
-        };
-        for (String json : bad) {
-            assertThrows(CharacterImportException.class, () -> PathbuilderImporter.parse(json), json);
-        }
+        assertRejected("{\"success\":false}", "reported an error");
+        assertRejected("{}", "no build");
+        assertRejected("[]", "JSON object");
+        assertRejected("not json", "Invalid Pathbuilder data");
+        assertRejected(build("0", GOOD_ABILITIES, ""), "Level");
+        assertRejected(build("21", GOOD_ABILITIES, ""), "Level");
+        assertRejected(build("1", GOOD_ABILITIES, ",\"dualClass\":\"Wizard\""), "Dual class");
+        assertRejected(build("1", GOOD_ABILITIES.replace("\"str\":10", "\"str\":0"), ""),
+                "out of range");
+        assertRejected(build("1", GOOD_ABILITIES.replace("\"str\":10", "\"str\":31"), ""),
+                "out of range");
+        String weapons = String.join(",", java.util.Collections.nCopies(65, "{\"name\":\"W\"}"));
+        assertRejected(build("1", GOOD_ABILITIES, ",\"weapons\":[" + weapons + "]"),
+                "Too many entries");
+        String sixtyFour = String.join(",", java.util.Collections.nCopies(64, "{\"name\":\"W\"}"));
+        assertDoesNotThrow(() ->
+                PathbuilderImporter.parse(build("1", GOOD_ABILITIES, ",\"weapons\":[" + sixtyFour + "]")));
     }
 }
