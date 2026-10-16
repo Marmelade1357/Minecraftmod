@@ -24,6 +24,7 @@ sourceSets {
     main {
         // The rules engine is compiled straight into the mod jar.
         java.srcDir '../core/src/main/java'
+        resources.srcDir '../core/src/main/resources'
     }
 }
 
