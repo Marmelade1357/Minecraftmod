@@ -40,6 +40,17 @@ class ClassProgressionTest {
     }
 
     @Test
+    void versatileLegendAtLevel19() throws IOException {
+        ClassProgression f = fighter();
+        assertEquals(Rank.MASTER, f.ranksAt(18).get("martial"));
+        assertEquals(Rank.LEGENDARY, f.ranksAt(19).get("martial"));
+        assertEquals(Rank.LEGENDARY, f.ranksAt(19).get("simple"));
+        assertEquals(Rank.LEGENDARY, f.ranksAt(19).get("unarmed"));
+        assertEquals(Rank.MASTER, f.ranksAt(19).get("advanced"));
+        assertEquals(Rank.MASTER, f.ranksAt(19).get("class_dc"));
+    }
+
+    @Test
     void levelEntries() throws IOException {
         ClassProgression f = fighter();
         assertTrue(f.levels().get(3).skillIncrease());

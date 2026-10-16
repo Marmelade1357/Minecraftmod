@@ -112,6 +112,10 @@
     },
     "19": {
       "proficiencies": {
+        "simple": "legendary",
+        "martial": "legendary",
+        "unarmed": "legendary",
+        "advanced": "master",
         "class_dc": "master"
       },
       "features": [
