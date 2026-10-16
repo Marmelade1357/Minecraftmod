@@ -127,4 +127,26 @@ class LevelUpTest {
         assertThrows(UnsupportedClassException.class,
                 () -> LevelUp.options(rebuilt(fighter5(), "Fighter", 20), registry()));
     }
+    @Test
+    void skillIncreaseTargetsRespectRankCaps() throws Exception {
+        CharacterSheet s = fighter5().withRank("athletics", Rank.EXPERT)
+                .withRank("acrobatics", Rank.TRAINED).withRank("stealth", Rank.MASTER)
+                .withRank("arcana", Rank.LEGENDARY);
+        List<String> at6 = LevelUp.skillIncreaseTargets(s, 6);
+        assertTrue(at6.contains("acrobatics"));
+        assertTrue(at6.contains("crafting"));
+        assertFalse(at6.contains("athletics"));
+        assertFalse(at6.contains("stealth"));
+        assertFalse(at6.contains("arcana"));
+        List<String> at7 = LevelUp.skillIncreaseTargets(s, 7);
+        assertTrue(at7.contains("athletics"));
+        assertFalse(at7.contains("stealth"));
+        List<String> at15 = LevelUp.skillIncreaseTargets(s, 15);
+        assertTrue(at15.contains("stealth"));
+        assertFalse(at15.contains("arcana"));
+        for (int i = 0; i < s.lores().size(); i++) {
+            assertEquals(s.lores().get(i).rank() != Rank.LEGENDARY,
+                    LevelUp.skillIncreaseTargets(s, 20).contains("lore:" + i));
+        }
+    }
 }

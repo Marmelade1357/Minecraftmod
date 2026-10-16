@@ -106,6 +106,32 @@ public final class LevelUp {
                 + CharacterMath.maxHp(leveled) - CharacterMath.maxHp(sheet));
     }
 
+    /**
+     * Skill ids and "lore:&lt;n&gt;" entries that may receive a skill increase at
+     * {@code newLevel} (master needs level 7, legendary level 15).
+     */
+    public static List<String> skillIncreaseTargets(CharacterSheet sheet, int newLevel) {
+        List<String> out = new ArrayList<>();
+        for (Skill skill : Skill.values()) {
+            if (canRaise(sheet.rank(skill.id()), newLevel)) {
+                out.add(skill.id());
+            }
+        }
+        for (int i = 0; i < sheet.lores().size(); i++) {
+            if (canRaise(sheet.lores().get(i).rank(), newLevel)) {
+                out.add("lore:" + i);
+            }
+        }
+        return out;
+    }
+
+    private static boolean canRaise(Rank current, int newLevel) {
+        Rank next = current.next();
+        return current != Rank.LEGENDARY
+                && (next != Rank.MASTER || newLevel >= 7)
+                && (next != Rank.LEGENDARY || newLevel >= 15);
+    }
+
     private static int hpGain(CharacterSheet s) {
         return s.hitPoints().classHpPerLevel() + s.abilityMod(Ability.CON)
                 + s.hitPoints().bonusHpPerLevel();

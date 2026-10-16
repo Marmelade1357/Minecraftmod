@@ -11,6 +11,8 @@ import de.pf2craft.core.character.Save;
 import de.pf2craft.core.character.Skill;
 import de.pf2craft.core.character.Strike;
 import de.pf2craft.network.CheckRollPayload;
+import de.pf2craft.network.GmEditPayload;
+import de.pf2craft.network.GrantLevelUpPayload;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -26,17 +28,21 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.CyclingButtonWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Language;
 import net.minecraft.util.math.MathHelper;
+import org.lwjgl.glfw.GLFW;
 
 /**
  * Character sheet with three tabs (overview, skills, feats). Check rows roll through the server; the
  * tab content scrolls when it does not fit. Layout is sized for ~640×360 scaled pixels (GUI scale 3
- * on 1080p).
+ * on 1080p). In GM view a bar with HP and level-up controls sits above the tabs, ability scores get
+ * - / + buttons and the skill rank letters cycle the rank; the server checks the GM role.
  */
 public class CharacterScreen extends Screen {
     private enum Tab { OVERVIEW, SKILLS, FEATS }
@@ -61,6 +67,18 @@ public class CharacterScreen extends Screen {
     private static final int ROW_STEP = 15;
     private static final int TEXT_STEP = 11;
     private static final int SCROLL_STEP = 15;
+    private static final int GM_BAR_H = 16;
+    private static final int GM_BUTTON_W = 16;
+    private static final int HP_FIELD_W = 40;
+    private static final int HP_SET_W = 40;
+    private static final int GRANT_W = 110;
+    private static final int ABILITY_BUTTON_W = 10;
+    private static final int ABILITY_BUTTON_H = 12;
+    /** Width of the clickable rank letter area at the left of a check row. */
+    private static final int RANK_AREA_W = 13;
+    private static final int HP_STEP_SHIFT = 5;
+    private static final int MIN_SCORE = 1;
+    private static final int MAX_SCORE = 30;
 
     private static Tab lastTab = Tab.OVERVIEW;
     private static boolean secret;
@@ -76,6 +94,8 @@ public class CharacterScreen extends Screen {
     private int top;
     private int contentTop;
     private int contentBottom;
+    private TextFieldWidget hpField;
+    private String hpText = "";
 
     public CharacterScreen(UUID owner) {
         super(Text.translatable("screen.pf2craft.sheet.title"));
@@ -103,12 +123,18 @@ public class CharacterScreen extends Screen {
         int panelH = Math.min(PANEL_H, height - 8);
         left = (width - panelW) / 2;
         top = (height - panelH) / 2;
+        hpField = null;
+        Optional<ClientSheets.Synced> synced = ClientSheets.get(owner);
+        boolean gm = synced.isPresent() && synced.get().gmView();
         int tabY = top + HEADER_H + 2;
+        if (gm) {
+            addGmBar(synced.get().sheet(), tabY);
+            tabY += GM_BAR_H + 2;
+        }
         contentTop = tabY + TAB_H + 6;
         int footerY = top + panelH - FOOTER_H;
         contentBottom = footerY - 6;
 
-        Optional<ClientSheets.Synced> synced = ClientSheets.get(owner);
         if (synced.isEmpty()) {
             return;
         }
@@ -129,8 +155,8 @@ public class CharacterScreen extends Screen {
 
         int contentW = panelW - SCROLLBAR_W;
         switch (tab) {
-            case OVERVIEW -> buildOverview(sheet, contentW);
-            case SKILLS -> buildSkills(sheet, contentW);
+            case OVERVIEW -> buildOverview(sheet, contentW, gm);
+            case SKILLS -> buildSkills(sheet, contentW, gm);
             case FEATS -> buildFeats(sheet, contentW);
         }
         contentHeight = 0;
@@ -158,15 +184,107 @@ public class CharacterScreen extends Screen {
             ButtonWidget levelUp = addDrawableChild(ButtonWidget.builder(
                             Text.translatable("screen.pf2craft.sheet.levelup"), b -> openLevelUp())
                     .dimensions(right - 164, footerY, 80, FOOTER_H).build());
-            levelUp.active = synced.classSupported();
-            levelUp.setTooltip(Tooltip.of(Text.translatable(synced.classSupported()
+            boolean available = synced.classSupported() && synced.levelUpOptions().isPresent();
+            levelUp.active = available;
+            levelUp.setTooltip(Tooltip.of(Text.translatable(available
                     ? "screen.pf2craft.sheet.levelup_available"
                     : "screen.pf2craft.sheet.levelup_unsupported")));
         }
     }
 
     private void openLevelUp() {
-        // TODO(Task 9): open LevelUpScreen for the own sheet.
+        if (client != null && isOwnSheet()) {
+            client.setScreen(new LevelUpScreen(owner));
+        }
+    }
+
+    // --- GM controls ------------------------------------------------------------------------
+
+    /** HP - / + (Shift = 5), a field to set the HP directly and "Grant level up". */
+    private void addGmBar(CharacterSheet sheet, int y) {
+        int x = left;
+        addDrawableChild(ButtonWidget.builder(Text.literal("-"), b -> changeHp(sheet, -1))
+                .dimensions(x, y, GM_BUTTON_W, GM_BAR_H)
+                .tooltip(Tooltip.of(Text.translatable("screen.pf2craft.sheet.gm.hp_minus"))).build());
+        x += GM_BUTTON_W + 2;
+        addDrawableChild(ButtonWidget.builder(Text.literal("+"), b -> changeHp(sheet, 1))
+                .dimensions(x, y, GM_BUTTON_W, GM_BAR_H)
+                .tooltip(Tooltip.of(Text.translatable("screen.pf2craft.sheet.gm.hp_plus"))).build());
+        x += GM_BUTTON_W + 4;
+        hpField = new TextFieldWidget(textRenderer, x, y, HP_FIELD_W, GM_BAR_H,
+                Text.translatable("screen.pf2craft.sheet.gm.hp_field"));
+        hpField.setMaxLength(4);
+        hpField.setTextPredicate(text -> text.chars().allMatch(c -> c >= '0' && c <= '9'));
+        hpField.setText(hpText);
+        hpField.setPlaceholder(Text.translatable("screen.pf2craft.sheet.gm.hp_field").formatted(Formatting.DARK_GRAY));
+        hpField.setChangedListener(text -> hpText = text);
+        addDrawableChild(hpField);
+        x += HP_FIELD_W + 2;
+        addDrawableChild(ButtonWidget.builder(Text.translatable("screen.pf2craft.sheet.gm.hp_set"), b -> setHp())
+                .dimensions(x, y, HP_SET_W, GM_BAR_H).build());
+
+        ButtonWidget grant = addDrawableChild(ButtonWidget.builder(
+                        Text.translatable("screen.pf2craft.sheet.gm.grant"), b -> sendGm(new GrantLevelUpPayload(owner)))
+                .dimensions(left + panelW - GRANT_W, y, GRANT_W, GM_BAR_H).build());
+        grant.active = !sheet.levelUpGranted();
+        if (sheet.levelUpGranted()) {
+            grant.setTooltip(Tooltip.of(Text.translatable("screen.pf2craft.sheet.gm.granted")));
+        }
+    }
+
+    private void changeHp(CharacterSheet sheet, int sign) {
+        int step = hasShiftDown() ? HP_STEP_SHIFT : 1;
+        int hp = MathHelper.clamp(sheet.currentHp() + sign * step, 0, CharacterMath.maxHp(sheet));
+        sendGm(new GmEditPayload(owner, "hp", hp));
+    }
+
+    private void setHp() {
+        if (hpText.isEmpty()) {
+            return;
+        }
+        int hp;
+        try {
+            hp = Integer.parseInt(hpText);
+        } catch (NumberFormatException e) {
+            return;
+        }
+        hpText = "";
+        if (hpField != null) {
+            hpField.setText("");
+        }
+        sendGm(new GmEditPayload(owner, "hp", hp));
+    }
+
+    /** Cycles the rank upwards, with Shift downwards; untrained and legendary wrap around. */
+    private void cycleRank(String key, Rank current) {
+        int count = Rank.values().length;
+        int next = (current.ordinal() + (hasShiftDown() ? count - 1 : 1)) % count;
+        sendGm(new GmEditPayload(owner, "rank:" + key, next));
+    }
+
+    private void sendGm(CustomPayload payload) {
+        if (client == null) {
+            return;
+        }
+        if (!ClientPlayNetworking.canSend(payload.getId())) {
+            if (client.player != null) {
+                client.player.sendMessage(Text.translatable("screen.pf2craft.dice.server_missing")
+                        .formatted(Formatting.RED), false);
+            }
+            return;
+        }
+        // The server answers with a sync, which refreshes this screen.
+        ClientPlayNetworking.send(payload);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (hpField != null && hpField.isFocused()
+                && (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER)) {
+            setHp();
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     private void switchTab(Tab newTab) {
@@ -178,24 +296,45 @@ public class CharacterScreen extends Screen {
 
     // --- tab content ------------------------------------------------------------------------
 
-    private void buildOverview(CharacterSheet sheet, int contentW) {
+    private void buildOverview(CharacterSheet sheet, int contentW, boolean gm) {
         int cellW = contentW / Ability.values().length;
         for (int i = 0; i < Ability.values().length; i++) {
             Ability ability = Ability.values()[i];
-            Text text = Text.translatable("pf2craft.ability." + ability.pathbuilderKey()).formatted(Formatting.GRAY)
-                    .append(Text.literal(" " + signed(sheet.abilityMod(ability))).formatted(Formatting.WHITE));
-            label(text, i * cellW + cellW / 2, 0, cellW - 2, Align.CENTER);
+            Text name = Text.translatable("pf2craft.ability." + ability.pathbuilderKey()).formatted(Formatting.GRAY);
+            if (!gm) {
+                label(name.copy().append(Text.literal(" " + signed(sheet.abilityMod(ability))).formatted(Formatting.WHITE)),
+                        i * cellW + cellW / 2, 0, cellW - 2, Align.CENTER);
+                continue;
+            }
+            // GM view shows the score, which is what - / + change; the modifier is in the tooltip.
+            int score = sheet.abilityScores().getOrDefault(ability, 10);
+            label(name.copy().append(Text.literal(" " + score).formatted(Formatting.WHITE)),
+                    i * cellW + cellW / 2, 2, cellW - 2 * ABILITY_BUTTON_W - 1, Align.CENTER);
+            Text modifier = Text.literal(signed(sheet.abilityMod(ability)));
+            String field = "ability:" + ability.pathbuilderKey();
+            ButtonWidget down = placeWidget(ButtonWidget.builder(Text.literal("-"),
+                            b -> sendGm(new GmEditPayload(owner, field, score - 1)))
+                    .dimensions(left + i * cellW, 0, ABILITY_BUTTON_W, ABILITY_BUTTON_H)
+                    .tooltip(Tooltip.of(Text.translatable("screen.pf2craft.sheet.gm.score_down", modifier)))
+                    .build(), 0);
+            down.active = score > MIN_SCORE;
+            ButtonWidget up = placeWidget(ButtonWidget.builder(Text.literal("+"),
+                            b -> sendGm(new GmEditPayload(owner, field, score + 1)))
+                    .dimensions(left + (i + 1) * cellW - ABILITY_BUTTON_W - 1, 0, ABILITY_BUTTON_W, ABILITY_BUTTON_H)
+                    .tooltip(Tooltip.of(Text.translatable("screen.pf2craft.sheet.gm.score_up", modifier)))
+                    .build(), 0);
+            up.active = score < MAX_SCORE;
         }
 
         int colW = (contentW - 6) / 2;
         int rightCol = colW + 6;
         int y = 14;
         for (Save save : Save.values()) {
-            checkRow(new CheckId(CheckId.Kind.SAVE, save.id(), 0), null,
+            checkRow(new CheckId(CheckId.Kind.SAVE, save.id(), 0), null, null,
                     Text.translatable("pf2craft.save." + save.id()), CharacterMath.save(sheet, save), 0, y, colW);
             y += ROW_STEP;
         }
-        checkRow(new CheckId(CheckId.Kind.PERCEPTION, "", 0), null, Text.translatable("pf2craft.perception"),
+        checkRow(new CheckId(CheckId.Kind.PERCEPTION, "", 0), null, null, Text.translatable("pf2craft.perception"),
                 CharacterMath.perception(sheet), rightCol, 14, colW);
         label(Text.translatable("screen.pf2craft.sheet.speed", sheet.speed(), CharacterMath.speedBlocks(sheet)),
                 rightCol + 4, 14 + ROW_STEP + 3, colW - 4, Align.LEFT);
@@ -221,7 +360,7 @@ public class CharacterScreen extends Screen {
         }
     }
 
-    private void buildSkills(CharacterSheet sheet, int contentW) {
+    private void buildSkills(CharacterSheet sheet, int contentW, boolean gm) {
         int colW = (contentW - 6) / 2;
         List<Skill> skills = new ArrayList<>(List.of(Skill.values()));
         // Sort by the translated name, so the German list is alphabetical as well.
@@ -229,8 +368,9 @@ public class CharacterScreen extends Screen {
         int rows = (skills.size() + 1) / 2;
         for (int i = 0; i < skills.size(); i++) {
             Skill skill = skills.get(i);
-            checkRow(new CheckId(CheckId.Kind.SKILL, skill.id(), 0), sheet.rank(skill.id()),
-                    Text.translatable("pf2craft.skill." + skill.id()), CharacterMath.skill(sheet, skill),
+            Rank rank = sheet.rank(skill.id());
+            checkRow(new CheckId(CheckId.Kind.SKILL, skill.id(), 0), rank,
+                    gm ? () -> cycleRank(skill.id(), rank) : null, Text.translatable("pf2craft.skill." + skill.id()), CharacterMath.skill(sheet, skill),
                     (i / rows) * (colW + 6), (i % rows) * ROW_STEP, colW);
         }
 
@@ -246,7 +386,7 @@ public class CharacterScreen extends Screen {
         int loreRows = (lores.size() + 1) / 2;
         for (int i = 0; i < lores.size(); i++) {
             Lore lore = lores.get(i);
-            checkRow(new CheckId(CheckId.Kind.LORE, "", i), lore.rank(), Text.literal(lore.name()),
+            checkRow(new CheckId(CheckId.Kind.LORE, "", i), lore.rank(), null, Text.literal(lore.name()),
                     CharacterMath.lore(sheet, i), (i / loreRows) * (colW + 6), y + (i % loreRows) * ROW_STEP, colW);
         }
     }
@@ -292,16 +432,25 @@ public class CharacterScreen extends Screen {
         labels.add(new Label(text, x, relY, maxWidth, align));
     }
 
-    private void checkRow(CheckId id, Rank rank, Text name, int bonus, int x, int relY, int w) {
-        addCheckRow(new CheckRow(x, 0, w, name, Text.literal(signed(bonus)), rank == null ? null : rankLetter(rank),
-                rollAction(id)), relY);
+    /** {@code rankClick} (GM view, may be null) runs when the rank letter is clicked. */
+    private void checkRow(CheckId id, Rank rank, Runnable rankClick, Text name, int bonus, int x, int relY, int w) {
+        CheckRow row = new CheckRow(x, 0, w, name, Text.literal(signed(bonus)), rank == null ? null : rankLetter(rank),
+                rollAction(id));
+        row.rankClick = rank == null ? null : rankClick;
+        addCheckRow(row, relY);
     }
 
     private void addCheckRow(CheckRow row, int relY) {
         row.setX(left + row.getX());
         row.rollable = isOwnSheet();
-        row.active = row.rollable;
+        row.active = row.rollable || row.rankClick != null;
         placed.add(new Placed(addDrawableChild(row), relY));
+    }
+
+    /** Adds a widget to the scrollable content; its x must already be absolute. */
+    private <T extends ClickableWidget> T placeWidget(T widget, int relY) {
+        placed.add(new Placed(addDrawableChild(widget), relY));
+        return widget;
     }
 
     private ButtonWidget.PressAction rollAction(CheckId id) {
@@ -457,13 +606,15 @@ public class CharacterScreen extends Screen {
 
     /**
      * A check row in vanilla button look: optional rank letter, name on the left, bonus on the right.
-     * Rows that cannot be rolled (another player's sheet) are drawn as plain text.
+     * Rows that cannot be rolled (another player's sheet) are drawn as plain text. With a
+     * {@code rankClick} the rank letter is a separate click target (GM rank editing).
      */
     private static final class CheckRow extends ButtonWidget {
         private final Text name;
         private final Text value;
         private final Text rank;
         private boolean rollable = true;
+        private Runnable rankClick;
 
         CheckRow(int x, int y, int width, Text name, Text value, Text rank, PressAction onPress) {
             super(x, y, width, ROW_H, name, onPress, DEFAULT_NARRATION_SUPPLIER);
@@ -472,12 +623,33 @@ public class CharacterScreen extends Screen {
             this.rank = rank;
         }
 
+        private boolean onRank(double mouseX) {
+            return rankClick != null && mouseX < getX() + RANK_AREA_W;
+        }
+
+        @Override
+        protected boolean clicked(double mouseX, double mouseY) {
+            return super.clicked(mouseX, mouseY) && (rollable || onRank(mouseX));
+        }
+
+        @Override
+        public void onClick(double mouseX, double mouseY) {
+            if (onRank(mouseX)) {
+                rankClick.run();
+            } else {
+                super.onClick(mouseX, mouseY);
+            }
+        }
+
         @Override
         protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
             if (rollable) {
                 super.renderWidget(context, mouseX, mouseY, delta);
             } else {
                 drawMessage(context, MinecraftClient.getInstance().textRenderer, 0xFFFFFFFF);
+            }
+            if (isHovered() && onRank(mouseX)) {
+                context.drawBorder(getX() + 1, getY() + 1, RANK_AREA_W - 1, getHeight() - 2, 0xC0FFFFFF);
             }
         }
 

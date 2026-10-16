@@ -104,7 +104,19 @@ public final class SheetService {
                 && ClassData.registry().find(sheet.className()).isPresent();
         boolean gmView = recipient != owner || GmRoles.isGm(recipient);
         ServerPlayNetworking.send(recipient, new SheetSyncPayload(owner.getUuid(), CharacterJson.write(sheet),
-                gmView, supported, open));
+                gmView, supported, open, levelUpOptionsJson(sheet, supported)));
+    }
+
+    /** The options of a granted level-up as JSON, or "" if none is granted or possible. */
+    private static String levelUpOptionsJson(CharacterSheet sheet, boolean supported) {
+        if (!sheet.levelUpGranted() || !supported) {
+            return "";
+        }
+        try {
+            return LevelUp.options(sheet, ClassData.registry()).toJson();
+        } catch (UnsupportedClassException e) {
+            return "";
+        }
     }
 
     // --- rolling ----------------------------------------------------------------------------

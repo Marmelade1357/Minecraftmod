@@ -65,7 +65,13 @@ public class Pf2CraftClient implements ClientModInitializer {
             pendingScreen = null;
         }));
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
-            if (!overlay && MinecraftClient.getInstance().currentScreen instanceof ImportScreen screen) {
+            if (overlay) {
+                return;
+            }
+            Screen current = MinecraftClient.getInstance().currentScreen;
+            if (current instanceof ImportScreen screen) {
+                screen.onServerMessage(message);
+            } else if (current instanceof LevelUpScreen screen) {
                 screen.onServerMessage(message);
             }
         });
@@ -120,7 +126,9 @@ public class Pf2CraftClient implements ClientModInitializer {
         if (own) {
             waitingForOwnSheet = -1;
         }
-        if (client.currentScreen instanceof CharacterScreen screen && screen.owner().equals(owner)) {
+        if (own && client.currentScreen instanceof LevelUpScreen screen) {
+            screen.onSync();
+        } else if (client.currentScreen instanceof CharacterScreen screen && screen.owner().equals(owner)) {
             screen.refresh();
         } else if (own && client.currentScreen instanceof ImportScreen) {
             // Import finished: replace the import screen with the new sheet.
