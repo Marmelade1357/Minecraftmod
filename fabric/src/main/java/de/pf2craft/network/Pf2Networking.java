@@ -1,5 +1,6 @@
 package de.pf2craft.network;
 
+import de.pf2craft.character.CharacterService;
 import de.pf2craft.core.dice.DiceParseException;
 import de.pf2craft.roll.RollService;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -16,9 +17,13 @@ public final class Pf2Networking {
     public static void registerPayloads() {
         PayloadTypeRegistry.playC2S().register(RollRequestPayload.ID, RollRequestPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(RollResultPayload.ID, RollResultPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(ImportCharacterPayload.ID, ImportCharacterPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(OpenImportPayload.ID, OpenImportPayload.CODEC);
     }
 
     public static void registerServerReceivers() {
+        ServerPlayNetworking.registerGlobalReceiver(ImportCharacterPayload.ID,
+                (payload, context) -> CharacterService.startImport(context.player(), payload.pathbuilderId()));
         ServerPlayNetworking.registerGlobalReceiver(RollRequestPayload.ID, (payload, context) -> {
             ServerPlayerEntity player = context.player();
             if (!RollService.checkCooldown(player)) {

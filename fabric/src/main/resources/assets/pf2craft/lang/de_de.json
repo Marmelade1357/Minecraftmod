@@ -24,5 +24,14 @@
 
   "pf2craft.gm.added": "%s ist jetzt Spielleiter.",
   "pf2craft.gm.removed": "%s ist kein Spielleiter mehr.",
-  "pf2craft.gm.list": "Spielleiter online: %s"
+  "pf2craft.gm.list": "Spielleiter online: %s",
+
+  "pf2craft.character.need_import": "Du brauchst zuerst einen Charakter: Importiere ihn aus Pathbuilder 2e.",
+  "pf2craft.character.invalid_id": "Ungültige Pathbuilder-ID (nur Ziffern).",
+  "pf2craft.character.import_busy": "Es läuft bereits ein Import.",
+  "pf2craft.character.import_failed": "Import fehlgeschlagen: %s",
+  "pf2craft.character.imported": "Charakter importiert: %s (%s, Stufe %s)",
+  "pf2craft.character.imported_gm": "%s hat %s importiert, Stufe %s",
+  "pf2craft.character.reset": "Charakter von %s wurde zurückgesetzt.",
+  "pf2craft.character.reset_notice": "Dein Charakter wurde zurückgesetzt. Importiere einen neuen."
 }

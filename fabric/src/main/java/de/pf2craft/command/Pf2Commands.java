@@ -8,6 +8,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.pf2craft.GmRoles;
+import de.pf2craft.character.CharacterService;
 import de.pf2craft.core.dice.DiceParseException;
 import de.pf2craft.roll.RollService;
 import java.util.stream.Collectors;
@@ -46,7 +47,34 @@ public final class Pf2Commands {
                                 .then(argument("player", EntityArgumentType.player())
                                         .executes(ctx -> setGm(ctx, false))))
                         .then(literal("list")
-                                .executes(Pf2Commands::listGms))));
+                                .executes(Pf2Commands::listGms)))
+                .then(literal("character")
+                        .then(literal("import")
+                                .then(argument("id", StringArgumentType.word())
+                                        .executes(Pf2Commands::importCharacter)))
+                        .then(literal("reset")
+                                .requires(Pf2Commands::isGmOrOp)
+                                .then(argument("player", EntityArgumentType.player())
+                                        .executes(Pf2Commands::resetCharacter)))));
+    }
+
+    private static boolean isGmOrOp(ServerCommandSource source) {
+        ServerPlayerEntity player = source.getPlayer();
+        return source.hasPermissionLevel(2) || (player != null && GmRoles.isGm(player));
+    }
+
+    private static int importCharacter(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+        CharacterService.startImport(player, StringArgumentType.getString(ctx, "id"));
+        return 1;
+    }
+
+    private static int resetCharacter(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "player");
+        CharacterService.reset(target);
+        ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.character.reset",
+                "Character of %s was reset.", target.getDisplayName()), true);
+        return 1;
     }
 
     private static int roll(CommandContext<ServerCommandSource> ctx, boolean secret) {

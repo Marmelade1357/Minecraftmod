@@ -24,5 +24,14 @@
 
   "pf2craft.gm.added": "%s is now a game master.",
   "pf2craft.gm.removed": "%s is no longer a game master.",
-  "pf2craft.gm.list": "Game masters online: %s"
+  "pf2craft.gm.list": "Game masters online: %s",
+
+  "pf2craft.character.need_import": "You need a character first: import it from Pathbuilder 2e.",
+  "pf2craft.character.invalid_id": "Invalid Pathbuilder id (digits only).",
+  "pf2craft.character.import_busy": "An import is already running.",
+  "pf2craft.character.import_failed": "Import failed: %s",
+  "pf2craft.character.imported": "Character imported: %s (%s, level %s)",
+  "pf2craft.character.imported_gm": "%s imported %s, level %s",
+  "pf2craft.character.reset": "Character of %s was reset.",
+  "pf2craft.character.reset_notice": "Your character was reset. Import a new one."
 }
