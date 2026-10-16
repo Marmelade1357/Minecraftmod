@@ -1,0 +1,28 @@
+{
+  "key.categories.pf2craft": "PF2 Craft",
+  "key.pf2craft.dice": "Open dice window",
+
+  "screen.pf2craft.dice.title": "Dice",
+  "screen.pf2craft.dice.die": "d%s",
+  "screen.pf2craft.dice.label": "Label (e.g. Athletics)",
+  "screen.pf2craft.dice.secret": "Secret",
+  "screen.pf2craft.dice.clear": "Clear",
+  "screen.pf2craft.dice.roll": "Roll!",
+  "screen.pf2craft.dice.empty": "Click dice to add them",
+  "screen.pf2craft.dice.hint": "Left click: add · Right click: remove · Shift: ±5",
+  "screen.pf2craft.dice.server_missing": "This server doesn't have PF2 Craft installed.",
+
+  "hud.pf2craft.roll.header": "%s – %s",
+  "hud.pf2craft.roll.natural20": "Natural 20!",
+  "hud.pf2craft.roll.natural1": "Natural 1!",
+
+  "pf2craft.roll.chat": "%s rolls %s = %s",
+  "pf2craft.roll.chat_labeled": "%s rolls %s: %s = %s",
+  "pf2craft.roll.secret_prefix": "[Secret] ",
+  "pf2craft.roll.secret_notice": "%s rolls secretly.",
+  "pf2craft.roll.invalid": "Invalid dice expression: %s",
+
+  "pf2craft.gm.added": "%s is now a game master.",
+  "pf2craft.gm.removed": "%s is no longer a game master.",
+  "pf2craft.gm.list": "Game masters online: %s"
+}

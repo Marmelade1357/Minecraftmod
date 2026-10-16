@@ -1,0 +1,18 @@
+pluginManagement {
+    repositories {
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'pf2craft'
+
+include 'core'
+// `-PcoreOnly` builds/tests only the rules engine without downloading Minecraft.
+if (!providers.gradleProperty('coreOnly').isPresent()) {
+    include 'fabric'
+}

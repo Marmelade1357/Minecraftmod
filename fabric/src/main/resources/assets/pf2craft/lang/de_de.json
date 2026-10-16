@@ -1,0 +1,28 @@
+{
+  "key.categories.pf2craft": "PF2 Craft",
+  "key.pf2craft.dice": "Würfelfenster öffnen",
+
+  "screen.pf2craft.dice.title": "Würfel",
+  "screen.pf2craft.dice.die": "W%s",
+  "screen.pf2craft.dice.label": "Bezeichnung (z. B. Athletik)",
+  "screen.pf2craft.dice.secret": "Verdeckt",
+  "screen.pf2craft.dice.clear": "Leeren",
+  "screen.pf2craft.dice.roll": "Würfeln!",
+  "screen.pf2craft.dice.empty": "Würfel anklicken, um sie hinzuzufügen",
+  "screen.pf2craft.dice.hint": "Linksklick: hinzufügen · Rechtsklick: entfernen · Shift: ±5",
+  "screen.pf2craft.dice.server_missing": "Auf diesem Server ist PF2 Craft nicht installiert.",
+
+  "hud.pf2craft.roll.header": "%s – %s",
+  "hud.pf2craft.roll.natural20": "Natürliche 20!",
+  "hud.pf2craft.roll.natural1": "Natürliche 1!",
+
+  "pf2craft.roll.chat": "%s würfelt %s = %s",
+  "pf2craft.roll.chat_labeled": "%s würfelt %s: %s = %s",
+  "pf2craft.roll.secret_prefix": "[Verdeckt] ",
+  "pf2craft.roll.secret_notice": "%s würfelt verdeckt.",
+  "pf2craft.roll.invalid": "Ungültiger Würfelausdruck: %s",
+
+  "pf2craft.gm.added": "%s ist jetzt Spielleiter.",
+  "pf2craft.gm.removed": "%s ist kein Spielleiter mehr.",
+  "pf2craft.gm.list": "Spielleiter online: %s"
+}

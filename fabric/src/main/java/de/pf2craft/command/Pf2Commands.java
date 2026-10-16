@@ -1,0 +1,83 @@
+package de.pf2craft.command;
+
+import static net.minecraft.server.command.CommandManager.argument;
+import static net.minecraft.server.command.CommandManager.literal;
+
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import de.pf2craft.GmRoles;
+import de.pf2craft.core.dice.DiceParseException;
+import de.pf2craft.roll.RollService;
+import java.util.stream.Collectors;
+import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+
+/**
+ * {@code /roll <dice>}, {@code /gmroll <dice>} (secret) and {@code /pf2 gm add|remove|list}.
+ * The dice window is the main way to roll; the commands are a fallback.
+ */
+public final class Pf2Commands {
+    private Pf2Commands() {
+    }
+
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
+                                CommandRegistryAccess registryAccess,
+                                CommandManager.RegistrationEnvironment environment) {
+        dispatcher.register(literal("roll")
+                .then(argument("dice", StringArgumentType.greedyString())
+                        .executes(ctx -> roll(ctx, false))));
+        dispatcher.register(literal("gmroll")
+                .then(argument("dice", StringArgumentType.greedyString())
+                        .executes(ctx -> roll(ctx, true))));
+
+        dispatcher.register(literal("pf2")
+                .then(literal("gm")
+                        .requires(source -> source.hasPermissionLevel(2))
+                        .then(literal("add")
+                                .then(argument("player", EntityArgumentType.player())
+                                        .executes(ctx -> setGm(ctx, true))))
+                        .then(literal("remove")
+                                .then(argument("player", EntityArgumentType.player())
+                                        .executes(ctx -> setGm(ctx, false))))
+                        .then(literal("list")
+                                .executes(Pf2Commands::listGms))));
+    }
+
+    private static int roll(CommandContext<ServerCommandSource> ctx, boolean secret) {
+        ServerCommandSource source = ctx.getSource();
+        try {
+            RollService.roll(source.getServer(), source.getPlayer(), source.getName(),
+                    StringArgumentType.getString(ctx, "dice"), "", secret);
+            return 1;
+        } catch (DiceParseException e) {
+            source.sendError(Text.translatableWithFallback("pf2craft.roll.invalid",
+                    "Invalid dice expression: %s", e.getMessage()));
+            return 0;
+        }
+    }
+
+    private static int setGm(CommandContext<ServerCommandSource> ctx, boolean gm) throws CommandSyntaxException {
+        ServerPlayerEntity player = EntityArgumentType.getPlayer(ctx, "player");
+        GmRoles.setGm(player, gm);
+        String key = gm ? "pf2craft.gm.added" : "pf2craft.gm.removed";
+        String fallback = gm ? "%s is now a game master." : "%s is no longer a game master.";
+        ctx.getSource().sendFeedback(() -> Text.translatableWithFallback(key, fallback, player.getDisplayName()), true);
+        return 1;
+    }
+
+    private static int listGms(CommandContext<ServerCommandSource> ctx) {
+        String names = ctx.getSource().getServer().getPlayerManager().getPlayerList().stream()
+                .filter(GmRoles::isGm)
+                .map(player -> player.getName().getString())
+                .collect(Collectors.joining(", "));
+        ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.gm.list",
+                "Game masters online: %s", names.isEmpty() ? "-" : names), false);
+        return 1;
+    }
+}
