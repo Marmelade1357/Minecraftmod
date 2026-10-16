@@ -1,0 +1,221 @@
+{
+  "name": "Rogue",
+  "hpPerLevel": 8,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "expert",
+        "fortitude": "trained",
+        "reflex": "expert",
+        "will": "expert",
+        "simple": "trained",
+        "martial": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "light": "trained",
+        "class_dc": "trained",
+        "stealth": "trained"
+      },
+      "features": [
+        "Rogue's Racket",
+        "Sneak Attack",
+        "Surprise Attack"
+      ],
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "2": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "features": [
+        "Deny Advantage"
+      ],
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
+    },
+    "4": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "proficiencies": {
+        "simple": "expert",
+        "martial": "expert",
+        "unarmed": "expert"
+      },
+      "features": [
+        "Weapon Tricks"
+      ],
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
+    },
+    "6": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "proficiencies": {
+        "reflex": "master",
+        "perception": "master"
+      },
+      "features": [
+        "Evasive Reflexes",
+        "Perception Mastery",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
+    },
+    "8": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "fortitude": "expert"
+      },
+      "features": [
+        "Debilitating Strike",
+        "Rogue Resilience"
+      ],
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
+    },
+    "10": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "proficiencies": {
+        "class_dc": "expert"
+      },
+      "features": [
+        "Rogue Expertise"
+      ],
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
+    },
+    "12": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "reflex": "legendary",
+        "perception": "legendary",
+        "simple": "master",
+        "martial": "master",
+        "unarmed": "master",
+        "light": "expert",
+        "unarmored": "expert"
+      },
+      "features": [
+        "Greater Rogue Reflexes",
+        "Light Armor Expertise",
+        "Master Tricks",
+        "Perception Legend"
+      ],
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
+    },
+    "14": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "features": [
+        "Double Debilitation",
+        "Greater Weapon Specialization"
+      ],
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
+    },
+    "16": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "proficiencies": {
+        "will": "master"
+      },
+      "features": [
+        "Agile Mind"
+      ],
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
+    },
+    "18": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "proficiencies": {
+        "light": "master",
+        "unarmored": "master",
+        "class_dc": "master"
+      },
+      "features": [
+        "Light Armor Mastery",
+        "Master Strike"
+      ],
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
+    },
+    "20": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}

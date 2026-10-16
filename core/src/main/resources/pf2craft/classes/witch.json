@@ -1,0 +1,164 @@
+{
+  "name": "Witch",
+  "hpPerLevel": 6,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "trained",
+        "fortitude": "trained",
+        "reflex": "trained",
+        "will": "expert",
+        "simple": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "class_dc": "trained"
+      },
+      "features": [
+        "Patron",
+        "Familiar",
+        "Witch Spellcasting",
+        "Hexes"
+      ]
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "skillIncrease": true
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "proficiencies": {
+        "fortitude": "expert"
+      },
+      "features": [
+        "Magical Fortitude"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "features": [
+        "Familiar Ability"
+      ],
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "features": [
+        "Expert Spellcaster"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "reflex": "expert"
+      },
+      "features": [
+        "Reflex Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "proficiencies": {
+        "perception": "expert",
+        "simple": "expert",
+        "unarmed": "expert"
+      },
+      "features": [
+        "Perception Expertise",
+        "Weapon Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "12": {
+      "features": [
+        "Familiar Ability"
+      ],
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "unarmored": "expert"
+      },
+      "features": [
+        "Defensive Robes",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "features": [
+        "Master Spellcaster"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "proficiencies": {
+        "will": "master"
+      },
+      "features": [
+        "Will of the Pupil"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "features": [
+        "Familiar Ability"
+      ],
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "features": [
+        "Legendary Spellcaster",
+        "Patron's Gift"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}
