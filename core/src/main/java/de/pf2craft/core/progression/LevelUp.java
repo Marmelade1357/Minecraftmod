@@ -1,6 +1,7 @@
 package de.pf2craft.core.progression;
 
 import de.pf2craft.core.character.Ability;
+import de.pf2craft.core.character.CharacterMath;
 import de.pf2craft.core.character.CharacterSheet;
 import de.pf2craft.core.character.Feat;
 import de.pf2craft.core.character.Lore;
@@ -95,12 +96,14 @@ public final class LevelUp {
         List<String> specials = new ArrayList<>(result.specials());
         specials.addAll(options.features());
 
-        // HP gain uses the CON modifier after boosts.
-        int hp = result.currentHp() + hpGain(result);
-        return new CharacterSheet(result.name(), result.className(), result.ancestry(),
-                result.heritage(), result.background(), newLevel, result.keyAbility(),
-                result.abilityScores(), result.proficiencies(), result.lores(), result.hitPoints(),
-                result.speed(), result.armorClass(), result.strikes(), feats, specials, hp, false);
+        CharacterSheet leveled = new CharacterSheet(result.name(), result.className(),
+                result.ancestry(), result.heritage(), result.background(), newLevel,
+                result.keyAbility(), result.abilityScores(), result.proficiencies(), result.lores(),
+                result.hitPoints(), result.speed(), result.armorClass(), result.strikes(), feats,
+                specials, result.currentHp(), false);
+        // Max HP growth includes retroactive HP from a CON boost.
+        return leveled.withCurrentHp(sheet.currentHp()
+                + CharacterMath.maxHp(leveled) - CharacterMath.maxHp(sheet));
     }
 
     private static int hpGain(CharacterSheet s) {

@@ -98,6 +98,22 @@ class LevelUpTest {
     }
 
     @Test
+    void conBoostAddsRetroactiveHp() throws Exception {
+        CharacterSheet base = rebuilt(fighter5(), "Fighter", 9).withAbilityScore(Ability.CON, 16);
+        CharacterSheet full = base.withCurrentHp(CharacterMath.maxHp(base));
+        LevelUpChoices choices = new LevelUpChoices(Optional.empty(),
+                Set.of(Ability.CON, Ability.STR, Ability.DEX, Ability.WIS), List.of("A", "B"));
+        CharacterSheet r = LevelUp.apply(full, registry(), choices);
+        assertEquals(18, r.abilityScores().get(Ability.CON));
+        assertEquals(full.currentHp() + CharacterMath.maxHp(r) - CharacterMath.maxHp(full),
+                r.currentHp());
+        assertEquals(CharacterMath.maxHp(r), r.currentHp());
+        CharacterSheet hurt = base.withCurrentHp(10);
+        assertEquals(10 + CharacterMath.maxHp(LevelUp.apply(hurt, registry(), choices))
+                - CharacterMath.maxHp(hurt), LevelUp.apply(hurt, registry(), choices).currentHp());
+    }
+
+    @Test
     void requiresGrant() throws Exception {
         CharacterSheet s = fighter5().withLevelUpGranted(false);
         assertThrows(InvalidChoiceException.class,

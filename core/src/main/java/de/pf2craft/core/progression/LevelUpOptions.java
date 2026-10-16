@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * What a character gets when advancing to {@code newLevel}. {@code featSlots} lists the slot
- * types in the order the chosen feat names must be supplied.
+Xs in the order the chosen feat names must be supplied.
  */
 public record LevelUpOptions(int newLevel, boolean skillIncrease, int abilityBoosts,
                              List<String> featSlots, List<String> features, int hpGain) {
