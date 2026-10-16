@@ -86,17 +86,18 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
 
 ### Bekannter Stand / offene Risiken
 
-- Der `fabric`-Teil wurde in der Cloud-Umgebung geschrieben, in der
-  `maven.fabricmc.net`, `libraries.minecraft.net` und `piston-meta.mojang.com` gesperrt
-  waren. **Er wurde noch nie kompiliert oder gestartet.** Beim ersten Build mit
-  Compile-Fehlern rechnen, vor allem bei Yarn-Namen und Fabric-API-Signaturen.
-  Diese zuerst beheben.
+- Lokale Entwicklung unter Windows mit Eclipse Temurin JDK 21
+  (`C:\Program Files\Eclipse Adoptium\jdk-21…`). Falls `java` nicht im PATH ist,
+  `JAVA_HOME` auf diesen Ordner setzen.
+- `./gradlew build` läuft ohne Fehler, `runClient` startet. Ingame im Einzelspieler
+  getestet: Würfelfenster, `/roll`, verdeckte Würfe.
+- Noch nicht getestet: Mehrspieler (Sichtbarkeit verdeckter Würfe für Nicht-GMs).
 - `core` ist getestet (23 Tests, alle grün).
 
 ## Fahrplan
 
 1. ✅ **Phase 1:** Regelkern-Grundlagen (Würfel, Erfolgsgrade), Würfelfenster, HUD-Anzeige,
-   GM-Rolle, `/roll`, `/gmroll`. *Noch offen: erster echter Build und Ingame-Test.*
+   GM-Rolle, `/roll`, `/gmroll`. *Noch offen: Test mit mehreren Spielern.*
 2. **Phase 2 – Charaktere:**
    - Charakterbogen als Screen: Attribute, Übungsgrade, TP, RK, Rettungswürfe, Fertigkeiten.
    - Klick auf eine Fertigkeit oder einen Rettungswurf würfelt über den bestehenden `RollService`.
