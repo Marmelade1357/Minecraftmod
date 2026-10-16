@@ -1,0 +1,190 @@
+{
+  "name": "Champion",
+  "hpPerLevel": 10,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "trained",
+        "fortitude": "expert",
+        "reflex": "trained",
+        "will": "expert",
+        "simple": "trained",
+        "martial": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "light": "trained",
+        "medium": "trained",
+        "heavy": "trained",
+        "class_dc": "trained",
+        "religion": "trained"
+      },
+      "features": [
+        "Deity",
+        "Cause",
+        "Devotion Spells",
+        "Shield Block"
+      ],
+      "featSlots": [
+        "Class Feat"
+      ]
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "features": [
+        "Blessing of the Devoted"
+      ],
+      "skillIncrease": true
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "proficiencies": {
+        "simple": "expert",
+        "martial": "expert",
+        "unarmed": "expert"
+      },
+      "features": [
+        "Weapon Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "proficiencies": {
+        "unarmored": "expert",
+        "light": "expert",
+        "medium": "expert",
+        "heavy": "expert"
+      },
+      "features": [
+        "Armor Expertise",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "class_dc": "expert",
+        "reflex": "expert",
+        "fortitude": "master"
+      },
+      "features": [
+        "Champion Expertise",
+        "Reflex Expertise",
+        "Relentless Reaction",
+        "Sacred Body"
+      ],
+      "skillIncrease": true
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "proficiencies": {
+        "will": "master",
+        "perception": "expert"
+      },
+      "features": [
+        "Divine Will",
+        "Exalted Reaction",
+        "Perception Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "12": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "unarmored": "master",
+        "light": "master",
+        "medium": "master",
+        "heavy": "master",
+        "simple": "master",
+        "martial": "master",
+        "unarmed": "master"
+      },
+      "features": [
+        "Armor Mastery",
+        "Weapon Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "features": [
+        "Greater Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "proficiencies": {
+        "class_dc": "master",
+        "unarmored": "legendary",
+        "light": "legendary",
+        "medium": "legendary",
+        "heavy": "legendary"
+      },
+      "features": [
+        "Champion Mastery",
+        "Legendary Armor"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "features": [
+        "Hero's Defiance"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}

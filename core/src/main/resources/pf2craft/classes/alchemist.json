@@ -1,0 +1,178 @@
+{
+  "name": "Alchemist",
+  "hpPerLevel": 8,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "trained",
+        "fortitude": "expert",
+        "reflex": "expert",
+        "will": "trained",
+        "simple": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "light": "trained",
+        "medium": "trained",
+        "class_dc": "trained",
+        "crafting": "trained"
+      },
+      "features": [
+        "Alchemy",
+        "Research Field"
+      ],
+      "featSlots": [
+        "Class Feat"
+      ]
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "skillIncrease": true
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "features": [
+        "Field Discovery",
+        "Powerful Alchemy"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "proficiencies": {
+        "simple": "expert",
+        "unarmed": "expert",
+        "will": "expert"
+      },
+      "features": [
+        "Alchemical Weapon Expertise",
+        "Will Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "class_dc": "expert",
+        "perception": "expert"
+      },
+      "features": [
+        "Alchemical Expertise",
+        "Double Brew",
+        "Perception Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "proficiencies": {
+        "fortitude": "master"
+      },
+      "features": [
+        "Advanced Vials",
+        "Chemical Hardiness"
+      ],
+      "skillIncrease": true
+    },
+    "12": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "light": "expert",
+        "medium": "expert",
+        "unarmored": "expert"
+      },
+      "features": [
+        "Greater Field Discovery",
+        "Medium Armor Expertise",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "proficiencies": {
+        "simple": "master",
+        "unarmed": "master",
+        "reflex": "master"
+      },
+      "features": [
+        "Alchemical Weapon Mastery",
+        "Explosion Dodger"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "proficiencies": {
+        "class_dc": "master"
+      },
+      "features": [
+        "Abundant Vials",
+        "Alchemical Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "proficiencies": {
+        "light": "master",
+        "medium": "master",
+        "unarmored": "master"
+      },
+      "features": [
+        "Medium Armor Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}

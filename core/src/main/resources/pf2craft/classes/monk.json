@@ -1,0 +1,167 @@
+{
+  "name": "Monk",
+  "hpPerLevel": 10,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "trained",
+        "fortitude": "expert",
+        "reflex": "expert",
+        "will": "expert",
+        "simple": "trained",
+        "unarmed": "trained",
+        "unarmored": "expert",
+        "class_dc": "trained"
+      },
+      "features": [
+        "Flurry of Blows",
+        "Powerful Fist"
+      ],
+      "featSlots": [
+        "Class Feat"
+      ]
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "features": [
+        "Incredible Movement",
+        "Mystic Strikes"
+      ],
+      "skillIncrease": true
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "proficiencies": {
+        "perception": "expert",
+        "simple": "expert",
+        "unarmed": "expert"
+      },
+      "features": [
+        "Expert Strikes",
+        "Perception Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "features": [
+        "Incredible Movement",
+        "Path to Perfection",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "class_dc": "expert"
+      },
+      "features": [
+        "Metal Strikes",
+        "Monk Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "features": [
+        "Incredible Movement",
+        "Second Path to Perfection"
+      ],
+      "skillIncrease": true
+    },
+    "12": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "unarmored": "master",
+        "simple": "master",
+        "unarmed": "master"
+      },
+      "features": [
+        "Graceful Mastery",
+        "Master Strikes"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "features": [
+        "Greater Weapon Specialization",
+        "Incredible Movement",
+        "Third Path to Perfection"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "proficiencies": {
+        "class_dc": "master",
+        "unarmored": "legendary"
+      },
+      "features": [
+        "Adamantine Strikes",
+        "Graceful Legend"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "features": [
+        "Incredible Movement",
+        "Perfected Form"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}
