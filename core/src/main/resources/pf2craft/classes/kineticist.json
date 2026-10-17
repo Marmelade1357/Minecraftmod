@@ -1,0 +1,182 @@
+{
+  "name": "Kineticist",
+  "hpPerLevel": 8,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "trained",
+        "fortitude": "expert",
+        "reflex": "expert",
+        "will": "trained",
+        "simple": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "light": "trained",
+        "class_dc": "trained",
+        "nature": "trained"
+      },
+      "features": [
+        "Kinetic Gate",
+        "Kinetic Aura",
+        "Elemental Blast",
+        "Base Kinesis"
+      ],
+      "featSlots": [
+        "Class Feat"
+      ]
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "proficiencies": {
+        "will": "expert"
+      },
+      "features": [
+        "Extract Element",
+        "Will Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "features": [
+        "Gate's Threshold"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "proficiencies": {
+        "fortitude": "master",
+        "class_dc": "expert"
+      },
+      "features": [
+        "Kinetic Durability",
+        "Kinetic Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "perception": "expert"
+      },
+      "features": [
+        "Gate's Threshold",
+        "Perception Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "proficiencies": {
+        "reflex": "master",
+        "simple": "expert",
+        "unarmed": "expert"
+      },
+      "features": [
+        "Kinetic Quickness",
+        "Reflow Elements",
+        "Weapon Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "12": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "unarmored": "expert",
+        "light": "expert"
+      },
+      "features": [
+        "Gate's Threshold",
+        "Light Armor Expertise",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "proficiencies": {
+        "fortitude": "legendary",
+        "class_dc": "master"
+      },
+      "features": [
+        "Greater Kinetic Durability",
+        "Kinetic Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "features": [
+        "Double Reflow",
+        "Gate's Threshold"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "proficiencies": {
+        "class_dc": "legendary",
+        "unarmored": "master",
+        "light": "master"
+      },
+      "features": [
+        "Final Gate",
+        "Kinetic Legend",
+        "Light Armor Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}

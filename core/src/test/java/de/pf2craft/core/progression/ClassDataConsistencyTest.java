@@ -93,6 +93,14 @@ class ClassDataConsistencyTest {
             Map.entry("generated-wizard-16.json:reflex",
                     "Canny Acumen raises a save/Perception by one rank"),
             Map.entry("generated-wizard-18.json:fortitude",
+                    "Canny Acumen raises a save/Perception by one rank"),
+            Map.entry("345816-guardian3.json:reflex",
+                    "Canny Acumen raises a save/Perception by one rank"),
+            Map.entry("generated-inventor-01.json:perception",
+                    "Canny Acumen raises a save/Perception by one rank"),
+            Map.entry("generated-necromancer-03.json:will",
+                    "Canny Acumen raises a save/Perception by one rank"),
+            Map.entry("generated-necromancer-04.json:reflex",
                     "Canny Acumen raises a save/Perception by one rank"));
 
     static List<Path> fixtures() throws Exception {
@@ -127,16 +135,30 @@ class ClassDataConsistencyTest {
         assertTrue(mismatches.isEmpty(), String.join("; ", mismatches));
     }
 
+    /** Every class offered by Pathbuilder (taken from the fixture set). */
+    private static final List<String> PATHBUILDER_CLASSES = List.of(
+            "Alchemist", "Animist", "Barbarian", "Bard", "Champion", "Cleric", "Commander", "Druid", "Exemplar",
+            "Fighter", "Guardian", "Gunslinger", "Inventor", "Investigator", "Kineticist", "Magus", "Monk",
+            "Necromancer", "Oracle", "Psychic", "Ranger", "Rogue", "Runesmith", "Sorcerer", "Summoner",
+            "Swashbuckler", "Thaumaturge", "Witch", "Wizard");
+
     @org.junit.jupiter.api.Test
-    void fixturesActuallyCoverFighters() throws Exception {
-        long n = 0;
+    void allPathbuilderClassesHaveData() {
+        for (String name : PATHBUILDER_CLASSES) {
+            assertTrue(REGISTRY.find(name).isPresent(), "no class data for " + name);
+        }
+    }
+
+    @org.junit.jupiter.api.Test
+    void everyRegisteredClassIsCoveredByAFixture() throws Exception {
+        java.util.Set<String> matched = new java.util.HashSet<>();
         for (Path f : fixtures()) {
             CharacterSheet s = PathbuilderImporter.parse(Files.readString(f, StandardCharsets.UTF_8));
-            if (REGISTRY.find(s.className()).isPresent()) {
-                n++;
-            }
+            REGISTRY.find(s.className()).ifPresent(c -> matched.add(c.name()));
         }
-        System.out.println("Fixtures checked: " + n);
-        assertTrue(n >= 2, "no fighter fixtures matched");
+        for (String name : PATHBUILDER_CLASSES) {
+            assertTrue(matched.contains(REGISTRY.find(name).orElseThrow().name()),
+                    "no fixture matched registry class " + name);
+        }
     }
 }

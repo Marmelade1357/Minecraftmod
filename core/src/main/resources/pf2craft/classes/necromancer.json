@@ -1,0 +1,165 @@
+{
+  "name": "Necromancer",
+  "hpPerLevel": 8,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "trained",
+        "fortitude": "expert",
+        "reflex": "trained",
+        "will": "trained",
+        "simple": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "light": "trained",
+        "class_dc": "trained",
+        "occultism": "trained"
+      },
+      "features": [
+        "Necromancer Spellcasting",
+        "Grave Spells",
+        "Fatal Method",
+        "Grim Fascination",
+        "Mastery of Life and Death",
+        "Undead Lore"
+      ]
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "proficiencies": {
+        "will": "expert"
+      },
+      "features": [
+        "Inevitable Return",
+        "Mental Wards"
+      ],
+      "skillIncrease": true
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "proficiencies": {
+        "reflex": "expert"
+      },
+      "features": [
+        "Reflex Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "proficiencies": {
+        "perception": "expert"
+      },
+      "features": [
+        "Expert Necromancy",
+        "Perception Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "skillIncrease": true
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "proficiencies": {
+        "fortitude": "master",
+        "simple": "expert",
+        "unarmed": "expert"
+      },
+      "features": [
+        "Unnatural Fortitude",
+        "Weapon Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "12": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "unarmored": "expert",
+        "light": "expert"
+      },
+      "features": [
+        "Light Armor Expertise",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "features": [
+        "Master Necromancy"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "proficiencies": {
+        "fortitude": "legendary"
+      },
+      "features": [
+        "Undying Resilience"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "features": [
+        "Epitaph",
+        "Legendary Necromancy"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}

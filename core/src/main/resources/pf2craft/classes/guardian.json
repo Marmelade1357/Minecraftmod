@@ -1,0 +1,189 @@
+{
+  "name": "Guardian",
+  "hpPerLevel": 12,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "trained",
+        "fortitude": "expert",
+        "reflex": "trained",
+        "will": "expert",
+        "simple": "trained",
+        "martial": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "light": "trained",
+        "medium": "trained",
+        "heavy": "trained",
+        "class_dc": "trained",
+        "athletics": "trained"
+      },
+      "features": [
+        "Guardian's Armor",
+        "Shield Block",
+        "Taunt",
+        "Guardian's Techniques"
+      ],
+      "featSlots": [
+        "Class Feat"
+      ]
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "features": [
+        "Tough to Kill"
+      ],
+      "skillIncrease": true
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "proficiencies": {
+        "simple": "expert",
+        "martial": "expert",
+        "unarmed": "expert",
+        "medium": "expert",
+        "heavy": "expert"
+      },
+      "features": [
+        "Unbreakable Expertise",
+        "Weapon Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "proficiencies": {
+        "perception": "expert",
+        "reflex": "expert"
+      },
+      "features": [
+        "Reaction Time",
+        "Reflex Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "fortitude": "master",
+        "class_dc": "expert"
+      },
+      "features": [
+        "Battle Hardened",
+        "Guardian Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "proficiencies": {
+        "medium": "master",
+        "heavy": "master",
+        "unarmored": "expert",
+        "light": "expert"
+      },
+      "features": [
+        "Unbreakable Mastery",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "12": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "simple": "master",
+        "martial": "master",
+        "unarmed": "master"
+      },
+      "features": [
+        "Weapon Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "proficiencies": {
+        "medium": "legendary",
+        "heavy": "legendary",
+        "unarmored": "master",
+        "light": "master"
+      },
+      "features": [
+        "Unbreakable Legend"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "proficiencies": {
+        "will": "master"
+      },
+      "features": [
+        "Greater Weapon Specialization",
+        "Unyielding Resolve"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "proficiencies": {
+        "class_dc": "master"
+      },
+      "features": [
+        "Guardian Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}

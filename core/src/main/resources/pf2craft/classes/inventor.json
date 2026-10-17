@@ -1,0 +1,197 @@
+{
+  "name": "Inventor",
+  "hpPerLevel": 8,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "trained",
+        "fortitude": "expert",
+        "reflex": "trained",
+        "will": "expert",
+        "simple": "trained",
+        "martial": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "light": "trained",
+        "medium": "trained",
+        "class_dc": "trained",
+        "crafting": "trained"
+      },
+      "features": [
+        "Overdrive",
+        "Innovation",
+        "Explode",
+        "Peerless Inventor",
+        "Shield Block"
+      ],
+      "featSlots": [
+        "Class Feat"
+      ]
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "proficiencies": {
+        "crafting": "expert"
+      },
+      "features": [
+        "Expert Overdrive",
+        "Reconfigure"
+      ],
+      "skillIncrease": true
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "proficiencies": {
+        "simple": "expert",
+        "martial": "expert",
+        "unarmed": "expert"
+      },
+      "features": [
+        "Inventor Weapon Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "proficiencies": {
+        "reflex": "expert",
+        "crafting": "master"
+      },
+      "features": [
+        "Breakthrough Innovation",
+        "Reflex Expertise",
+        "Master Overdrive",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "class_dc": "expert"
+      },
+      "features": [
+        "Inventive Expertise",
+        "Offensive Boost"
+      ],
+      "skillIncrease": true
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "proficiencies": {
+        "will": "master",
+        "unarmored": "expert",
+        "light": "expert",
+        "medium": "expert"
+      },
+      "features": [
+        "Medium Armor Expertise",
+        "Resolve"
+      ],
+      "skillIncrease": true
+    },
+    "12": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "perception": "expert",
+        "simple": "master",
+        "martial": "master",
+        "unarmed": "master"
+      },
+      "features": [
+        "Alertness",
+        "Complete Reconfiguration",
+        "Inventor Weapon Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "proficiencies": {
+        "crafting": "legendary"
+      },
+      "features": [
+        "Greater Weapon Specialization",
+        "Legendary Overdrive",
+        "Revolutionary Innovation"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "proficiencies": {
+        "fortitude": "master",
+        "class_dc": "master"
+      },
+      "features": [
+        "Inventive Mastery",
+        "Juggernaut"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "proficiencies": {
+        "unarmored": "master",
+        "light": "master",
+        "medium": "master"
+      },
+      "features": [
+        "Infinite Invention",
+        "Medium Armor Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "name": "Exemplar",
+  "hpPerLevel": 10,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "trained",
+        "fortitude": "expert",
+        "reflex": "trained",
+        "will": "expert",
+        "simple": "trained",
+        "martial": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "light": "trained",
+        "medium": "trained",
+        "class_dc": "trained",
+        "religion": "trained"
+      },
+      "features": [
+        "Divine Spark",
+        "Ikons",
+        "Humble Strikes",
+        "Shield Block"
+      ],
+      "featSlots": [
+        "Class Feat"
+      ]
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "features": [
+        "Root Epithet"
+      ],
+      "skillIncrease": true
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "proficiencies": {
+        "simple": "expert",
+        "martial": "expert",
+        "unarmed": "expert"
+      },
+      "features": [
+        "Weapon Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "proficiencies": {
+        "will": "master"
+      },
+      "features": [
+        "Dominion Epithet",
+        "Spirit Striking",
+        "Unassailable Soul"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "perception": "expert",
+        "reflex": "expert",
+        "class_dc": "expert"
+      },
+      "features": [
+        "Divine Premonition",
+        "Godly Expertise",
+        "Perception Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "skillIncrease": true
+    },
+    "12": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "will": "legendary",
+        "simple": "master",
+        "martial": "master",
+        "unarmed": "master",
+        "unarmored": "expert",
+        "light": "expert",
+        "medium": "expert"
+      },
+      "features": [
+        "Burnished Armor Expertise",
+        "Divine Weapon Mastery",
+        "Greater Unassailable Soul"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "proficiencies": {
+        "fortitude": "master"
+      },
+      "features": [
+        "Greater Spirit Striking",
+        "Mortality Reforged",
+        "Sovereignty Epithet"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "proficiencies": {
+        "perception": "master",
+        "class_dc": "master"
+      },
+      "features": [
+        "Deific Mastery",
+        "Perception Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "proficiencies": {
+        "unarmored": "master",
+        "light": "master",
+        "medium": "master"
+      },
+      "features": [
+        "Burnished Armor Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}
