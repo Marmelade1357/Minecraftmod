@@ -127,5 +127,15 @@
   "pf2craft.skill.society": "Gesellschaft",
   "pf2craft.skill.stealth": "Heimlichkeit",
   "pf2craft.skill.survival": "Überleben",
-  "pf2craft.skill.thievery": "Diebeskunst"
+  "pf2craft.skill.thievery": "Diebeskunst",
+  "pf2craft.items.dice": "%sW%s",
+  "pf2craft.items.damage": "%s %s",
+  "pf2craft.damage.b": "Wucht",
+  "pf2craft.damage.p": "Stich",
+  "pf2craft.damage.s": "Hieb",
+  "pf2craft.items.traits": "Merkmale: %s",
+  "pf2craft.items.runes": "Runen: %s",
+  "pf2craft.items.owner": "Besitzer: %s",
+  "pf2craft.items.dropped": "Dein Inventar ist voll: %s liegt zu deinen Füßen.",
+  "pf2craft.items.shield": "RK +%s, Härte %s, TP %s"
 }

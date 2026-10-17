@@ -127,5 +127,15 @@
   "pf2craft.skill.society": "Society",
   "pf2craft.skill.stealth": "Stealth",
   "pf2craft.skill.survival": "Survival",
-  "pf2craft.skill.thievery": "Thievery"
+  "pf2craft.skill.thievery": "Thievery",
+  "pf2craft.items.dice": "%sd%s",
+  "pf2craft.items.damage": "%s %s",
+  "pf2craft.damage.b": "bludgeoning",
+  "pf2craft.damage.p": "piercing",
+  "pf2craft.damage.s": "slashing",
+  "pf2craft.items.traits": "Traits: %s",
+  "pf2craft.items.runes": "Runes: %s",
+  "pf2craft.items.owner": "Owner: %s",
+  "pf2craft.items.dropped": "Your inventory is full: %s was dropped at your feet.",
+  "pf2craft.items.shield": "AC +%s, Hardness %s, HP %s"
 }

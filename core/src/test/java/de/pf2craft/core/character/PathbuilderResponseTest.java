@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.pf2craft.core.item.TestCatalog;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -33,5 +34,14 @@ class PathbuilderResponseTest {
         String body = Files.readString(Paths.get(getClass().getResource("/pathbuilder/422753-fighter5.json").toURI()),
                 StandardCharsets.UTF_8);
         assertEquals("August [Kholo, F]", PathbuilderResponse.toSheet(200, body).name());
+    }
+
+    @Test
+    void fixtureParsesWithCatalog() throws Exception {
+        String body = Files.readString(Paths.get(getClass().getResource("/pathbuilder/422753-fighter5.json").toURI()),
+                StandardCharsets.UTF_8);
+        CharacterSheet sheet = PathbuilderResponse.toSheet(200, body, TestCatalog.shipped());
+        assertEquals("Lion Scythe", sheet.strikes().get(0).name());
+        assertEquals("d6", sheet.strikes().get(0).damageDie());
     }
 }

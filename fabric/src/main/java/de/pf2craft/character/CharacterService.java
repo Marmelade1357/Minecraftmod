@@ -5,6 +5,7 @@ import de.pf2craft.Pf2Craft;
 import de.pf2craft.core.character.CharacterImportException;
 import de.pf2craft.core.character.CharacterSheet;
 import de.pf2craft.core.character.PathbuilderId;
+import de.pf2craft.item.CharacterItems;
 import de.pf2craft.network.OpenImportPayload;
 import java.util.Optional;
 import java.util.Set;
@@ -74,6 +75,7 @@ public final class CharacterService {
     private static void complete(MinecraftServer server, ServerPlayerEntity player, CharacterSheet sheet) {
         boolean hadCharacter = CharacterStore.get(player).isPresent();
         CharacterStore.set(player, sheet);
+        CharacterItems.replace(player, sheet);
         if (!hadCharacter && !GmRoles.isGm(player)) {
             player.changeGameMode(GameMode.SURVIVAL);
         }
@@ -95,6 +97,7 @@ public final class CharacterService {
     /** Removes the character and sends the player back to spectator mode. */
     public static void reset(ServerPlayerEntity target) {
         CharacterStore.remove(target);
+        CharacterItems.remove(target);
         SheetService.forget(target.getUuid());
         if (!GmRoles.isGm(target)) {
             target.changeGameMode(GameMode.SPECTATOR);

@@ -5,6 +5,8 @@ import de.pf2craft.character.CharacterStore;
 import de.pf2craft.character.ClassData;
 import de.pf2craft.character.SheetService;
 import de.pf2craft.command.Pf2Commands;
+import de.pf2craft.item.ItemData;
+import de.pf2craft.item.Pf2Components;
 import de.pf2craft.network.Pf2Networking;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -24,8 +26,10 @@ public class Pf2Craft implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        Pf2Components.register();
         CharacterStore.register();
         ServerLifecycleEvents.SERVER_STARTING.register(ClassData::load);
+        ServerLifecycleEvents.SERVER_STARTING.register(ItemData::load);
         ServerPlayConnectionEvents.JOIN.register(
                 (handler, sender, server) -> CharacterService.onJoin(handler.player));
         ServerPlayConnectionEvents.DISCONNECT.register(
