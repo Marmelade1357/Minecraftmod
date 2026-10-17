@@ -1,0 +1,174 @@
+{
+  "name": "Magus",
+  "hpPerLevel": 8,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "trained",
+        "fortitude": "expert",
+        "reflex": "trained",
+        "will": "expert",
+        "simple": "trained",
+        "martial": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "light": "trained",
+        "medium": "trained",
+        "class_dc": "trained",
+        "arcana": "trained"
+      },
+      "features": [
+        "Magus Spellcasting",
+        "Spellstrike",
+        "Arcane Cascade",
+        "Hybrid Study",
+        "Conflux Spells"
+      ]
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "skillIncrease": true
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "proficiencies": {
+        "reflex": "expert",
+        "simple": "expert",
+        "martial": "expert",
+        "unarmed": "expert"
+      },
+      "features": [
+        "Reflex Expertise",
+        "Weapon Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "features": [
+        "Studious Spells",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "perception": "expert",
+        "will": "master"
+      },
+      "features": [
+        "Expert Spellcaster",
+        "Perception Expertise",
+        "Twofold Will"
+      ],
+      "skillIncrease": true
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "proficiencies": {
+        "light": "expert",
+        "medium": "expert",
+        "unarmored": "expert"
+      },
+      "features": [
+        "Medium Armor Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "12": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "simple": "master",
+        "martial": "master",
+        "unarmed": "master"
+      },
+      "features": [
+        "Weapon Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "proficiencies": {
+        "fortitude": "master"
+      },
+      "features": [
+        "Greater Weapon Specialization",
+        "Spell-Tempered Body"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "proficiencies": {
+        "light": "master",
+        "medium": "master",
+        "unarmored": "master"
+      },
+      "features": [
+        "Master Spellcaster",
+        "Medium Armor Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "features": [
+        "Double Spellstrike"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}

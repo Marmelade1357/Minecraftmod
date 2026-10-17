@@ -1,0 +1,194 @@
+{
+  "name": "Swashbuckler",
+  "hpPerLevel": 10,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "expert",
+        "fortitude": "trained",
+        "reflex": "expert",
+        "will": "expert",
+        "simple": "trained",
+        "martial": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "light": "trained",
+        "class_dc": "trained",
+        "acrobatics": "trained"
+      },
+      "features": [
+        "Panache",
+        "Precise Strike",
+        "Stylish Combatant",
+        "Swashbuckler's Style",
+        "Confident Finisher"
+      ],
+      "featSlots": [
+        "Class Feat"
+      ]
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "proficiencies": {
+        "fortitude": "expert"
+      },
+      "features": [
+        "Fortitude Expertise",
+        "Opportune Riposte",
+        "Stylish Tricks",
+        "Vivacious Speed"
+      ],
+      "skillIncrease": true
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "proficiencies": {
+        "simple": "expert",
+        "martial": "expert",
+        "unarmed": "expert"
+      },
+      "features": [
+        "Weapon Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "proficiencies": {
+        "reflex": "master"
+      },
+      "features": [
+        "Confident Evasion",
+        "Stylish Tricks",
+        "Vivacious Speed",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "class_dc": "expert"
+      },
+      "features": [
+        "Exemplary Finisher",
+        "Swashbuckler Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "proficiencies": {
+        "perception": "master"
+      },
+      "features": [
+        "Continuous Flair",
+        "Perception Mastery",
+        "Vivacious Speed"
+      ],
+      "skillIncrease": true
+    },
+    "12": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "reflex": "legendary",
+        "light": "expert",
+        "unarmored": "expert",
+        "simple": "master",
+        "martial": "master",
+        "unarmed": "master"
+      },
+      "features": [
+        "Assured Evasion",
+        "Light Armor Expertise",
+        "Weapon Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "features": [
+        "Greater Weapon Specialization",
+        "Keen Flair",
+        "Stylish Tricks",
+        "Vivacious Speed"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "proficiencies": {
+        "will": "master"
+      },
+      "features": [
+        "Reinforced Ego"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "proficiencies": {
+        "light": "master",
+        "unarmored": "master",
+        "class_dc": "master"
+      },
+      "features": [
+        "Eternal Confidence",
+        "Light Armor Mastery",
+        "Vivacious Speed"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}

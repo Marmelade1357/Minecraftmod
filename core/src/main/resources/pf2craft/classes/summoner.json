@@ -1,0 +1,166 @@
+{
+  "name": "Summoner",
+  "hpPerLevel": 10,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "trained",
+        "fortitude": "expert",
+        "reflex": "trained",
+        "will": "expert",
+        "simple": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "class_dc": "trained"
+      },
+      "features": [
+        "Eidolon",
+        "Summoner Spellcasting",
+        "Spell Repertoire",
+        "Link Spells",
+        "Evolution Feat"
+      ]
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "proficiencies": {
+        "perception": "expert"
+      },
+      "features": [
+        "Shared Vigilance",
+        "Signature Spells"
+      ],
+      "skillIncrease": true
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "features": [
+        "Eidolon Unarmed Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "features": [
+        "Eidolon Symbiosis",
+        "Eidolon Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "reflex": "expert"
+      },
+      "features": [
+        "Expert Spellcaster",
+        "Shared Reflexes"
+      ],
+      "skillIncrease": true
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "proficiencies": {
+        "fortitude": "master",
+        "simple": "expert",
+        "unarmed": "expert"
+      },
+      "features": [
+        "Eidolon Defensive Expertise",
+        "Simple Weapon Expertise",
+        "Twin Juggernauts"
+      ],
+      "skillIncrease": true
+    },
+    "12": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "unarmored": "expert"
+      },
+      "features": [
+        "Defensive Robes",
+        "Eidolon Unarmed Mastery",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "proficiencies": {
+        "will": "master"
+      },
+      "features": [
+        "Greater Eidolon Specialization",
+        "Shared Resolve"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "features": [
+        "Eidolon Transcendence",
+        "Master Spellcaster"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "features": [
+        "Eidolon Defensive Mastery",
+        "Instant Manifestation"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}

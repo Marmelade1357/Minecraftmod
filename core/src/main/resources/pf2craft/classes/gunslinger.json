@@ -1,0 +1,184 @@
+{
+  "name": "Gunslinger",
+  "hpPerLevel": 8,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "expert",
+        "fortitude": "expert",
+        "reflex": "expert",
+        "will": "trained",
+        "simple": "trained",
+        "martial": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "light": "trained",
+        "medium": "trained",
+        "class_dc": "trained"
+      },
+      "features": [
+        "Gunslinger's Way",
+        "Initial Deed",
+        "Slinger's Precision"
+      ],
+      "featSlots": [
+        "Class Feat"
+      ]
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "proficiencies": {
+        "will": "expert"
+      },
+      "features": [
+        "Stubborn"
+      ],
+      "skillIncrease": true
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "proficiencies": {
+        "simple": "expert",
+        "martial": "expert",
+        "unarmed": "expert"
+      },
+      "features": [
+        "Gunslinger Weapon Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "proficiencies": {
+        "perception": "master"
+      },
+      "features": [
+        "Perception Mastery",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "class_dc": "expert"
+      },
+      "features": [
+        "Advanced Deed",
+        "Gunslinger Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "proficiencies": {
+        "reflex": "master"
+      },
+      "features": [
+        "Blast Dodger"
+      ],
+      "skillIncrease": true
+    },
+    "12": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "light": "expert",
+        "medium": "expert",
+        "unarmored": "expert",
+        "simple": "master",
+        "martial": "master",
+        "unarmed": "master"
+      },
+      "features": [
+        "Gunslinging Legend",
+        "Medium Armor Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "features": [
+        "Greater Deed",
+        "Greater Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "proficiencies": {
+        "fortitude": "master",
+        "class_dc": "master"
+      },
+      "features": [
+        "Lead Constitution",
+        "Shootist's Edge"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "proficiencies": {
+        "light": "master",
+        "medium": "master",
+        "unarmored": "master",
+        "perception": "legendary"
+      },
+      "features": [
+        "Medium Armor Mastery",
+        "Perception Legend"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}

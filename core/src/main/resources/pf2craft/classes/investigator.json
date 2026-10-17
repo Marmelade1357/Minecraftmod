@@ -1,0 +1,204 @@
+{
+  "name": "Investigator",
+  "hpPerLevel": 8,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "expert",
+        "fortitude": "trained",
+        "reflex": "expert",
+        "will": "expert",
+        "simple": "trained",
+        "martial": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "light": "trained",
+        "class_dc": "trained",
+        "society": "trained"
+      },
+      "features": [
+        "On the Case",
+        "Devise a Stratagem",
+        "Methodology",
+        "Strategic Strike"
+      ],
+      "featSlots": [
+        "Class Feat"
+      ]
+    },
+    "2": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "features": [
+        "Keen Recollection",
+        "Skillful Lesson"
+      ],
+      "skillIncrease": true
+    },
+    "4": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "proficiencies": {
+        "simple": "expert",
+        "martial": "expert",
+        "unarmed": "expert"
+      },
+      "features": [
+        "Skillful Lesson",
+        "Weapon Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "proficiencies": {
+        "perception": "master"
+      },
+      "features": [
+        "Vigilant Senses",
+        "Skillful Lesson",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "fortitude": "expert",
+        "class_dc": "expert"
+      },
+      "features": [
+        "Fortitude Expertise",
+        "Investigator Expertise",
+        "Skillful Lesson"
+      ],
+      "skillIncrease": true
+    },
+    "10": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "proficiencies": {
+        "will": "master"
+      },
+      "features": [
+        "Deductive Improvisation",
+        "Dogged Will",
+        "Skillful Lesson"
+      ],
+      "skillIncrease": true
+    },
+    "12": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "perception": "legendary",
+        "light": "expert",
+        "unarmored": "expert",
+        "simple": "master",
+        "martial": "master",
+        "unarmed": "master"
+      },
+      "features": [
+        "Incredible Senses",
+        "Light Armor Expertise",
+        "Skillful Lesson",
+        "Weapon Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "proficiencies": {
+        "reflex": "master"
+      },
+      "features": [
+        "Greater Weapon Specialization",
+        "Savvy Reflexes",
+        "Skillful Lesson"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "proficiencies": {
+        "will": "legendary"
+      },
+      "features": [
+        "Greater Dogged Will",
+        "Skillful Lesson"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "proficiencies": {
+        "light": "master",
+        "unarmored": "master",
+        "class_dc": "master"
+      },
+      "features": [
+        "Light Armor Mastery",
+        "Master Detective",
+        "Skillful Lesson"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "skillIncrease": true,
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}

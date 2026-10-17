@@ -1,0 +1,195 @@
+{
+  "name": "Thaumaturge",
+  "hpPerLevel": 8,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "expert",
+        "fortitude": "expert",
+        "reflex": "trained",
+        "will": "expert",
+        "simple": "trained",
+        "martial": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "light": "trained",
+        "medium": "trained",
+        "class_dc": "trained",
+        "arcana": "trained",
+        "nature": "trained",
+        "occultism": "trained",
+        "religion": "trained"
+      },
+      "features": [
+        "Esoteric Lore",
+        "First Implement and Esoterica",
+        "Implement's Empowerment"
+      ],
+      "featSlots": [
+        "Class Feat"
+      ]
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "proficiencies": {
+        "reflex": "expert"
+      },
+      "features": [
+        "Reflex Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "proficiencies": {
+        "simple": "expert",
+        "martial": "expert",
+        "unarmed": "expert"
+      },
+      "features": [
+        "Second Implement",
+        "Weapon Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "proficiencies": {
+        "will": "master"
+      },
+      "features": [
+        "Disciplined Mind",
+        "Implement Adept",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "perception": "master",
+        "class_dc": "expert"
+      },
+      "features": [
+        "Intensify Vulnerability",
+        "Perception Expertise",
+        "Thaumaturgic Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "proficiencies": {
+        "light": "expert",
+        "medium": "expert",
+        "unarmored": "expert"
+      },
+      "features": [
+        "Medium Armor Expertise",
+        "Second Adept"
+      ],
+      "skillIncrease": true
+    },
+    "12": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "will": "legendary",
+        "simple": "master",
+        "martial": "master",
+        "unarmed": "master"
+      },
+      "features": [
+        "Perfected Mind",
+        "Weapon Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "proficiencies": {
+        "fortitude": "master"
+      },
+      "features": [
+        "Earned Resilience",
+        "Greater Weapon Specialization",
+        "Third Implement"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "proficiencies": {
+        "class_dc": "master"
+      },
+      "features": [
+        "Implement Paragon",
+        "Thaumaturgic Mastery"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "proficiencies": {
+        "light": "master",
+        "medium": "master",
+        "unarmored": "master"
+      },
+      "features": [
+        "Medium Armor Mastery",
+        "Unlimited Esoterica"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}

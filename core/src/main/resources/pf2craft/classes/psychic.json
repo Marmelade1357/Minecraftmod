@@ -1,0 +1,164 @@
+{
+  "name": "Psychic",
+  "hpPerLevel": 6,
+  "levels": {
+    "1": {
+      "proficiencies": {
+        "perception": "trained",
+        "fortitude": "trained",
+        "reflex": "trained",
+        "will": "expert",
+        "simple": "trained",
+        "unarmed": "trained",
+        "unarmored": "trained",
+        "class_dc": "trained",
+        "occultism": "trained"
+      },
+      "features": [
+        "Psychic Spellcasting",
+        "Spell Repertoire",
+        "Psi Cantrips",
+        "Unleash Psyche",
+        "Subconscious Mind",
+        "Conscious Mind"
+      ]
+    },
+    "2": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "3": {
+      "features": [
+        "Signature Spells"
+      ],
+      "skillIncrease": true
+    },
+    "4": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "5": {
+      "proficiencies": {
+        "reflex": "expert"
+      },
+      "features": [
+        "Clarity of Focus",
+        "Precognitive Reflexes"
+      ],
+      "skillIncrease": true
+    },
+    "6": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "7": {
+      "features": [
+        "Expert Spellcaster"
+      ],
+      "skillIncrease": true
+    },
+    "8": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "9": {
+      "proficiencies": {
+        "fortitude": "expert"
+      },
+      "features": [
+        "Fortitude Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "10": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "11": {
+      "proficiencies": {
+        "perception": "expert",
+        "will": "master",
+        "simple": "expert",
+        "unarmed": "expert"
+      },
+      "features": [
+        "Extrasensory Perception",
+        "Walls of Will",
+        "Weapon Expertise"
+      ],
+      "skillIncrease": true
+    },
+    "12": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "13": {
+      "proficiencies": {
+        "unarmored": "expert"
+      },
+      "features": [
+        "Personal Barrier",
+        "Weapon Specialization"
+      ],
+      "skillIncrease": true
+    },
+    "14": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "15": {
+      "features": [
+        "Master Spellcaster"
+      ],
+      "skillIncrease": true
+    },
+    "16": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "17": {
+      "proficiencies": {
+        "will": "legendary"
+      },
+      "features": [
+        "Fortress of Will"
+      ],
+      "skillIncrease": true
+    },
+    "18": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    },
+    "19": {
+      "features": [
+        "Infinite Mind",
+        "Legendary Spellcaster"
+      ],
+      "skillIncrease": true
+    },
+    "20": {
+      "featSlots": [
+        "Class Feat",
+        "Skill Feat"
+      ]
+    }
+  }
+}
