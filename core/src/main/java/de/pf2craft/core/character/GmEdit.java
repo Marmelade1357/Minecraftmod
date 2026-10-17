@@ -32,7 +32,9 @@ public final class GmEdit {
             if (value < 1 || value > 30) {
                 throw new InvalidChoiceException("Ability score must be between 1 and 30.");
             }
-            return sheet.withAbilityScore(ability, value);
+            CharacterSheet changed = sheet.withAbilityScore(ability, value);
+            // A lower CON can shrink max HP; keep current HP within it.
+            return changed.withCurrentHp(Math.min(changed.currentHp(), CharacterMath.maxHp(changed)));
         }
         if (field.startsWith("rank:")) {
             String key = field.substring("rank:".length());

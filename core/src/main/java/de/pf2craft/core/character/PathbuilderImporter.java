@@ -146,7 +146,7 @@ public final class PathbuilderImporter {
             JsonObject total = b.getAsJsonObject("acTotal");
             itemBonus = intOf(total, "acItemBonus", 0);
             int abilityBonus = intOf(total, "acAbilityBonus", dexMod);
-            if (abilityBonus < dexMod) {
+            if (!category.equals("unarmored")) {
                 dexCap = OptionalInt.of(abilityBonus);
             }
         }
@@ -161,21 +161,33 @@ public final class PathbuilderImporter {
         int attack = intOf(w, "attack", 0);
         int str = Ability.modifier(scores.get(Ability.STR));
         int dex = Ability.modifier(scores.get(Ability.DEX));
+        int strOther = attack - str - rankBonus;
+        int dexOther = attack - dex - rankBonus;
         Ability ability;
         int other;
-        if (fits(attack - str - rankBonus)) {
+        if (fits(strOther) && fits(dexOther)) {
+            // Both fit: the smaller remainder means the higher modifier explains the bonus.
+            ability = dexOther < strOther ? Ability.DEX : Ability.STR;
+        } else if (fits(strOther)) {
             ability = Ability.STR;
-            other = attack - str - rankBonus;
-        } else if (fits(attack - dex - rankBonus)) {
+        } else if (fits(dexOther)) {
             ability = Ability.DEX;
-            other = attack - dex - rankBonus;
         } else {
             ability = str >= dex ? Ability.STR : Ability.DEX;
-            other = attack - (ability == Ability.STR ? str : dex) - rankBonus;
         }
+        other = ability == Ability.STR ? strOther : dexOther;
         int otherDamage = intOf(w, "damageBonus", 0) - (ability == Ability.STR ? str : 0);
         return new Strike(str(w, "name", "Strike"), category, str(w, "die", "d4"),
-                str(w, "damageType", ""), ability, other, otherDamage);
+                str(w, "damageType", ""), damageDice(str(w, "str", "")), ability, other, otherDamage);
+    }
+
+    private static int damageDice(String striking) {
+        return switch (striking) {
+            case "striking" -> 2;
+            case "greaterStriking" -> 3;
+            case "majorStriking" -> 4;
+            default -> 1;
+        };
     }
 
     private static boolean fits(int other) {

@@ -25,6 +25,13 @@ class GmEditTest {
     }
 
     @Test
+    void loweringConClampsCurrentHp() throws Exception {
+        CharacterSheet lowered = GmEdit.apply(s, "ability:con", 8);
+        assertEquals(CharacterMath.maxHp(lowered), lowered.currentHp());
+        assertEquals(true, lowered.currentHp() < 75);
+    }
+
+    @Test
     void rank() throws Exception {
         assertEquals(Rank.MASTER, GmEdit.apply(s, "rank:athletics", 3).rank("athletics"));
         assertThrows(InvalidChoiceException.class, () -> GmEdit.apply(s, "rank:flying", 1));

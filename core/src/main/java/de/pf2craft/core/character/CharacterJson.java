@@ -69,6 +69,7 @@ public final class CharacterJson {
             so.addProperty("category", st.category());
             so.addProperty("damageDie", st.damageDie());
             so.addProperty("damageType", st.damageType());
+            so.addProperty("damageDice", st.damageDice());
             so.addProperty("attackAbility", st.attackAbility().name());
             so.addProperty("otherAttackBonus", st.otherAttackBonus());
             so.addProperty("otherDamageBonus", st.otherDamageBonus());
@@ -127,7 +128,9 @@ public final class CharacterJson {
             for (JsonElement el : arr(o, "strikes")) {
                 JsonObject st = el.getAsJsonObject();
                 strikes.add(new Strike(str(st, "name"), str(st, "category"), str(st, "damageDie"),
-                        str(st, "damageType"), Ability.valueOf(str(st, "attackAbility")),
+                        str(st, "damageType"),
+                        st.has("damageDice") ? Math.max(1, Math.min(4, st.get("damageDice").getAsInt())) : 1,
+                        Ability.valueOf(str(st, "attackAbility")),
                         num(st, "otherAttackBonus"), num(st, "otherDamageBonus")));
             }
             List<Feat> feats = new ArrayList<>();

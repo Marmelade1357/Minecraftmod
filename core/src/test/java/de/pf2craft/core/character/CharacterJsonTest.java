@@ -13,6 +13,16 @@ class CharacterJsonTest {
     }
 
     @Test
+    void damageDiceRoundTripsAndDefaultsToOne() throws Exception {
+        String json = java.nio.file.Files.readString(java.nio.file.Paths.get(
+                getClass().getResource("/pathbuilder/315329-magus9.json").toURI()));
+        CharacterSheet magus = PathbuilderImporter.parse(json);
+        assertEquals(magus, CharacterJson.read(CharacterJson.write(magus)));
+        String legacy = CharacterJson.write(Fixtures.fighter5()).replace("\"damageDice\":1,", "");
+        assertEquals(1, CharacterJson.read(legacy).strikes().get(0).damageDice());
+    }
+
+    @Test
     void invalidInputThrows() {
         assertThrows(CharacterImportException.class, () -> CharacterJson.read("{}"));
         assertThrows(CharacterImportException.class, () -> CharacterJson.read("not json"));

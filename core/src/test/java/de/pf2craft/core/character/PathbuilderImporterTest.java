@@ -102,6 +102,32 @@ class PathbuilderImporterTest {
         }
     }
 
+    private static CharacterSheet fixture(String name) throws Exception {
+        Path p = Paths.get(PathbuilderImporterTest.class.getResource("/pathbuilder/" + name).toURI());
+        return PathbuilderImporter.parse(read(p));
+    }
+
+    @Test
+    void strikingRuneRaisesDamageDice() throws Exception {
+        CharacterSheet s = fixture("315329-magus9.json");
+        Strike rapier = s.strikes().stream().filter(st -> st.name().contains("Rapier")).findFirst().orElseThrow();
+        assertEquals(2, rapier.damageDice());
+        assertEquals(1, fixture("422753-fighter5.json").strikes().get(0).damageDice());
+    }
+
+    @Test
+    void dexterityWeaponDetectsDexterity() throws Exception {
+        CharacterSheet s = fixture("314710-gunslinger1.json");
+        Strike pistol = s.strikes().stream().filter(st -> st.name().contains("Coat Pistol")).findFirst().orElseThrow();
+        assertEquals(Ability.DEX, pistol.attackAbility());
+    }
+
+    @Test
+    void armorWithoutDexBonusStoresCap() throws Exception {
+        CharacterSheet s = fixture("422753-fighter5.json");
+        assertEquals(java.util.OptionalInt.of(0), s.armorClass().dexCap());
+    }
+
     @Test
     void otherAttackBonusIsPlausible() throws Exception {
         int total = 0;
