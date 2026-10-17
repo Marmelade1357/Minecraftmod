@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import de.pf2craft.core.item.TestCatalog;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -58,6 +59,51 @@ class PathbuilderImporterTest {
         assertEquals(Rank.TRAINED, s.lores().get(farming).rank());
         assertEquals(75, s.currentHp());
         assertFalse(s.levelUpGranted());
+    }
+
+    private static String fixtureJson(String name) throws Exception {
+        return read(Paths.get(PathbuilderImporterTest.class.getResource("/pathbuilder/" + name).toURI()));
+    }
+
+    @Test
+    void magusRapierGetsCatalogFacts() throws Exception {
+        CharacterSheet s = PathbuilderImporter.parse(fixtureJson("315329-magus9.json"), TestCatalog.shipped());
+        Strike st = s.strikes().get(0);
+        assertEquals("sword", st.group());
+        assertTrue(st.traits().containsAll(List.of("deadly-d8", "disarm", "finesse")));
+        assertEquals(1, st.potency());
+        assertEquals(2, st.damageDice());
+    }
+
+    @Test
+    void unknownWeaponStillProducesStrike() throws Exception {
+        CharacterSheet s = PathbuilderImporter.parse(fixtureJson("422753-fighter5.json"), TestCatalog.shipped());
+        Strike st = s.strikes().get(0);
+        assertEquals("d6", st.damageDie());
+        assertEquals("S", st.damageType());
+        assertEquals("", st.group());
+        assertTrue(st.traits().isEmpty());
+    }
+
+    @Test
+    void shieldIsParsed() throws Exception {
+        // jack-necromancer9 wears a Steel Shield
+        CharacterSheet s = PathbuilderImporter.parse(fixtureJson("jack-necromancer9.json"), TestCatalog.shipped());
+        assertTrue(s.shield().isPresent());
+        assertEquals(5, s.shield().get().hardness());
+    }
+
+    @Test
+    void shieldFirstDoesNotBecomeArmorCategory() throws Exception {
+        JsonObject root = JsonParser.parseString(fixtureJson("422753-fighter5.json")).getAsJsonObject();
+        JsonArray armor = root.getAsJsonObject("build").getAsJsonArray("armor");
+        JsonArray changed = new JsonArray();
+        changed.add(JsonParser.parseString("{\"name\":\"Steel Shield\",\"prof\":\"shield\",\"worn\":true}"));
+        changed.addAll(armor);
+        root.getAsJsonObject("build").add("armor", changed);
+        CharacterSheet s = PathbuilderImporter.parse(root.toString(), TestCatalog.shipped());
+        assertEquals("heavy", s.armorClass().armorCategory());
+        assertEquals(23, CharacterMath.armorClass(s));
     }
 
     @ParameterizedTest(name = "{0}")

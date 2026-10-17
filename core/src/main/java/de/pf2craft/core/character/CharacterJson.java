@@ -10,6 +10,7 @@ import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.TreeMap;
 
@@ -73,6 +74,14 @@ public final class CharacterJson {
             so.addProperty("attackAbility", st.attackAbility().name());
             so.addProperty("otherAttackBonus", st.otherAttackBonus());
             so.addProperty("otherDamageBonus", st.otherDamageBonus());
+            so.addProperty("group", st.group());
+            JsonArray traits = new JsonArray();
+            st.traits().forEach(traits::add);
+            so.add("traits", traits);
+            JsonArray runes = new JsonArray();
+            st.propertyRunes().forEach(runes::add);
+            so.add("propertyRunes", runes);
+            so.addProperty("potency", st.potency());
             strikes.add(so);
         }
         o.add("strikes", strikes);
@@ -90,6 +99,15 @@ public final class CharacterJson {
         o.add("specials", specials);
         o.addProperty("currentHp", s.currentHp());
         o.addProperty("levelUpGranted", s.levelUpGranted());
+        s.shield().ifPresent(sh -> {
+            JsonObject sho = new JsonObject();
+            sho.addProperty("name", sh.name());
+            sho.addProperty("acBonus", sh.acBonus());
+            sho.addProperty("hardness", sh.hardness());
+            sho.addProperty("hitPoints", sh.hitPoints());
+            sho.addProperty("brokenThreshold", sh.brokenThreshold());
+            o.add("shield", sho);
+        });
         return GSON.toJson(o);
     }
 
@@ -131,7 +149,10 @@ public final class CharacterJson {
                         str(st, "damageType"),
                         st.has("damageDice") ? Math.max(1, Math.min(4, st.get("damageDice").getAsInt())) : 1,
                         Ability.valueOf(str(st, "attackAbility")),
-                        num(st, "otherAttackBonus"), num(st, "otherDamageBonus")));
+                        num(st, "otherAttackBonus"), num(st, "otherDamageBonus"),
+                        st.has("group") ? str(st, "group") : "",
+                        strings(st, "traits"), strings(st, "propertyRunes"),
+                        st.has("potency") ? num(st, "potency") : 0));
             }
             List<Feat> feats = new ArrayList<>();
             for (JsonElement el : arr(o, "feats")) {
@@ -142,16 +163,32 @@ public final class CharacterJson {
             for (JsonElement el : arr(o, "specials")) {
                 specials.add(el.getAsString());
             }
+            Optional<Shield> shield = Optional.empty();
+            if (o.has("shield") && o.get("shield").isJsonObject()) {
+                JsonObject sh = o.getAsJsonObject("shield");
+                shield = Optional.of(new Shield(str(sh, "name"), num(sh, "acBonus"), num(sh, "hardness"),
+                        num(sh, "hitPoints"), num(sh, "brokenThreshold")));
+            }
             return new CharacterSheet(str(o, "name"), str(o, "className"), str(o, "ancestry"),
                     str(o, "heritage"), str(o, "background"), num(o, "level"),
                     Ability.valueOf(str(o, "keyAbility")), scores, prof, lores, hp, num(o, "speed"), ac,
                     strikes, feats, specials, num(o, "currentHp"),
-                    o.get("levelUpGranted").getAsBoolean());
+                    o.get("levelUpGranted").getAsBoolean(), shield);
         } catch (CharacterImportException e) {
             throw e;
         } catch (RuntimeException e) {
             throw new CharacterImportException("Invalid character data: " + e, e);
         }
+    }
+
+    private static List<String> strings(JsonObject o, String key) {
+        List<String> out = new ArrayList<>();
+        if (o.has(key) && o.get(key).isJsonArray()) {
+            for (JsonElement el : o.getAsJsonArray(key)) {
+                out.add(el.getAsString());
+            }
+        }
+        return out;
     }
 
     private static JsonObject obj(JsonObject o, String key) {

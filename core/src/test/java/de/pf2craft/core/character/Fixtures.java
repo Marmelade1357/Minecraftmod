@@ -24,8 +24,10 @@ final class Fixtures {
                 List.of(new Lore("Farming", Rank.TRAINED)),
                 new HitPoints(8, 10, 2, 0), 25,
                 new ArmorClass("heavy", OptionalInt.of(0), 6),
-                List.of(new Strike("Lion Scythe", "martial", "d4", "S", 1, Ability.STR, 0, 0)),
+                List.of(new Strike("Lion Scythe", "martial", "d4", "S", 1, Ability.STR, 0, 0,
+                        "", List.of(), List.of(), 0)),
                 List.of(new Feat("Power Attack", "Class Feat", 1)),
-                List.of("Attack of Opportunity"), 75, false);
+                List.of("Attack of Opportunity"), 75, false,
+                java.util.Optional.empty());
     }
 }

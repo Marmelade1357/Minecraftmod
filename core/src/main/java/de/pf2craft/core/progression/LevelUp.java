@@ -100,7 +100,7 @@ public final class LevelUp {
                 result.ancestry(), result.heritage(), result.background(), newLevel,
                 result.keyAbility(), result.abilityScores(), result.proficiencies(), result.lores(),
                 result.hitPoints(), result.speed(), result.armorClass(), result.strikes(), feats,
-                specials, result.currentHp(), false);
+                specials, result.currentHp(), false, result.shield());
         // Max HP growth includes retroactive HP from a CON boost.
         return leveled.withCurrentHp(sheet.currentHp()
                 + CharacterMath.maxHp(leveled) - CharacterMath.maxHp(sheet));
@@ -157,7 +157,7 @@ public final class LevelUp {
                     sheet.heritage(), sheet.background(), sheet.level(), sheet.keyAbility(),
                     sheet.abilityScores(), sheet.proficiencies(), lores, sheet.hitPoints(),
                     sheet.speed(), sheet.armorClass(), sheet.strikes(), sheet.feats(),
-                    sheet.specials(), sheet.currentHp(), sheet.levelUpGranted());
+                    sheet.specials(), sheet.currentHp(), sheet.levelUpGranted(), sheet.shield());
         }
         for (Skill skill : Skill.values()) {
             if (skill.id().equals(target)) {

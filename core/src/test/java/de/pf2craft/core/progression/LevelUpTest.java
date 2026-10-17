@@ -34,7 +34,7 @@ class LevelUpTest {
         return new CharacterSheet(s.name(), className, s.ancestry(), s.heritage(), s.background(),
                 level, s.keyAbility(), s.abilityScores(), s.proficiencies(), s.lores(),
                 s.hitPoints(), s.speed(), s.armorClass(), s.strikes(), s.feats(), s.specials(),
-                s.currentHp(), s.levelUpGranted());
+                s.currentHp(), s.levelUpGranted(), s.shield());
     }
 
     private static LevelUpChoices feats(String... names) {

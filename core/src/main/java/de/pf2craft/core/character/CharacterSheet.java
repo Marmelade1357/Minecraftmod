@@ -5,6 +5,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Immutable character sheet. Proficiency keys: perception, fortitude, reflex, will, class_dc,
@@ -16,7 +17,8 @@ public record CharacterSheet(String name, String className, String ancestry, Str
                              Map<Ability, Integer> abilityScores, Map<String, Rank> proficiencies,
                              List<Lore> lores, HitPoints hitPoints, int speed, ArmorClass armorClass,
                              List<Strike> strikes, List<Feat> feats, List<String> specials,
-                             int currentHp, boolean levelUpGranted) {
+                             int currentHp, boolean levelUpGranted,
+                             Optional<Shield> shield) {
 
     public CharacterSheet {
         abilityScores = Collections.unmodifiableMap(copyScores(abilityScores));
@@ -44,7 +46,7 @@ public record CharacterSheet(String name, String className, String ancestry, Str
     public CharacterSheet withCurrentHp(int hp) {
         return new CharacterSheet(name, className, ancestry, heritage, background, level, keyAbility,
                 abilityScores, proficiencies, lores, hitPoints, speed, armorClass, strikes, feats,
-                specials, hp, levelUpGranted);
+                specials, hp, levelUpGranted, shield);
     }
 
     public CharacterSheet withAbilityScore(Ability ability, int score) {
@@ -52,7 +54,7 @@ public record CharacterSheet(String name, String className, String ancestry, Str
         scores.put(ability, score);
         return new CharacterSheet(name, className, ancestry, heritage, background, level, keyAbility,
                 scores, proficiencies, lores, hitPoints, speed, armorClass, strikes, feats,
-                specials, currentHp, levelUpGranted);
+                specials, currentHp, levelUpGranted, shield);
     }
 
     public CharacterSheet withRank(String key, Rank rank) {
@@ -60,12 +62,12 @@ public record CharacterSheet(String name, String className, String ancestry, Str
         prof.put(key, rank);
         return new CharacterSheet(name, className, ancestry, heritage, background, level, keyAbility,
                 abilityScores, prof, lores, hitPoints, speed, armorClass, strikes, feats,
-                specials, currentHp, levelUpGranted);
+                specials, currentHp, levelUpGranted, shield);
     }
 
     public CharacterSheet withLevelUpGranted(boolean granted) {
         return new CharacterSheet(name, className, ancestry, heritage, background, level, keyAbility,
                 abilityScores, proficiencies, lores, hitPoints, speed, armorClass, strikes, feats,
-                specials, currentHp, granted);
+                specials, currentHp, granted, shield);
     }
 }

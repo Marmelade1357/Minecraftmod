@@ -4,11 +4,16 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import de.pf2craft.core.item.ItemCatalog;
+import de.pf2craft.core.item.ShieldData;
+import de.pf2craft.core.item.WeaponData;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 
@@ -21,9 +26,15 @@ public final class PathbuilderImporter {
     private PathbuilderImporter() {
     }
 
+    private static final ItemCatalog EMPTY_CATALOG = new ItemCatalog(List.of(), List.of(), List.of());
+
     public static CharacterSheet parse(String json) throws CharacterImportException {
+        return parse(json, EMPTY_CATALOG);
+    }
+
+    public static CharacterSheet parse(String json, ItemCatalog catalog) throws CharacterImportException {
         try {
-            return parseUnchecked(json);
+            return parseUnchecked(json, catalog);
         } catch (CharacterImportException e) {
             throw e;
         } catch (RuntimeException e) {
@@ -31,7 +42,7 @@ public final class PathbuilderImporter {
         }
     }
 
-    private static CharacterSheet parseUnchecked(String json) throws CharacterImportException {
+    private static CharacterSheet parseUnchecked(String json, ItemCatalog catalog) throws CharacterImportException {
         JsonElement rootEl = JsonParser.parseString(json);
         if (!rootEl.isJsonObject()) {
             throw new CharacterImportException("Pathbuilder data must be a JSON object");
@@ -121,13 +132,13 @@ public final class PathbuilderImporter {
 
         List<Strike> strikes = new ArrayList<>();
         for (JsonElement el : array(b, "weapons", MAX_LIST)) {
-            strikes.add(parseStrike(el.getAsJsonObject(), level, scores, prof));
+            strikes.add(parseStrike(el.getAsJsonObject(), level, scores, prof, catalog));
         }
 
         CharacterSheet sheet = new CharacterSheet(b.get("name").getAsString(),
                 b.get("class").getAsString(), str(b, "ancestry", ""), str(b, "heritage", ""),
                 str(b, "background", ""), level, keyAbility, scores, prof, lores, hp, speed, ac,
-                strikes, feats, specials, 0, false);
+                strikes, feats, specials, 0, false, parseShield(b, catalog));
         return sheet.withCurrentHp(CharacterMath.maxHp(sheet));
     }
 
@@ -135,7 +146,7 @@ public final class PathbuilderImporter {
         String category = "unarmored";
         for (JsonElement el : array(b, "armor", MAX_LIST)) {
             JsonObject armor = el.getAsJsonObject();
-            if (armor.has("worn") && !armor.get("worn").isJsonNull() && armor.get("worn").getAsBoolean()) {
+            if (isWornArmor(armor) && !isShield(armor)) {
                 category = str(armor, "prof", "unarmored");
                 break;
             }
@@ -153,9 +164,32 @@ public final class PathbuilderImporter {
         return new ArmorClass(category, dexCap, itemBonus);
     }
 
+    private static boolean isWornArmor(JsonObject armor) {
+        return armor.has("worn") && !armor.get("worn").isJsonNull() && armor.get("worn").getAsBoolean();
+    }
+
+    private static boolean isShield(JsonObject armor) {
+        return "shield".equals(str(armor, "prof", ""));
+    }
+
+    /** The first worn shield; unknown shields get wooden shield statistics. */
+    private static Optional<Shield> parseShield(JsonObject b, ItemCatalog catalog) {
+        for (JsonElement el : array(b, "armor", MAX_LIST)) {
+            JsonObject armor = el.getAsJsonObject();
+            if (isWornArmor(armor) && isShield(armor)) {
+                String name = str(armor, "name", "Shield");
+                Optional<ShieldData> data = catalog.shield(name);
+                return Optional.of(data
+                        .map(d -> new Shield(name, d.acBonus(), d.hardness(), d.hitPoints(), d.brokenThreshold()))
+                        .orElseGet(() -> new Shield(name, 2, 3, 12, 6)));
+            }
+        }
+        return Optional.empty();
+    }
+
     /** Splits Pathbuilder's single attack bonus into ability modifier, proficiency and the rest. */
     private static Strike parseStrike(JsonObject w, int level, Map<Ability, Integer> scores,
-                                      Map<String, Rank> prof) {
+                                      Map<String, Rank> prof, ItemCatalog catalog) {
         String category = str(w, "prof", "simple");
         int rankBonus = prof.getOrDefault(category, Rank.UNTRAINED).bonus(level);
         int attack = intOf(w, "attack", 0);
@@ -177,8 +211,18 @@ public final class PathbuilderImporter {
         }
         other = ability == Ability.STR ? strOther : dexOther;
         int otherDamage = intOf(w, "damageBonus", 0) - (ability == Ability.STR ? str : 0);
-        return new Strike(str(w, "name", "Strike"), category, str(w, "die", "d4"),
-                str(w, "damageType", ""), damageDice(str(w, "str", "")), ability, other, otherDamage);
+        String name = str(w, "name", "Strike");
+        Optional<WeaponData> data = catalog.weapon(name);
+        List<String> runes = new ArrayList<>();
+        for (JsonElement r : array(w, "runes", MAX_LIST)) {
+            if (!r.isJsonNull()) {
+                runes.add(r.getAsString().toLowerCase(Locale.ROOT));
+            }
+        }
+        return new Strike(name, category, str(w, "die", "d4"),
+                str(w, "damageType", ""), damageDice(str(w, "str", "")), ability, other, otherDamage,
+                data.map(WeaponData::group).orElse(""), data.map(WeaponData::traits).orElse(List.of()),
+                runes, intOf(w, "pot", 0));
     }
 
     private static int damageDice(String striking) {
