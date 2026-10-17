@@ -99,8 +99,8 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
 - `./gradlew build` läuft ohne Fehler, `runClient` startet. Ingame im Einzelspieler
   getestet: Würfelfenster, `/roll`, verdeckte Würfe.
 - Noch nicht getestet: Mehrspieler (Sichtbarkeit verdeckter Würfe für Nicht-GMs).
-- Phase 2 (Charaktere) ist gebaut und per Unit-Tests in `core` abgedeckt; die UI
-  (Import-, Charakter-, Aufstiegsfenster) wurde vom Nutzer **noch nicht ingame getestet**.
+- Phase 2 (Charaktere) ist gebaut, per Unit-Tests in `core` abgedeckt und vom Nutzer im
+  Einzelspieler getestet (Import, Bogen, Würfe, GM-Ansicht, Aufstieg, Reset): funktioniert.
 - Bekannte Grenzen Phase 2: Taste C kollidiert mit Vanilla „Save Hotbar Activator“;
   Talente nur als Name (keine Effekte); auswahlbasierte Klassenverbesserungen (Doktrinen,
   Waffenmeisterschaft, Wissensränge) setzt der GM; keine Zauber/Inventar; Wurfbezeichnungen
@@ -113,7 +113,7 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
 2. ✅ **Phase 2 – Charaktere:** Charakterbogen (Taste C), Klick-zum-Würfeln über `RollService`,
    Pathbuilder-Import, Speicherung per Data Attachment, Stufenaufstieg nach GM-Freigabe, GM-Ansicht.
    *Noch offen: geführte Charaktererschaffung im Spiel („Schritt B“), Mehrspielertest,
-   Ingame-Test der UI durch den Nutzer, die bekannten Grenzen oben.*
+   die bekannten Grenzen oben.*
 3. **Phase 3 – Kampfmodus:**
    - GM startet und beendet einen Kampf, Initiative mit Zugreihenfolge im HUD.
    - 3 Aktionen + 1 Reaktion pro Zug, Mehrfachangriffsmalus.
