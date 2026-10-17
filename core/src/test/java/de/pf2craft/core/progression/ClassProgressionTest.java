@@ -100,4 +100,15 @@ class ClassProgressionTest {
                     "{\"name\":\"X\",\"hpPerLevel\":8,\"levels\":{\"3\":{\"skillIncrease\":" + bad + "}}}"), bad);
         }
     }
+
+    @Test
+    void investigatorHasNineteenSkillFeatSlots() throws IOException {
+        ClassProgression c;
+        try (InputStream in = ClassProgressionTest.class.getResourceAsStream("/pf2craft/classes/investigator.json")) {
+            c = ClassProgressionParser.parse(new String(in.readAllBytes(), StandardCharsets.UTF_8));
+        }
+        long skillFeats = c.levels().values().stream()
+                .flatMap(e -> e.featSlots().stream()).filter("Skill Feat"::equals).count();
+        assertEquals(19, skillFeats);
+    }
 }

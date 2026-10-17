@@ -35,10 +35,12 @@
     },
     "3": {
       "features": [
-        "Keen Recollection",
-        "Skillful Lesson"
+        "Keen Recollection"
       ],
-      "skillIncrease": true
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
     },
     "4": {
       "skillIncrease": true,
@@ -54,10 +56,12 @@
         "unarmed": "expert"
       },
       "features": [
-        "Skillful Lesson",
         "Weapon Expertise"
       ],
-      "skillIncrease": true
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
     },
     "6": {
       "skillIncrease": true,
@@ -72,10 +76,12 @@
       },
       "features": [
         "Vigilant Senses",
-        "Skillful Lesson",
         "Weapon Specialization"
       ],
-      "skillIncrease": true
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
     },
     "8": {
       "skillIncrease": true,
@@ -91,10 +97,12 @@
       },
       "features": [
         "Fortitude Expertise",
-        "Investigator Expertise",
-        "Skillful Lesson"
+        "Investigator Expertise"
       ],
-      "skillIncrease": true
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
     },
     "10": {
       "skillIncrease": true,
@@ -109,10 +117,12 @@
       },
       "features": [
         "Deductive Improvisation",
-        "Dogged Will",
-        "Skillful Lesson"
+        "Dogged Will"
       ],
-      "skillIncrease": true
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
     },
     "12": {
       "skillIncrease": true,
@@ -133,10 +143,12 @@
       "features": [
         "Incredible Senses",
         "Light Armor Expertise",
-        "Skillful Lesson",
         "Weapon Mastery"
       ],
-      "skillIncrease": true
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
     },
     "14": {
       "skillIncrease": true,
@@ -151,10 +163,12 @@
       },
       "features": [
         "Greater Weapon Specialization",
-        "Savvy Reflexes",
-        "Skillful Lesson"
+        "Savvy Reflexes"
       ],
-      "skillIncrease": true
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
     },
     "16": {
       "skillIncrease": true,
@@ -168,10 +182,12 @@
         "will": "legendary"
       },
       "features": [
-        "Greater Dogged Will",
-        "Skillful Lesson"
+        "Greater Dogged Will"
       ],
-      "skillIncrease": true
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
     },
     "18": {
       "skillIncrease": true,
@@ -188,10 +204,12 @@
       },
       "features": [
         "Light Armor Mastery",
-        "Master Detective",
-        "Skillful Lesson"
+        "Master Detective"
       ],
-      "skillIncrease": true
+      "skillIncrease": true,
+      "featSlots": [
+        "Skill Feat"
+      ]
     },
     "20": {
       "skillIncrease": true,
