@@ -37,6 +37,8 @@
   "pf2craft.character.none": "%s has no character.",
   "pf2craft.character.player_offline": "That player is not online.",
   "pf2craft.character.levelup_granted": "The GM allows you to level up!",
+  "pf2craft.character.not_gm": "Only a GM can do that.",
+  "pf2craft.character.levelup_unavailable": "%s cannot level up (maximum level or unsupported class).",
   "pf2craft.character.leveled": "%s reached level %s!",
   "pf2craft.character.hp_changed": "%s now has %s HP.",
 
@@ -79,6 +81,7 @@
   "screen.pf2craft.sheet.gm.hp_set": "Set",
   "screen.pf2craft.sheet.gm.grant": "Grant level up",
   "screen.pf2craft.sheet.gm.granted": "Level-up already granted",
+  "screen.pf2craft.sheet.gm.grant_unsupported": "Class not supported: no level-up data",
   "screen.pf2craft.sheet.gm.score_down": "Score -1 (modifier %s)",
   "screen.pf2craft.sheet.gm.score_up": "Score +1 (modifier %s)",
   "screen.pf2craft.levelup.title": "Level up",

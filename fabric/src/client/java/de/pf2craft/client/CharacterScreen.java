@@ -128,7 +128,7 @@ public class CharacterScreen extends Screen {
         boolean gm = synced.isPresent() && synced.get().gmView();
         int tabY = top + HEADER_H + 2;
         if (gm) {
-            addGmBar(synced.get().sheet(), tabY);
+            addGmBar(synced.get(), tabY);
             tabY += GM_BAR_H + 2;
         }
         contentTop = tabY + TAB_H + 6;
@@ -201,7 +201,8 @@ public class CharacterScreen extends Screen {
     // --- GM controls ------------------------------------------------------------------------
 
     /** HP - / + (Shift = 5), a field to set the HP directly and "Grant level up". */
-    private void addGmBar(CharacterSheet sheet, int y) {
+    private void addGmBar(ClientSheets.Synced synced, int y) {
+        CharacterSheet sheet = synced.sheet();
         int x = left;
         addDrawableChild(ButtonWidget.builder(Text.literal("-"), b -> changeHp(sheet, -1))
                 .dimensions(x, y, GM_BUTTON_W, GM_BAR_H)
@@ -226,9 +227,11 @@ public class CharacterScreen extends Screen {
         ButtonWidget grant = addDrawableChild(ButtonWidget.builder(
                         Text.translatable("screen.pf2craft.sheet.gm.grant"), b -> sendGm(new GrantLevelUpPayload(owner)))
                 .dimensions(left + panelW - GRANT_W, y, GRANT_W, GM_BAR_H).build());
-        grant.active = !sheet.levelUpGranted();
+        grant.active = !sheet.levelUpGranted() && synced.classSupported();
         if (sheet.levelUpGranted()) {
             grant.setTooltip(Tooltip.of(Text.translatable("screen.pf2craft.sheet.gm.granted")));
+        } else if (!synced.classSupported()) {
+            grant.setTooltip(Tooltip.of(Text.translatable("screen.pf2craft.sheet.gm.grant_unsupported")));
         }
     }
 
@@ -493,7 +496,8 @@ public class CharacterScreen extends Screen {
         Text text;
         if (die.length() > 1 && (die.charAt(0) == 'd' || die.charAt(0) == 'D')
                 && die.substring(1).chars().allMatch(c -> c >= '0' && c <= '9')) {
-            text = Text.translatable("screen.pf2craft.dice.die", die.substring(1));
+            Text sides = Text.translatable("screen.pf2craft.dice.die", die.substring(1));
+            text = strike.damageDice() > 1 ? Text.literal(strike.damageDice() + "").append(sides) : sides;
         } else {
             text = Text.literal(die);
         }

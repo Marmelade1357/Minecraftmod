@@ -52,8 +52,13 @@ Der Charakter wird auf dem Server gespeichert.
   Danach erscheint beim Spieler „Aufsteigen“ und öffnet das Aufstiegsfenster
   (Attributssteigerungen, Fertigkeitssteigerung, Talent per Name), das mit *Bestätigen* abgeschlossen wird.
 
+**Neu importieren:** Der Knopf **Neu importieren** unten im eigenen Charakterbogen öffnet das Import-Fenster erneut.
+
 **Spielleiter-Ansicht:** `/pf2 sheet <Spieler>` öffnet den Bogen eines Spielers mit
 Zusatzknöpfen: TP ändern oder setzen, Attributswerte ±1, Aufstieg gewähren.
+Bearbeiten setzt die **GM-Rolle** voraus: Wer nur OP ist, sieht fremde Bögen schreibgeschützt.
+Ein Klick auf den Rangbuchstaben vor einer Fertigkeit oder einem Rettungswurf ändert den
+Übungsgrad (Klick = eine Stufe höher, **Shift**+Klick = eine Stufe niedriger).
 
 **Eigene Klassen und Anpassungen:** Die Klassendaten (29 Klassen) liegen als JSON in der Mod.
 Dateien in `config/pf2craft/classes/*.json` auf dem Server überschreiben sie oder ergänzen eigene Klassen.
@@ -64,7 +69,7 @@ Dateien in `config/pf2craft/classes/*.json` auf dem Server überschreiben sie od
 - Auswahlbasierte Klassenverbesserungen (z. B. Doktrinen, Waffenmeisterschaft, Wissensränge) muss der Spielleiter setzen.
 - Zauber und Inventar gibt es noch nicht.
 - Die Bezeichnungen der Würfe im Chat sind englisch.
-- Erfolgsrunen (striking) werden in den Schadenswürfeln nicht angezeigt.
+- Steigt der INT-Modifikator, muss der Spielleiter die zusätzliche trainierte Fertigkeit von Hand setzen.
 - Die geführte Charaktererschaffung im Spiel fehlt noch; Charaktere kommen aus Pathbuilder.
 
 ## Projektstruktur

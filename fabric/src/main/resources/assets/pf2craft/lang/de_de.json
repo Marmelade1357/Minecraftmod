@@ -37,6 +37,8 @@
   "pf2craft.character.none": "%s hat keinen Charakter.",
   "pf2craft.character.player_offline": "Dieser Spieler ist nicht online.",
   "pf2craft.character.levelup_granted": "Der SL erlaubt dir einen Stufenaufstieg!",
+  "pf2craft.character.not_gm": "Das darf nur ein SL.",
+  "pf2craft.character.levelup_unavailable": "%s kann nicht aufsteigen (Höchststufe oder nicht unterstützte Klasse).",
   "pf2craft.character.leveled": "%s hat Stufe %s erreicht!",
   "pf2craft.character.hp_changed": "%s hat jetzt %s TP.",
 
@@ -79,6 +81,7 @@
   "screen.pf2craft.sheet.gm.hp_set": "Setzen",
   "screen.pf2craft.sheet.gm.grant": "Aufstieg gewähren",
   "screen.pf2craft.sheet.gm.granted": "Aufstieg bereits gewährt",
+  "screen.pf2craft.sheet.gm.grant_unsupported": "Klasse nicht unterstützt: keine Aufstiegsdaten",
   "screen.pf2craft.sheet.gm.score_down": "Wert -1 (Modifikator %s)",
   "screen.pf2craft.sheet.gm.score_up": "Wert +1 (Modifikator %s)",
   "screen.pf2craft.levelup.title": "Aufsteigen",

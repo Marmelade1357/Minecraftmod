@@ -104,7 +104,7 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
 - Bekannte Grenzen Phase 2: Taste C kollidiert mit Vanilla „Save Hotbar Activator“;
   Talente nur als Name (keine Effekte); auswahlbasierte Klassenverbesserungen (Doktrinen,
   Waffenmeisterschaft, Wissensränge) setzt der GM; keine Zauber/Inventar; Wurfbezeichnungen
-  im Chat englisch; Striking-Runen fehlen in den Schadenswürfeln.
+  im Chat englisch; steigt der INT-Modifikator, muss der GM die zusätzliche trainierte Fertigkeit von Hand setzen.
 
 ## Fahrplan
 

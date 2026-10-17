@@ -125,6 +125,7 @@ public final class Pf2Commands {
     private static int setGm(CommandContext<ServerCommandSource> ctx, boolean gm) throws CommandSyntaxException {
         ServerPlayerEntity player = EntityArgumentType.getPlayer(ctx, "player");
         GmRoles.setGm(player, gm);
+        ctx.getSource().getServer().getPlayerManager().sendCommandTree(player);
         String key = gm ? "pf2craft.gm.added" : "pf2craft.gm.removed";
         String fallback = gm ? "%s is now a game master." : "%s is no longer a game master.";
         ctx.getSource().sendFeedback(() -> Text.translatableWithFallback(key, fallback, player.getDisplayName()), true);

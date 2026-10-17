@@ -44,6 +44,11 @@ public final class SheetService {
         VIEWERS.values().forEach(set -> set.remove(id));
     }
 
+    /** Stops live updates for a sheet that no longer exists. */
+    public static void forget(UUID owner) {
+        VIEWERS.remove(owner);
+    }
+
     // --- sync -------------------------------------------------------------------------------
 
     /** Handles a sheet request: the own sheet always, other sheets only for GMs. */
@@ -102,7 +107,7 @@ public final class SheetService {
         }
         boolean supported = sheet.level() < LevelUp.MAX_LEVEL
                 && ClassData.registry().find(sheet.className()).isPresent();
-        boolean gmView = recipient != owner || GmRoles.isGm(recipient);
+        boolean gmView = GmRoles.isGm(recipient);
         ServerPlayNetworking.send(recipient, new SheetSyncPayload(owner.getUuid(), CharacterJson.write(sheet),
                 gmView, supported, open, levelUpOptionsJson(sheet, supported)));
     }
@@ -144,6 +149,7 @@ public final class SheetService {
 
     public static void gmEdit(ServerPlayerEntity gm, UUID target, String field, int value) {
         if (!GmRoles.isGm(gm)) {
+            notGm(gm);
             return;
         }
         ServerPlayerEntity owner = gm.getServer().getPlayerManager().getPlayer(target);
@@ -166,6 +172,7 @@ public final class SheetService {
 
     public static void grantLevelUp(ServerPlayerEntity gm, UUID target) {
         if (!GmRoles.isGm(gm)) {
+            notGm(gm);
             return;
         }
         ServerPlayerEntity owner = gm.getServer().getPlayerManager().getPlayer(target);
@@ -175,6 +182,12 @@ public final class SheetService {
         }
         Optional<CharacterSheet> sheet = CharacterStore.get(owner);
         if (sheet.isEmpty()) {
+            return;
+        }
+        if (sheet.get().level() >= LevelUp.MAX_LEVEL
+                || ClassData.registry().find(sheet.get().className()).isEmpty()) {
+            error(gm, Text.translatableWithFallback("pf2craft.character.levelup_unavailable",
+                    "%s cannot level up (maximum level or unsupported class).", owner.getName()));
             return;
         }
         CharacterSheet granted = sheet.get().withLevelUpGranted(true);
@@ -238,6 +251,11 @@ public final class SheetService {
         } catch (UnsupportedClassException | InvalidChoiceException e) {
             error(player, Text.literal(e.getMessage()));
         }
+    }
+
+    private static void notGm(ServerPlayerEntity to) {
+        error(to, Text.translatableWithFallback("pf2craft.character.not_gm",
+                "Only a GM can do that."));
     }
 
     private static void offline(ServerPlayerEntity to) {

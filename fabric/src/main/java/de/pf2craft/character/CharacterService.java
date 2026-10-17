@@ -61,9 +61,8 @@ public final class CharacterService {
                 String message = "Unexpected error while importing";
                 if (cause instanceof CharacterImportException) {
                     message = cause.getMessage();
-                } else {
-                    Pf2Craft.LOGGER.warn("Character import failed", cause);
                 }
+                Pf2Craft.LOGGER.warn("Character import failed for {}", target.getName().getString(), cause);
                 error(target, Text.translatableWithFallback("pf2craft.character.import_failed",
                         "Import failed: %s", message));
                 return;
@@ -96,7 +95,13 @@ public final class CharacterService {
     /** Removes the character and sends the player back to spectator mode. */
     public static void reset(ServerPlayerEntity target) {
         CharacterStore.remove(target);
-        target.changeGameMode(GameMode.SPECTATOR);
+        SheetService.forget(target.getUuid());
+        if (!GmRoles.isGm(target)) {
+            target.changeGameMode(GameMode.SPECTATOR);
+        }
+        if (ServerPlayNetworking.canSend(target, OpenImportPayload.ID)) {
+            ServerPlayNetworking.send(target, new OpenImportPayload());
+        }
         target.sendMessage(Text.translatableWithFallback("pf2craft.character.reset_notice",
                 "Your character was reset. Import a new one.").formatted(Formatting.YELLOW), false);
     }
