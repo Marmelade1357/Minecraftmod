@@ -1,0 +1,47 @@
+[
+  {
+    "id": "buckler",
+    "name": "Buckler",
+    "acBonus": 1,
+    "hardness": 3,
+    "hitPoints": 6,
+    "brokenThreshold": 3,
+    "speedPenalty": 0
+  },
+  {
+    "id": "spined-shield",
+    "name": "Spined Shield",
+    "acBonus": 2,
+    "hardness": 6,
+    "hitPoints": 24,
+    "brokenThreshold": 12,
+    "speedPenalty": 0
+  },
+  {
+    "id": "steel-shield",
+    "name": "Steel Shield",
+    "acBonus": 2,
+    "hardness": 5,
+    "hitPoints": 20,
+    "brokenThreshold": 10,
+    "speedPenalty": 0
+  },
+  {
+    "id": "tower-shield",
+    "name": "Tower Shield",
+    "acBonus": 2,
+    "hardness": 5,
+    "hitPoints": 20,
+    "brokenThreshold": 10,
+    "speedPenalty": 5
+  },
+  {
+    "id": "wooden-shield",
+    "name": "Wooden Shield",
+    "acBonus": 2,
+    "hardness": 3,
+    "hitPoints": 12,
+    "brokenThreshold": 6,
+    "speedPenalty": 0
+  }
+]

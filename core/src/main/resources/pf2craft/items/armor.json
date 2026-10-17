@@ -1,0 +1,146 @@
+[
+  {
+    "id": "breastplate",
+    "name": "Breastplate",
+    "category": "medium",
+    "acBonus": 4,
+    "dexCap": 1,
+    "checkPenalty": 2,
+    "speedPenalty": 5,
+    "strength": 3,
+    "traits": []
+  },
+  {
+    "id": "chain-mail",
+    "name": "Chain Mail",
+    "category": "medium",
+    "acBonus": 4,
+    "dexCap": 1,
+    "checkPenalty": 2,
+    "speedPenalty": 5,
+    "strength": 3,
+    "traits": [
+      "flexible",
+      "noisy"
+    ]
+  },
+  {
+    "id": "chain-shirt",
+    "name": "Chain Shirt",
+    "category": "light",
+    "acBonus": 2,
+    "dexCap": 3,
+    "checkPenalty": 1,
+    "speedPenalty": 0,
+    "strength": 1,
+    "traits": [
+      "flexible",
+      "noisy"
+    ]
+  },
+  {
+    "id": "explorers-clothing",
+    "name": "Explorer's Clothing",
+    "category": "unarmored",
+    "acBonus": 0,
+    "dexCap": 5,
+    "checkPenalty": 0,
+    "speedPenalty": 0,
+    "strength": 0,
+    "traits": [
+      "comfort"
+    ]
+  },
+  {
+    "id": "full-plate",
+    "name": "Full Plate",
+    "category": "heavy",
+    "acBonus": 6,
+    "dexCap": 0,
+    "checkPenalty": 3,
+    "speedPenalty": 10,
+    "strength": 4,
+    "traits": [
+      "bulwark"
+    ]
+  },
+  {
+    "id": "half-plate",
+    "name": "Half Plate",
+    "category": "heavy",
+    "acBonus": 5,
+    "dexCap": 1,
+    "checkPenalty": 3,
+    "speedPenalty": 10,
+    "strength": 3,
+    "traits": []
+  },
+  {
+    "id": "hide-armor",
+    "name": "Hide Armor",
+    "category": "medium",
+    "acBonus": 3,
+    "dexCap": 2,
+    "checkPenalty": 2,
+    "speedPenalty": 5,
+    "strength": 2,
+    "traits": []
+  },
+  {
+    "id": "leather-armor",
+    "name": "Leather Armor",
+    "category": "light",
+    "acBonus": 1,
+    "dexCap": 4,
+    "checkPenalty": 1,
+    "speedPenalty": 0,
+    "strength": 0,
+    "traits": []
+  },
+  {
+    "id": "padded-armor",
+    "name": "Padded Armor",
+    "category": "light",
+    "acBonus": 1,
+    "dexCap": 3,
+    "checkPenalty": 0,
+    "speedPenalty": 0,
+    "strength": 0,
+    "traits": [
+      "comfort"
+    ]
+  },
+  {
+    "id": "scale-mail",
+    "name": "Scale Mail",
+    "category": "medium",
+    "acBonus": 3,
+    "dexCap": 2,
+    "checkPenalty": 2,
+    "speedPenalty": 5,
+    "strength": 2,
+    "traits": []
+  },
+  {
+    "id": "splint-mail",
+    "name": "Splint Mail",
+    "category": "heavy",
+    "acBonus": 5,
+    "dexCap": 1,
+    "checkPenalty": 3,
+    "speedPenalty": 10,
+    "strength": 3,
+    "traits": []
+  },
+  {
+    "id": "studded-leather-armor",
+    "name": "Studded Leather Armor",
+    "category": "light",
+    "acBonus": 2,
+    "dexCap": 3,
+    "checkPenalty": 1,
+    "speedPenalty": 0,
+    "strength": 1,
+    "traits": []
+  }
+]

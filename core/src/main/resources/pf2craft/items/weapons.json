@@ -1,0 +1,1166 @@
+[
+  {
+    "id": "arbalest",
+    "name": "Arbalest",
+    "category": "martial",
+    "die": "d10",
+    "damageType": "P",
+    "group": "crossbow",
+    "hands": 2,
+    "range": 110,
+    "traits": [
+      "backstabber"
+    ]
+  },
+  {
+    "id": "bastard-sword",
+    "name": "Bastard Sword",
+    "category": "martial",
+    "die": "d8",
+    "damageType": "S",
+    "group": "sword",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "two-hand-d12"
+    ]
+  },
+  {
+    "id": "battle-axe",
+    "name": "Battle Axe",
+    "category": "martial",
+    "die": "d8",
+    "damageType": "S",
+    "group": "axe",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "sweep"
+    ]
+  },
+  {
+    "id": "bo-staff",
+    "name": "Bo Staff",
+    "category": "martial",
+    "die": "d8",
+    "damageType": "B",
+    "group": "club",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "monk",
+      "parry",
+      "reach",
+      "trip"
+    ]
+  },
+  {
+    "id": "bola",
+    "name": "Bola",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "B",
+    "group": "sling",
+    "hands": 1,
+    "range": 20,
+    "traits": [
+      "nonlethal",
+      "ranged-trip",
+      "thrown"
+    ]
+  },
+  {
+    "id": "clan-dagger",
+    "name": "Clan Dagger",
+    "category": "simple",
+    "die": "d4",
+    "damageType": "P",
+    "group": "knife",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "dwarf",
+      "parry",
+      "versatile-b"
+    ]
+  },
+  {
+    "id": "club",
+    "name": "Club",
+    "category": "simple",
+    "die": "d6",
+    "damageType": "B",
+    "group": "club",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "thrown-10"
+    ]
+  },
+  {
+    "id": "composite-longbow",
+    "name": "Composite Longbow",
+    "category": "martial",
+    "die": "d8",
+    "damageType": "P",
+    "group": "bow",
+    "hands": 2,
+    "range": 100,
+    "traits": [
+      "deadly-d10",
+      "propulsive",
+      "volley-30"
+    ]
+  },
+  {
+    "id": "composite-shortbow",
+    "name": "Composite Shortbow",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "P",
+    "group": "bow",
+    "hands": 2,
+    "range": 60,
+    "traits": [
+      "deadly-d10",
+      "propulsive"
+    ]
+  },
+  {
+    "id": "crossbow",
+    "name": "Crossbow",
+    "category": "simple",
+    "die": "d8",
+    "damageType": "P",
+    "group": "crossbow",
+    "hands": 2,
+    "range": 120,
+    "traits": []
+  },
+  {
+    "id": "dagger",
+    "name": "Dagger",
+    "category": "simple",
+    "die": "d4",
+    "damageType": "P",
+    "group": "knife",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "finesse",
+      "thrown-10",
+      "versatile-s"
+    ]
+  },
+  {
+    "id": "dart",
+    "name": "Dart",
+    "category": "simple",
+    "die": "d4",
+    "damageType": "P",
+    "group": "dart",
+    "hands": 1,
+    "range": 20,
+    "traits": [
+      "agile",
+      "thrown"
+    ]
+  },
+  {
+    "id": "dogslicer",
+    "name": "Dogslicer",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "S",
+    "group": "sword",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "backstabber",
+      "finesse",
+      "goblin"
+    ]
+  },
+  {
+    "id": "dwarven-war-axe",
+    "name": "Dwarven War Axe",
+    "category": "advanced",
+    "die": "d8",
+    "damageType": "S",
+    "group": "axe",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "dwarf",
+      "sweep",
+      "two-hand-d12"
+    ]
+  },
+  {
+    "id": "elven-curve-blade",
+    "name": "Elven Curve Blade",
+    "category": "martial",
+    "die": "d8",
+    "damageType": "S",
+    "group": "sword",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "elf",
+      "finesse",
+      "forceful"
+    ]
+  },
+  {
+    "id": "falchion",
+    "name": "Falchion",
+    "category": "martial",
+    "die": "d10",
+    "damageType": "S",
+    "group": "sword",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "forceful",
+      "sweep"
+    ]
+  },
+  {
+    "id": "filchers-fork",
+    "name": "Filcher's Fork",
+    "category": "martial",
+    "die": "d4",
+    "damageType": "P",
+    "group": "spear",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "backstabber",
+      "deadly-d6",
+      "finesse",
+      "halfling",
+      "thrown-20"
+    ]
+  },
+  {
+    "id": "flail",
+    "name": "Flail",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "B",
+    "group": "flail",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "disarm",
+      "sweep",
+      "trip"
+    ]
+  },
+  {
+    "id": "gauntlet",
+    "name": "Gauntlet",
+    "category": "simple",
+    "die": "d4",
+    "damageType": "B",
+    "group": "brawling",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "free-hand"
+    ]
+  },
+  {
+    "id": "glaive",
+    "name": "Glaive",
+    "category": "martial",
+    "die": "d8",
+    "damageType": "S",
+    "group": "polearm",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "deadly-d8",
+      "forceful",
+      "reach"
+    ]
+  },
+  {
+    "id": "gnome-flickmace",
+    "name": "Gnome Flickmace",
+    "category": "advanced",
+    "die": "d6",
+    "damageType": "B",
+    "group": "flail",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "gnome",
+      "reach",
+      "sweep"
+    ]
+  },
+  {
+    "id": "gnome-hooked-hammer",
+    "name": "Gnome Hooked Hammer",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "B",
+    "group": "hammer",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "gnome",
+      "trip",
+      "two-hand-d10",
+      "versatile-p"
+    ]
+  },
+  {
+    "id": "greataxe",
+    "name": "Greataxe",
+    "category": "martial",
+    "die": "d12",
+    "damageType": "S",
+    "group": "axe",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "sweep"
+    ]
+  },
+  {
+    "id": "greatclub",
+    "name": "Greatclub",
+    "category": "martial",
+    "die": "d10",
+    "damageType": "B",
+    "group": "club",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "backswing",
+      "shove"
+    ]
+  },
+  {
+    "id": "greatpick",
+    "name": "Greatpick",
+    "category": "martial",
+    "die": "d10",
+    "damageType": "P",
+    "group": "pick",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "fatal-d12"
+    ]
+  },
+  {
+    "id": "greatsword",
+    "name": "Greatsword",
+    "category": "martial",
+    "die": "d12",
+    "damageType": "S",
+    "group": "sword",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "versatile-p"
+    ]
+  },
+  {
+    "id": "guisarme",
+    "name": "Guisarme",
+    "category": "martial",
+    "die": "d10",
+    "damageType": "S",
+    "group": "polearm",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "reach",
+      "trip"
+    ]
+  },
+  {
+    "id": "halberd",
+    "name": "Halberd",
+    "category": "martial",
+    "die": "d10",
+    "damageType": "P",
+    "group": "polearm",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "reach",
+      "versatile-s"
+    ]
+  },
+  {
+    "id": "halfling-sling-staff",
+    "name": "Halfling Sling Staff",
+    "category": "martial",
+    "die": "d10",
+    "damageType": "B",
+    "group": "sling",
+    "hands": 2,
+    "range": 80,
+    "traits": [
+      "halfling",
+      "propulsive"
+    ]
+  },
+  {
+    "id": "hand-crossbow",
+    "name": "Hand Crossbow",
+    "category": "simple",
+    "die": "d6",
+    "damageType": "P",
+    "group": "crossbow",
+    "hands": 1,
+    "range": 60,
+    "traits": []
+  },
+  {
+    "id": "hatchet",
+    "name": "Hatchet",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "S",
+    "group": "axe",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "sweep",
+      "thrown-10"
+    ]
+  },
+  {
+    "id": "heavy-crossbow",
+    "name": "Heavy Crossbow",
+    "category": "simple",
+    "die": "d10",
+    "damageType": "P",
+    "group": "crossbow",
+    "hands": 2,
+    "range": 120,
+    "traits": []
+  },
+  {
+    "id": "horsechopper",
+    "name": "Horsechopper",
+    "category": "martial",
+    "die": "d8",
+    "damageType": "S",
+    "group": "polearm",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "goblin",
+      "reach",
+      "trip",
+      "versatile-p"
+    ]
+  },
+  {
+    "id": "javelin",
+    "name": "Javelin",
+    "category": "simple",
+    "die": "d6",
+    "damageType": "P",
+    "group": "dart",
+    "hands": 1,
+    "range": 30,
+    "traits": [
+      "thrown"
+    ]
+  },
+  {
+    "id": "kama",
+    "name": "Kama",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "S",
+    "group": "knife",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "monk",
+      "trip"
+    ]
+  },
+  {
+    "id": "katana",
+    "name": "Katana",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "S",
+    "group": "sword",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "deadly-d8",
+      "two-hand-d10",
+      "versatile-p"
+    ]
+  },
+  {
+    "id": "katar",
+    "name": "Katar",
+    "category": "simple",
+    "die": "d4",
+    "damageType": "P",
+    "group": "knife",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "deadly-d6",
+      "monk"
+    ]
+  },
+  {
+    "id": "khakkhara",
+    "name": "Khakkhara",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "B",
+    "group": "club",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "shove",
+      "two-hand-d10",
+      "versatile-p"
+    ]
+  },
+  {
+    "id": "kukri",
+    "name": "Kukri",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "S",
+    "group": "knife",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "finesse",
+      "trip"
+    ]
+  },
+  {
+    "id": "lance",
+    "name": "Lance",
+    "category": "martial",
+    "die": "d8",
+    "damageType": "P",
+    "group": "spear",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "deadly-d8",
+      "jousting-d6",
+      "reach"
+    ]
+  },
+  {
+    "id": "light-hammer",
+    "name": "Light Hammer",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "B",
+    "group": "hammer",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "thrown-20"
+    ]
+  },
+  {
+    "id": "light-mace",
+    "name": "Light Mace",
+    "category": "simple",
+    "die": "d4",
+    "damageType": "B",
+    "group": "club",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "finesse",
+      "shove"
+    ]
+  },
+  {
+    "id": "light-pick",
+    "name": "Light Pick",
+    "category": "martial",
+    "die": "d4",
+    "damageType": "P",
+    "group": "pick",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "fatal-d8"
+    ]
+  },
+  {
+    "id": "longbow",
+    "name": "Longbow",
+    "category": "martial",
+    "die": "d8",
+    "damageType": "P",
+    "group": "bow",
+    "hands": 2,
+    "range": 100,
+    "traits": [
+      "deadly-d10",
+      "volley-30"
+    ]
+  },
+  {
+    "id": "longspear",
+    "name": "Longspear",
+    "category": "simple",
+    "die": "d8",
+    "damageType": "P",
+    "group": "spear",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "reach"
+    ]
+  },
+  {
+    "id": "longsword",
+    "name": "Longsword",
+    "category": "martial",
+    "die": "d8",
+    "damageType": "S",
+    "group": "sword",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "versatile-p"
+    ]
+  },
+  {
+    "id": "mace",
+    "name": "Mace",
+    "category": "simple",
+    "die": "d6",
+    "damageType": "B",
+    "group": "club",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "shove"
+    ]
+  },
+  {
+    "id": "main-gauche",
+    "name": "Main-Gauche",
+    "category": "martial",
+    "die": "d4",
+    "damageType": "P",
+    "group": "knife",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "disarm",
+      "finesse",
+      "parry",
+      "versatile-s"
+    ]
+  },
+  {
+    "id": "maul",
+    "name": "Maul",
+    "category": "martial",
+    "die": "d12",
+    "damageType": "B",
+    "group": "hammer",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "shove"
+    ]
+  },
+  {
+    "id": "morningstar",
+    "name": "Morningstar",
+    "category": "simple",
+    "die": "d6",
+    "damageType": "B",
+    "group": "club",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "versatile-p"
+    ]
+  },
+  {
+    "id": "nunchaku",
+    "name": "Nunchaku",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "B",
+    "group": "club",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "backswing",
+      "disarm",
+      "finesse",
+      "monk"
+    ]
+  },
+  {
+    "id": "orc-knuckle-dagger",
+    "name": "Orc Knuckle Dagger",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "P",
+    "group": "knife",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "disarm",
+      "orc"
+    ]
+  },
+  {
+    "id": "orc-necksplitter",
+    "name": "Orc Necksplitter",
+    "category": "advanced",
+    "die": "d8",
+    "damageType": "S",
+    "group": "axe",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "forceful",
+      "orc",
+      "sweep"
+    ]
+  },
+  {
+    "id": "pick",
+    "name": "Pick",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "P",
+    "group": "pick",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "fatal-d10"
+    ]
+  },
+  {
+    "id": "ranseur",
+    "name": "Ranseur",
+    "category": "martial",
+    "die": "d10",
+    "damageType": "P",
+    "group": "polearm",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "disarm",
+      "reach"
+    ]
+  },
+  {
+    "id": "rapier",
+    "name": "Rapier",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "P",
+    "group": "sword",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "deadly-d8",
+      "disarm",
+      "finesse"
+    ]
+  },
+  {
+    "id": "sai",
+    "name": "Sai",
+    "category": "martial",
+    "die": "d4",
+    "damageType": "P",
+    "group": "knife",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "disarm",
+      "finesse",
+      "monk",
+      "versatile-b"
+    ]
+  },
+  {
+    "id": "sap",
+    "name": "Sap",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "B",
+    "group": "club",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "nonlethal"
+    ]
+  },
+  {
+    "id": "sawtooth-saber",
+    "name": "Sawtooth Saber",
+    "category": "advanced",
+    "die": "d6",
+    "damageType": "S",
+    "group": "sword",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "finesse",
+      "twin"
+    ]
+  },
+  {
+    "id": "scimitar",
+    "name": "Scimitar",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "S",
+    "group": "sword",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "forceful",
+      "sweep"
+    ]
+  },
+  {
+    "id": "scythe",
+    "name": "Scythe",
+    "category": "martial",
+    "die": "d10",
+    "damageType": "S",
+    "group": "polearm",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "deadly-d10",
+      "trip"
+    ]
+  },
+  {
+    "id": "shield-boss",
+    "name": "Shield Boss",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "B",
+    "group": "shield",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "attached-to-shield"
+    ]
+  },
+  {
+    "id": "shield-spikes",
+    "name": "Shield Spikes",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "P",
+    "group": "shield",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "attached-to-shield"
+    ]
+  },
+  {
+    "id": "shortbow",
+    "name": "Shortbow",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "P",
+    "group": "bow",
+    "hands": 2,
+    "range": 60,
+    "traits": [
+      "deadly-d10"
+    ]
+  },
+  {
+    "id": "shortsword",
+    "name": "Shortsword",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "P",
+    "group": "sword",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "finesse",
+      "versatile-s"
+    ]
+  },
+  {
+    "id": "shuriken",
+    "name": "Shuriken",
+    "category": "martial",
+    "die": "d4",
+    "damageType": "P",
+    "group": "dart",
+    "hands": 1,
+    "range": 20,
+    "traits": [
+      "agile",
+      "monk",
+      "thrown"
+    ]
+  },
+  {
+    "id": "sickle",
+    "name": "Sickle",
+    "category": "simple",
+    "die": "d4",
+    "damageType": "S",
+    "group": "knife",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "finesse",
+      "trip"
+    ]
+  },
+  {
+    "id": "sling",
+    "name": "Sling",
+    "category": "simple",
+    "die": "d6",
+    "damageType": "B",
+    "group": "sling",
+    "hands": 1,
+    "range": 50,
+    "traits": [
+      "propulsive"
+    ]
+  },
+  {
+    "id": "spear",
+    "name": "Spear",
+    "category": "simple",
+    "die": "d6",
+    "damageType": "P",
+    "group": "spear",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "monk",
+      "thrown-20"
+    ]
+  },
+  {
+    "id": "spiked-chain",
+    "name": "Spiked Chain",
+    "category": "martial",
+    "die": "d8",
+    "damageType": "S",
+    "group": "flail",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "disarm",
+      "finesse",
+      "trip"
+    ]
+  },
+  {
+    "id": "spiked-gauntlet",
+    "name": "Spiked Gauntlet",
+    "category": "simple",
+    "die": "d4",
+    "damageType": "P",
+    "group": "brawling",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "free-hand"
+    ]
+  },
+  {
+    "id": "staff",
+    "name": "Staff",
+    "category": "simple",
+    "die": "d4",
+    "damageType": "B",
+    "group": "club",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "monk",
+      "two-hand-d8"
+    ]
+  },
+  {
+    "id": "starknife",
+    "name": "Starknife",
+    "category": "martial",
+    "die": "d4",
+    "damageType": "P",
+    "group": "knife",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "deadly-d6",
+      "finesse",
+      "thrown-20",
+      "versatile-s"
+    ]
+  },
+  {
+    "id": "sword-cane",
+    "name": "Sword Cane",
+    "category": "martial",
+    "die": "d6",
+    "damageType": "P",
+    "group": "sword",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "concealable",
+      "finesse"
+    ]
+  },
+  {
+    "id": "temple-sword",
+    "name": "Temple Sword",
+    "category": "martial",
+    "die": "d8",
+    "damageType": "S",
+    "group": "sword",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "monk",
+      "trip"
+    ]
+  },
+  {
+    "id": "tiger-fork",
+    "name": "Tiger Fork",
+    "category": "martial",
+    "die": "d8",
+    "damageType": "P",
+    "group": "spear",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "disarm",
+      "grapple",
+      "magical",
+      "thrown-20"
+    ]
+  },
+  {
+    "id": "trident",
+    "name": "Trident",
+    "category": "martial",
+    "die": "d8",
+    "damageType": "P",
+    "group": "spear",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "thrown-20"
+    ]
+  },
+  {
+    "id": "wakizashi",
+    "name": "Wakizashi",
+    "category": "martial",
+    "die": "d4",
+    "damageType": "S",
+    "group": "sword",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "agile",
+      "deadly-d8",
+      "finesse",
+      "versatile-p"
+    ]
+  },
+  {
+    "id": "war-flail",
+    "name": "War Flail",
+    "category": "martial",
+    "die": "d10",
+    "damageType": "B",
+    "group": "flail",
+    "hands": 2,
+    "range": 0,
+    "traits": [
+      "disarm",
+      "sweep",
+      "trip"
+    ]
+  },
+  {
+    "id": "warhammer",
+    "name": "Warhammer",
+    "category": "martial",
+    "die": "d8",
+    "damageType": "B",
+    "group": "hammer",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "shove"
+    ]
+  },
+  {
+    "id": "whip",
+    "name": "Whip",
+    "category": "martial",
+    "die": "d4",
+    "damageType": "S",
+    "group": "flail",
+    "hands": 1,
+    "range": 0,
+    "traits": [
+      "disarm",
+      "finesse",
+      "nonlethal",
+      "reach",
+      "trip"
+    ]
+  }
+]
