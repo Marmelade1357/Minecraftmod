@@ -24,7 +24,7 @@ deutsch. **Code, Kommentare, Bezeichner und Commit-Messages sind englisch.**
 | GM-Rolle | Command-Tag `pf2craft_gm` am Spieler | Wird mit den Spielerdaten gespeichert. Vergeben mit `/pf2 gm add <Spieler>` (OP-Level 2). OPs sind **nicht** automatisch GM. |
 | Verdeckte Würfe | Sehen nur der Würfelnde und alle GMs | Alle anderen erhalten „X würfelt verdeckt“. |
 | Sprachen | Englisch + Deutsch (`en_us.json`, `de_de.json`) | Bei neuen Texten **immer beide** Dateien pflegen. In der deutschen Version heißen Würfel „W“ (W20), in der englischen „d“. |
-| Charaktere (geplant) | Import aus **Pathbuilder 2e** (JSON-Export) | Spart den Nachbau der Charaktererschaffung. Muss noch mit dem Nutzer bestätigt werden. |
+| Charaktere | Import aus **Pathbuilder 2e** (JSON-Export, 6-stellige ID), Stufenaufstieg im Spiel nach Freigabe durch den GM | Bestätigt. Spart den Nachbau der Charaktererschaffung; geführte Erschaffung im Spiel ist als „Schritt B“ offen. |
 | Inhalte (geplant) | Datengetrieben als JSON (Monster, Zauber, Gegenstände) | Die Gruppe soll selbst Inhalte ergänzen können. |
 | Lizenz | Mechanik nach ORC-Lizenz umsetzen | **Keine Regeltexte von AoN massenhaft kopieren.** Kurze eigene Zusammenfassungen sind in Ordnung. |
 
@@ -34,14 +34,21 @@ deutsch. **Code, Kommentare, Bezeichner und Commit-Messages sind englisch.**
 core/                       Reines Java ohne Minecraft-Abhängigkeit. Regelkern + JUnit-5-Tests.
   de.pf2craft.core.dice     DiceExpression (Parser, d/W-Notation), RollResult, DieRoller
   de.pf2craft.core.check    DegreeOfSuccess (Erfolgsgrade inkl. nat. 20/1)
+  de.pf2craft.core.character   Charakterbogen-Modell, CharacterMath, PathbuilderImporter, CharacterJson, CheckId, GmEdit, PathbuilderId/-Response
+  de.pf2craft.core.progression ClassProgression (+ Parser), ClassRegistry, LevelUp
+  src/main/resources/pf2craft/classes/  Klassendaten (29 Klassen + index.json); Testdaten: 261 Pathbuilder-Fixtures
+                            (MIT, MrPrimate/pathmuncher) in core/src/test/resources/pathbuilder/
 fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
   src/main/java/de/pf2craft       gemeinsamer und Server-Code
     Pf2Craft                      ModInitializer, MOD_ID = "pf2craft", Pf2Craft.id(path)
     GmRoles                       GM-Rolle über den Command-Tag
     network/                      Payloads (CustomPayload-Records) + Pf2Networking
     roll/                         RollService (serverseitig würfeln/verteilen), RollMessages (Chat-Text)
-    command/                      Pf2Commands (/roll, /gmroll, /pf2 gm …)
-  src/client/java/de/pf2craft/client  nur Client: Pf2CraftClient, DiceScreen, RollHud
+    character/                    CharacterStore (Data Attachment), ClassData (Jar + config/pf2craft/classes/*.json),
+                                  PathbuilderFetcher, CharacterService (Import/Reset/Aufstieg), SheetService (Bogen, TP, GM-Edits)
+    command/                      Pf2Commands (/roll, /gmroll, /pf2 gm|hp|sheet|character …)
+  src/client/java/de/pf2craft/client  nur Client: Pf2CraftClient, DiceScreen, RollHud, ImportScreen,
+                                  CharacterScreen (Reiter, Verdeckt, GM-Knöpfe), LevelUpScreen, ClientSheets
   src/main/resources/assets/pf2craft/lang/  en_us.json, de_de.json
 ```
 
@@ -92,17 +99,21 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
 - `./gradlew build` läuft ohne Fehler, `runClient` startet. Ingame im Einzelspieler
   getestet: Würfelfenster, `/roll`, verdeckte Würfe.
 - Noch nicht getestet: Mehrspieler (Sichtbarkeit verdeckter Würfe für Nicht-GMs).
-- `core` ist getestet (23 Tests, alle grün).
+- Phase 2 (Charaktere) ist gebaut und per Unit-Tests in `core` abgedeckt; die UI
+  (Import-, Charakter-, Aufstiegsfenster) wurde vom Nutzer **noch nicht ingame getestet**.
+- Bekannte Grenzen Phase 2: Taste C kollidiert mit Vanilla „Save Hotbar Activator“;
+  Talente nur als Name (keine Effekte); auswahlbasierte Klassenverbesserungen (Doktrinen,
+  Waffenmeisterschaft, Wissensränge) setzt der GM; keine Zauber/Inventar; Wurfbezeichnungen
+  im Chat englisch; Striking-Runen fehlen in den Schadenswürfeln.
 
 ## Fahrplan
 
 1. ✅ **Phase 1:** Regelkern-Grundlagen (Würfel, Erfolgsgrade), Würfelfenster, HUD-Anzeige,
    GM-Rolle, `/roll`, `/gmroll`. *Noch offen: Test mit mehreren Spielern.*
-2. **Phase 2 – Charaktere:**
-   - Charakterbogen als Screen: Attribute, Übungsgrade, TP, RK, Rettungswürfe, Fertigkeiten.
-   - Klick auf eine Fertigkeit oder einen Rettungswurf würfelt über den bestehenden `RollService`.
-   - Import aus Pathbuilder 2e (JSON).
-   - Serverseitige Speicherung (PersistentState o. Ä.).
+2. ✅ **Phase 2 – Charaktere:** Charakterbogen (Taste C), Klick-zum-Würfeln über `RollService`,
+   Pathbuilder-Import, Speicherung per Data Attachment, Stufenaufstieg nach GM-Freigabe, GM-Ansicht.
+   *Noch offen: geführte Charaktererschaffung im Spiel („Schritt B“), Mehrspielertest,
+   Ingame-Test der UI durch den Nutzer, die bekannten Grenzen oben.*
 3. **Phase 3 – Kampfmodus:**
    - GM startet und beendet einen Kampf, Initiative mit Zugreihenfolge im HUD.
    - 3 Aktionen + 1 Reaktion pro Zug, Mehrfachangriffsmalus.
