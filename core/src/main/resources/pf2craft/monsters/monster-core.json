@@ -56,7 +56,7 @@
      }
     ],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -239,7 +239,7 @@
     "traits": [
      "brutal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -351,7 +351,7 @@
     "traits": [
      "brutal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -461,7 +461,7 @@
     "traits": [
      "brutal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -574,7 +574,7 @@
     "traits": [
      "brutal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -684,7 +684,7 @@
     "traits": [
      "brutal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -795,7 +795,7 @@
     "traits": [
      "brutal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -942,7 +942,7 @@
      "magical",
      "versatile-p"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -1101,7 +1101,7 @@
   "reflex": 22,
   "will": 23,
   "hp": 225,
-  "speed": 0,
+  "speed": 60,
   "strikes": [
    {
     "name": "Tail",
@@ -1418,7 +1418,7 @@
     "traits": [
      "acid"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -1480,7 +1480,7 @@
     "traits": [
      "acid"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -1746,7 +1746,7 @@
     "traits": [
      "brutal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -2047,7 +2047,7 @@
     "traits": [
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -2414,7 +2414,7 @@
     "traits": [
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -2670,7 +2670,7 @@
      }
     ],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -2709,7 +2709,7 @@
   "reflex": 29,
   "will": 32,
   "hp": 250,
-  "speed": 0,
+  "speed": 60,
   "strikes": [
    {
     "name": "Hand",
@@ -2739,7 +2739,6 @@
    "bleed",
    "death-effects",
    "disease",
-   "paralyzed",
    "paralyzed",
    "poison",
    "precision",
@@ -3034,7 +3033,7 @@
      "propulsive",
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -3219,7 +3218,7 @@
     "attackBonus": 14,
     "damage": [],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -3316,7 +3315,7 @@
   "reflex": 7,
   "will": 5,
   "hp": 16,
-  "speed": 0,
+  "speed": 60,
   "strikes": [
    {
     "name": "Snout",
@@ -4057,7 +4056,7 @@
   "reflex": 6,
   "will": 4,
   "hp": 20,
-  "speed": 0,
+  "speed": 40,
   "strikes": [
    {
     "name": "Headbutt",
@@ -4364,7 +4363,7 @@
     "traits": [
      "brutal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -4431,7 +4430,7 @@
      "propulsive",
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -4763,7 +4762,7 @@
      "magical",
      "sonic"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -5233,7 +5232,7 @@
     "traits": [
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    },
    {
     "name": "Hand Crossbow (Serpentfolk Venom)",
@@ -5248,7 +5247,7 @@
     "traits": [
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -5451,7 +5450,7 @@
     "traits": [
      "mental"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -5558,7 +5557,7 @@
     "traits": [
      "mental"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -5664,7 +5663,7 @@
     "traits": [
      "mental"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -5772,7 +5771,7 @@
     "traits": [
      "mental"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -5877,7 +5876,7 @@
     "traits": [
      "mental"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -5984,7 +5983,7 @@
     "traits": [
      "mental"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -6330,7 +6329,7 @@
     "traits": [
      "reload-2"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -6732,7 +6731,7 @@
     "traits": [
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -6794,7 +6793,7 @@
     "traits": [
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -6932,7 +6931,7 @@
     "traits": [
      "acid"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -7981,7 +7980,7 @@
     "traits": [
      "magical"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -8181,7 +8180,7 @@
      "plant",
      "primal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -8385,7 +8384,7 @@
      "reload-0",
      "volley-30"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -8547,7 +8546,7 @@
   "reflex": 28,
   "will": 29,
   "hp": 175,
-  "speed": 0,
+  "speed": 50,
   "strikes": [
    {
     "name": "Ghostly Hand",
@@ -8886,7 +8885,7 @@
     "traits": [
      "brutal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -8924,7 +8923,7 @@
   "reflex": 24,
   "will": 18,
   "hp": 140,
-  "speed": 0,
+  "speed": 100,
   "strikes": [
    {
     "name": "Gust",
@@ -8953,7 +8952,7 @@
      }
     ],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -9016,7 +9015,7 @@
      }
     ],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -9233,7 +9232,7 @@
     "traits": [
      "deadly-d8"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -10341,7 +10340,7 @@
      "fire",
      "primal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -10463,7 +10462,7 @@
      }
     ],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -11452,7 +11451,7 @@
      "cold",
      "primal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -11518,7 +11517,7 @@
      }
     ],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -11675,7 +11674,7 @@
   "reflex": 11,
   "will": 8,
   "hp": 30,
-  "speed": 0,
+  "speed": 25,
   "strikes": [
    {
     "name": "Ghostly Hand",
@@ -11739,7 +11738,7 @@
   "reflex": 19,
   "will": 22,
   "hp": 135,
-  "speed": 0,
+  "speed": 25,
   "strikes": [
    {
     "name": "Ghostly Hand",
@@ -12055,7 +12054,7 @@
      "fire",
      "magical"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -13178,7 +13177,7 @@
     "traits": [
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -13216,7 +13215,7 @@
   "reflex": 31,
   "will": 28,
   "hp": 230,
-  "speed": 0,
+  "speed": 50,
   "strikes": [
    {
     "name": "Slam",
@@ -13255,7 +13254,7 @@
      "holy",
      "magical"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -13431,7 +13430,43 @@
   "will": 9,
   "hp": 16,
   "speed": 25,
-  "strikes": [],
+  "strikes": [
+   {
+    "name": "Dagger",
+    "attackBonus": 8,
+    "damage": [
+     {
+      "dice": "1d4",
+      "bonus": 2,
+      "type": "piercing"
+     }
+    ],
+    "traits": [
+     "agile",
+     "finesse",
+     "thrown-10",
+     "versatile-s"
+    ],
+    "ranged": false
+   },
+   {
+    "name": "Sling",
+    "attackBonus": 8,
+    "damage": [
+     {
+      "dice": "1d6",
+      "bonus": 1,
+      "type": "bludgeoning"
+     }
+    ],
+    "traits": [
+     "propulsive",
+     "range-increment-50",
+     "reload-1"
+    ],
+    "ranged": true
+   }
+  ],
   "resistances": [],
   "weaknesses": [],
   "immunities": [],
@@ -13489,7 +13524,7 @@
      "deadly-d10",
      "reload-0"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -13560,7 +13595,28 @@
   "will": 4,
   "hp": 15,
   "speed": 25,
-  "strikes": [],
+  "strikes": [
+   {
+    "name": "Torch",
+    "attackBonus": 7,
+    "damage": [
+     {
+      "dice": "1d4",
+      "bonus": 0,
+      "type": "bludgeoning"
+     },
+     {
+      "dice": "",
+      "bonus": 1,
+      "type": "fire"
+     }
+    ],
+    "traits": [
+     "fire"
+    ],
+    "ranged": false
+   }
+  ],
   "resistances": [],
   "weaknesses": [],
   "immunities": [],
@@ -13619,7 +13675,7 @@
      "deadly-d10",
      "reload-0"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -13679,7 +13735,7 @@
      "deadly-d10",
      "reload-0"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -13792,7 +13848,7 @@
     "attackBonus": 22,
     "damage": [],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -14105,7 +14161,7 @@
      }
     ],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -14205,7 +14261,7 @@
      "reload-0",
      "volley-30"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -14314,7 +14370,7 @@
     "traits": [
      "brutal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -14345,7 +14401,7 @@
   "reflex": 10,
   "will": 9,
   "hp": 60,
-  "speed": 0,
+  "speed": 40,
   "strikes": [
    {
     "name": "Jaws",
@@ -14575,7 +14631,7 @@
   "reflex": 18,
   "will": 15,
   "hp": 75,
-  "speed": 0,
+  "speed": 30,
   "strikes": [
    {
     "name": "Shadow Hand",
@@ -15096,7 +15152,7 @@
      "acid",
      "splash"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -15422,7 +15478,7 @@
      "propulsive",
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -15829,7 +15885,7 @@
     "traits": [
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -15893,7 +15949,7 @@
      "propulsive",
      "reload-0"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -15952,7 +16008,7 @@
      "deadly-d10",
      "reload-0"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -16737,7 +16793,7 @@
     "traits": [
      "splash"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -16799,7 +16855,7 @@
     "traits": [
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -16894,7 +16950,7 @@
     "attackBonus": 7,
     "damage": [],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -17545,7 +17601,7 @@
      "electricity",
      "magical"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -17644,7 +17700,7 @@
      "air",
      "arcane"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -17866,7 +17922,7 @@
      "propulsive",
      "reload-0"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -18327,7 +18383,7 @@
     "traits": [
      "deadly-d10"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -18403,7 +18459,7 @@
      "propulsive",
      "reload-0"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -18544,7 +18600,7 @@
     "traits": [
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -18617,7 +18673,7 @@
      "propulsive",
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -18986,7 +19042,7 @@
      }
     ],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -19049,7 +19105,7 @@
     "traits": [
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -19104,7 +19160,7 @@
      }
     ],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -19325,7 +19381,7 @@
      "unholy",
      "volley-30"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -19651,7 +19707,7 @@
   "reflex": 16,
   "will": 10,
   "hp": 50,
-  "speed": 0,
+  "speed": 50,
   "strikes": [
    {
     "name": "Gust",
@@ -19731,7 +19787,7 @@
      }
     ],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -19907,7 +19963,7 @@
      "nonlethal",
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -20131,7 +20187,7 @@
      "holy",
      "light"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -20392,7 +20448,7 @@
     "traits": [
      "propulsive"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -20542,7 +20598,7 @@
      "primal",
      "water"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -20619,7 +20675,7 @@
      "propulsive",
      "reload-0"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -20649,7 +20705,7 @@
   "reflex": 16,
   "will": 17,
   "hp": 180,
-  "speed": 0,
+  "speed": 80,
   "strikes": [
    {
     "name": "Jaws",
@@ -22029,7 +22085,7 @@
      "magical",
      "water"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -22104,7 +22160,7 @@
      "magical",
      "water"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -22758,7 +22814,7 @@
      }
     ],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -23775,7 +23831,7 @@
      "brutal",
      "unholy"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -24063,7 +24119,7 @@
   "reflex": 11,
   "will": 12,
   "hp": 75,
-  "speed": 0,
+  "speed": 60,
   "strikes": [
    {
     "name": "Jaws",
@@ -24388,7 +24444,7 @@
   "reflex": 18,
   "will": 16,
   "hp": 120,
-  "speed": 0,
+  "speed": 35,
   "strikes": [
    {
     "name": "Phantom Horn",
@@ -24449,7 +24505,7 @@
   "reflex": 12,
   "will": 13,
   "hp": 45,
-  "speed": 0,
+  "speed": 25,
   "strikes": [
    {
     "name": "Phantom Sword",
@@ -24483,7 +24539,7 @@
      "magical",
      "volley-30"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -24677,7 +24733,7 @@
     "traits": [
      "fire"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -24843,7 +24899,7 @@
      "reload-0",
      "volley-20"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -24952,7 +25008,7 @@
   "reflex": 31,
   "will": 37,
   "hp": 335,
-  "speed": 0,
+  "speed": 40,
   "strikes": [
    {
     "name": "Touch of Creation",
@@ -25030,7 +25086,7 @@
   "reflex": 14,
   "will": 13,
   "hp": 55,
-  "speed": 0,
+  "speed": 20,
   "strikes": [
    {
     "name": "Telekinetic Object",
@@ -25046,7 +25102,7 @@
      "magical",
      "occult"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -25316,7 +25372,7 @@
      "magical",
      "reload-0"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -25395,7 +25451,7 @@
     "traits": [
      "deadly-d10"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -25588,7 +25644,7 @@
      "propulsive",
      "volley-30"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -26172,7 +26228,7 @@
     "traits": [
      "splash"
     ],
-    "ranged": false
+    "ranged": true
    },
    {
     "name": "Hand Crossbow",
@@ -26187,7 +26243,7 @@
     "traits": [
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -27102,7 +27158,7 @@
      "deadly-d10",
      "reload-0"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -27344,7 +27400,7 @@
      "brutal",
      "water"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -27812,7 +27868,7 @@
   "reflex": 14,
   "will": 12,
   "hp": 40,
-  "speed": 0,
+  "speed": 30,
   "strikes": [
    {
     "name": "Shadow Hand",
@@ -27937,7 +27993,7 @@
   "reflex": 14,
   "will": 12,
   "hp": 40,
-  "speed": 0,
+  "speed": 30,
   "strikes": [
    {
     "name": "Shadow Hand",
@@ -28148,7 +28204,7 @@
      "arcane",
      "magical"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -28643,7 +28699,7 @@
      "deadly-d10",
      "reload-0"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -28920,7 +28976,7 @@
     "attackBonus": 9,
     "damage": [],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -29190,7 +29246,7 @@
      "cold",
      "magical"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -30092,7 +30148,7 @@
      }
     ],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -30163,7 +30219,7 @@
      "fire",
      "light"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -30286,7 +30342,7 @@
      "brutal",
      "magical"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -30375,7 +30431,7 @@
     "traits": [
      "brutal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -30434,7 +30490,7 @@
     "traits": [
      "brutal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -30851,7 +30907,7 @@
      "deadly-d10",
      "reload-0"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -30925,7 +30981,7 @@
      "magical",
      "unholy"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -31689,7 +31745,7 @@
     "traits": [
      "deadly-d6"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -31886,7 +31942,7 @@
     "traits": [
      "propulsive"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -31942,7 +31998,7 @@
      "propulsive",
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -31996,7 +32052,7 @@
     "traits": [
      "reload-2"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -32622,7 +32678,7 @@
      "acid",
      "magical"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -32776,7 +32832,7 @@
      "holy",
      "poison"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -33513,7 +33569,7 @@
     "traits": [
      "magical"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -33787,7 +33843,7 @@
     "traits": [
      "reload-1"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -33826,7 +33882,36 @@
   "will": 9,
   "hp": 75,
   "speed": 25,
-  "strikes": [],
+  "strikes": [
+   {
+    "name": "Jaws",
+    "attackBonus": 14,
+    "damage": [
+     {
+      "dice": "2d6",
+      "bonus": 7,
+      "type": "piercing"
+     }
+    ],
+    "traits": [],
+    "ranged": false
+   },
+   {
+    "name": "Claw",
+    "attackBonus": 14,
+    "damage": [
+     {
+      "dice": "2d4",
+      "bonus": 7,
+      "type": "slashing"
+     }
+    ],
+    "traits": [
+     "agile"
+    ],
+    "ranged": false
+   }
+  ],
   "resistances": [],
   "weaknesses": [
    {
@@ -33895,7 +33980,7 @@
      "deadly-d10",
      "reload-0"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -34020,7 +34105,7 @@
   "reflex": 16,
   "will": 14,
   "hp": 50,
-  "speed": 0,
+  "speed": 50,
   "strikes": [
    {
     "name": "Shock",
@@ -34286,7 +34371,7 @@
   "reflex": 14,
   "will": 14,
   "hp": 80,
-  "speed": 0,
+  "speed": 40,
   "strikes": [
    {
     "name": "Wraith Touch",
@@ -35047,7 +35132,7 @@
     "attackBonus": 17,
     "damage": [],
     "traits": [],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -35077,7 +35162,7 @@
   "reflex": 13,
   "will": 7,
   "hp": 36,
-  "speed": 0,
+  "speed": 50,
   "strikes": [
    {
     "name": "Wing",
@@ -35125,7 +35210,7 @@
   "reflex": 10,
   "will": 4,
   "hp": 20,
-  "speed": 0,
+  "speed": 40,
   "strikes": [
    {
     "name": "Eye Ray",
@@ -35143,7 +35228,7 @@
      "holy",
      "magical"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [
@@ -35278,7 +35363,7 @@
     "traits": [
      "brutal"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [],
@@ -35446,7 +35531,7 @@
     "traits": [
      "deadly-d10"
     ],
-    "ranged": false
+    "ranged": true
    }
   ],
   "resistances": [

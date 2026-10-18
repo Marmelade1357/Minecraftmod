@@ -17,10 +17,20 @@ import org.junit.jupiter.api.Test;
 
 /** Sanity checks for the bundled Monster Core data file. */
 class MonsterDataConsistencyTest {
-    // Creatures without a melee/ranged Strike item (swarms act through area abilities, casters through spells).
-    private static final Set<String> NO_STRIKES = Set.of("army-ant-swarm", "centipede-swarm", "gnome-bard",
-            "goblin-pyro", "rat-swarm", "scorpion-swarm", "spider-swarm", "tooth-fairy-swarm",
-            "vampire-bat-swarm", "vescavor-swarm", "wasp-swarm", "weretiger");
+    // Reason per creature without a Strike (checked against Foundry actors and AoN): swarms attack only
+    // through area abilities (Swarming Bites etc.), they have no Melee/Ranged line.
+    private static final Map<String, String> NO_STRIKES = Map.of(
+            "army-ant-swarm", "swarm: area ability only",
+            "centipede-swarm", "swarm: area ability only",
+            "rat-swarm", "swarm: area ability only",
+            "scorpion-swarm", "swarm: area ability only",
+            "spider-swarm", "swarm: area ability only",
+            "tooth-fairy-swarm", "swarm: area ability only",
+            "vampire-bat-swarm", "swarm: area ability only",
+            "vescavor-swarm", "swarm: area ability only",
+            "wasp-swarm", "swarm: area ability only");
+    // Monsters allowed to have speed 0 (immobile); none in Monster Core, fly/swim-only ones use their best speed.
+    private static final Map<String, String> ZERO_SPEED = Map.of();
 
     private static List<MonsterData> all;
     private static Map<String, MonsterData> byId;
@@ -41,7 +51,7 @@ class MonsterDataConsistencyTest {
     }
 
     // Spot values from Archives of Nethys (Remaster entries):
-    // https://2e.aonprd.com/Monsters.aspx?ID=3072 (Kobold Warrior)
+    // https://2e.aonprd.com/NPCs.aspx?ID=3072 (Kobold Warrior: AC 16, HP 7, Fort +3, spear +3/+5/+5)
     // https://2e.aonprd.com/Monsters.aspx?ID=3241 (Wolf)
     // https://2e.aonprd.com/Monsters.aspx?ID=3119 (Ogre Glutton)
     // https://2e.aonprd.com/Monsters.aspx?ID=2923 (Tyrannosaurus)
@@ -76,13 +86,44 @@ class MonsterDataConsistencyTest {
     void strikesAndLimits() {
         for (MonsterData m : all) {
             if (m.strikes().isEmpty()) {
-                assertTrue(NO_STRIKES.contains(m.id()), "unexpected monster without strikes: " + m.id());
+                assertTrue(NO_STRIKES.containsKey(m.id()), "unexpected monster without strikes: " + m.id());
             }
             for (String a : m.abilities()) {
                 assertTrue(a.length() <= 64, m.id() + " ability too long: " + a);
             }
         }
         assertTrue(NO_STRIKES.size() * 20 <= all.size(), "NO_STRIKES above 5 %");
+    }
+
+    @Test
+    void reloadAndVolleyStrikesAreRanged() {
+        for (MonsterData m : all) {
+            for (MonsterStrike s : m.strikes()) {
+                boolean rangedTrait = s.traits().stream().anyMatch(t -> t.startsWith("reload-")
+                        || t.startsWith("volley-") || t.equals("propulsive"));
+                assertTrue(!rangedTrait || s.ranged(), m.id() + " " + s.name() + " should be ranged");
+            }
+        }
+        assertTrue(byId.get("kobold-warrior").strikes().stream().anyMatch(s -> s.name().equals("Sling")
+                && s.ranged()));
+        assertEquals(2, byId.get("weretiger").strikes().size());
+    }
+
+    @Test
+    void speedIsNeverZeroUnlessListed() {
+        for (MonsterData m : all) {
+            assertTrue(m.speed() > 0 || ZERO_SPEED.containsKey(m.id()), m.id() + " has speed 0");
+        }
+        assertEquals(60, byId.get("banshee").speed());
+        assertEquals(80, byId.get("megalodon").speed());
+    }
+
+    @Test
+    void noDuplicateListEntries() {
+        for (MonsterData m : all) {
+            assertEquals(m.immunities().size(), Set.copyOf(m.immunities()).size(), m.id() + " immunities");
+            assertEquals(m.traits().size(), Set.copyOf(m.traits()).size(), m.id() + " traits");
+        }
     }
 
     @Test
