@@ -120,14 +120,16 @@ public final class AttackService {
 
     private static boolean perform(ServerPlayerEntity attacker, Entity target, int number) {
         long now = System.currentTimeMillis();
-        Long last = LAST_CONFIRM.put(attacker.getUuid(), now);
+        Long last = LAST_CONFIRM.get(attacker.getUuid());
         if (last != null && now - last < COOLDOWN_MS) {
+            hint(attacker, CombatMessages.attackCooldown());
             return false;
         }
         Prepared p = prepare(attacker, target, false);
         if (p == null) {
             return false;
         }
+        LAST_CONFIRM.put(attacker.getUuid(), now); // only an accepted attack starts the cooldown
         // Nothing is rejected any more: from here on the action is spent.
         CombatService.turn().spendActions(1);
         CombatService.turn().recordAttack();

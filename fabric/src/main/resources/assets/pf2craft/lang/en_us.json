@@ -292,5 +292,7 @@
   "screen.pf2craft.attack.title_multi": "Choose an attack",
   "screen.pf2craft.attack.button": "Attack %s (%s)",
   "screen.pf2craft.attack.strike": "Strike: %s",
-  "screen.pf2craft.attack.cancel": "Cancel"
+  "screen.pf2craft.attack.cancel": "Cancel",
+  "pf2craft.combat.can_end_players": "All players are unable to fight. The combat can be ended.",
+  "pf2craft.combat.attack_cooldown": "Not so fast!"
 }

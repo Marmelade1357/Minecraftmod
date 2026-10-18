@@ -38,6 +38,10 @@ public class AttackScreen extends Screen {
     @Override
     protected void init() {
         clearChildren();
+        if (options.isEmpty()) {
+            close();
+            return;
+        }
         int w = Math.min(PANEL_W, width - 16);
         int x = (width - w) / 2;
         int y = height / 2 - 48;
@@ -80,6 +84,9 @@ public class AttackScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         renderBackground(context, mouseX, mouseY, delta);
+        if (options.isEmpty()) {
+            return;
+        }
         Text heading = options.size() == 1
                 ? Text.translatable("screen.pf2craft.attack.title", options.get(0).name())
                 : title;

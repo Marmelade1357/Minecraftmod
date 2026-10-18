@@ -377,9 +377,11 @@ public final class CombatService {
             }
         }
         if (!encounter.hasActive(true) || !encounter.hasActive(false)) {
+            // Only the GMs are told; the combat goes on until nobody at all is active.
+            Text hint = encounter.hasActive(true) ? CombatMessages.canEndPlayers() : CombatMessages.canEnd();
             for (ServerPlayerEntity gm : recipients(leaving)) {
                 if (GmRoles.isGm(gm)) {
-                    gm.sendMessage(CombatMessages.canEnd(), false);
+                    gm.sendMessage(hint, false);
                 }
             }
         }

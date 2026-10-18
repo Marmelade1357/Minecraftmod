@@ -77,6 +77,15 @@ final class CombatMessages {
                 .formatted(Formatting.GOLD);
     }
 
+    static MutableText canEndPlayers() {
+        return Text.translatableWithFallback("pf2craft.combat.can_end_players",
+                "All players are unable to fight. The combat can be ended.").formatted(Formatting.GOLD);
+    }
+
+    static MutableText attackCooldown() {
+        return Text.translatableWithFallback("pf2craft.combat.attack_cooldown", "Not so fast!");
+    }
+
     static MutableText statusHead(int round, String current, int actionsLeft, boolean reaction) {
         return Text.translatableWithFallback("pf2craft.combat.status_head",
                 "Round %s, %s's turn. Actions left: %s, reaction: %s", round, current, actionsLeft,
