@@ -6,7 +6,7 @@ Ein Spieler ist Spielleiter (GM) und steuert NPCs, die anderen spielen ihre Char
 **Plattform:** Fabric · Minecraft 1.21.1 · Java 21. Server **und** alle Spieler brauchen die Mod
 (plus [Fabric API](https://modrinth.com/mod/fabric-api)).
 
-## Aktueller Stand (Phase 1 und 2)
+## Aktueller Stand (Phase 1 bis 3, Teil 2)
 
 ### Würfelfenster
 - Taste **R** (änderbar unter Steuerung → PF2 Craft) öffnet das Würfelfenster.
@@ -31,6 +31,11 @@ groß oben auf dem Bildschirm (natürliche 20 golden, natürliche 1 rot) und im 
 | `/pf2 sheet <Spieler>` | Charakterbogen eines Spielers ansehen (Spielleiter oder OP) |
 | `/pf2 items <Spieler>` | Waffen und Schild eines Spielers aus dem gespeicherten Bogen neu ausgeben (Spielleiter oder OP) |
 | `/pf2 hp <Spieler> <Menge>` | TP eines Spielers ändern, negativ = Schaden (Spielleiter oder OP) |
+| `/pf2 tools` | Befehlsstab erhalten (nur Spieler mit GM-Rolle, OP allein genügt nicht) |
+| `/pf2 npc spawn <id>` | NPC aus den Monsterdaten neben dir erzeugen, z. B. `goblin-warrior` (Spielleiter oder OP) |
+| `/pf2 npc info` | Werte des ausgewählten (sonst angesehenen, max. 16 Blöcke) NPCs im Chat (Spielleiter oder OP) |
+| `/pf2 npc remove` | ausgewählten (sonst angesehenen) NPC entfernen (Spielleiter oder OP) |
+| `/pf2 npc hp <Wert>` | aktuelle TP des ausgewählten NPCs setzen (Spielleiter oder OP) |
 
 „Spielleiter oder OP“ heißt: Spieler mit GM-Rolle oder Berechtigungsstufe 2.
 
@@ -81,15 +86,20 @@ Beim Import aus Pathbuilder bekommt jeder Spieler seine Waffen und seinen Schild
 Lizenz- und Urheberhinweise stehen in [NOTICE.md](NOTICE.md).
 
 ### Befehlsstab (NPCs, nur Spielleiter)
-`/pf2 tools` gibt dem Spielleiter den **Befehlsstab** (wird auch bei `/pf2 gm add` ausgegeben). Rechtsklick:
+Die NPCs stammen aus den Monsterdaten (Monster Core, 492 Kreaturen). `/pf2 tools` gibt dem Spielleiter den
+**Befehlsstab** (er wird auch bei `/pf2 gm add` ausgegeben). Rechtsklick:
 - **in die Luft:** Fenster „NPC hinzufügen“ (Monster suchen, anklicken, der NPC erscheint neben dir).
-- **auf einen NPC:** wählt ihn aus (Anzeige über der Hotbar). **Schleichen + Rechtsklick:** Werte-Fenster mit Bearbeitung,
-  „Als Vorlage speichern“ (nach `config/pf2craft/monsters/`) und „Entfernen“.
+- **auf einen NPC:** wählt ihn aus (Anzeige über der Hotbar). **Schleichen + Rechtsklick:** Werte-Fenster mit
+  Bearbeitung der Werte, Umbenennen, „Als Vorlage speichern“ und „Entfernen“.
 - **auf einen Block** (NPC ausgewählt): der NPC läuft dorthin.
 
-Ersatzbefehle: `/pf2 npc spawn|info|remove` (wirken auf den ausgewählten NPC, sonst auf den angesehenen) und
-`/pf2 npc hp <Wert>` für die aktuellen TP des ausgewählten NPCs. Hinweis: Blockklicks in der Spawn-Schutzzone des Servers
-(`spawn-protection`) erreichen die Mod nur bei Operatoren.
+**Vorlagen:** Gespeicherte Vorlagen liegen in `config/pf2craft/monsters/` auf dem Server und erscheinen in der
+Monstersuche. Eine Vorlage überschreibt nie ein eingebautes Monster: Ist die ID vergeben, wird `-custom`,
+`-custom-2` … angehängt. Alle `*.json`-Dateien in diesem Ordner werden geladen.
+
+**Besiegte NPCs:** Bei 0 TP legt sich ein NPC auf den Boden.
+
+Hinweis: Blockklicks in der Spawn-Schutzzone des Servers (`spawn-protection`) erreichen die Mod bei Spielern ohne OP nicht.
 
 ### Bekannte Grenzen
 - Taste **C** kollidiert mit der Vanilla-Belegung „Hotbar-Aktivator speichern“; eine der beiden Tasten unter Steuerung umbelegen.
@@ -99,6 +109,10 @@ Ersatzbefehle: `/pf2 npc spawn|info|remove` (wirken auf den ausgewählten NPC, s
 - Die Bezeichnungen der Würfe im Chat sind englisch.
 - Steigt der INT-Modifikator, muss der Spielleiter die zusätzliche trainierte Fertigkeit von Hand setzen.
 - Die geführte Charaktererschaffung im Spiel fehlt noch; Charaktere kommen aus Pathbuilder.
+- NPCs tun von selbst nichts und sind noch nicht im Kampf einsetzbar (kommt mit dem Kampfkern, Phase 3 Teil 3).
+- Das NPC-Modell ist ein Platzhalter (Dorfbewohner).
+- Angriffsboni (Strikes) lassen sich im Werte-Fenster noch nicht ändern.
+- Zusatzeffekte wie Ergreifen (Grab) oder anhaltender Schaden sind nur Namen bzw. Hinweise, ohne Regelwirkung.
 
 ## Projektstruktur
 
@@ -123,8 +137,13 @@ Der Regelkern wird direkt in die Mod-Jar kompiliert.
 1. ✅ Regelkern-Grundlagen, Würfelfenster, GM-Rolle, `/roll`
 2. ✅ Charakterbogen (Fenster), Import aus Pathbuilder 2e (JSON), Speicherung auf dem Server, Stufenaufstieg
    (offen: geführte Charaktererschaffung im Spiel)
-3. Kampfmodus: Initiative, 3 Aktionen + Reaktion, Angriffe, Mehrfachangriffsmalus, Zustände
-4. NPCs mit Werteblock, Steuerung und „Übernehmen“ durch den GM
+3. Kampfmodus (in Teilen):
+   - ✅ Teil 1: Waffen und Schilde als Gegenstände
+   - ✅ Teil 2: NPCs mit Monster-Core-Werten und Befehlsstab (gebaut, Ingame-Test steht aus)
+   - Teil 3: Kampfkern (Initiative, 3 Aktionen + Reaktion, Angriffe, Mehrfachangriffsmalus)
+   - Teil 4: Aktionsmenü
+   - Teil 5: Zustände
+4. NPC-Steuerung im Kampf und „Übernehmen“ durch den GM
 5. Zauber, Gegenstände, mehr Inhalte, physische Würfel
 
 ## Lizenzhinweis

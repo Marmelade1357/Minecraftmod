@@ -20,8 +20,8 @@ Full text: https://paizo.com/orclicense
 ### Attribution Notice
 
 PF2 Craft implements game mechanics (rules numbers, names, class progressions, weapon, armor
-and shield statistics) from the Pathfinder Second Edition Remaster books by Paizo Inc.
-(Pathfinder Player Core), licensed under the ORC License. No rules description text is
+and shield statistics, creature statistics) from the Pathfinder Second Edition Remaster books by Paizo Inc.
+(Pathfinder Player Core and Monster Core), licensed under the ORC License. No rules description text is
 reproduced. PF2 Craft's own source code and data files are by the PF2 Craft contributors.
 
 ### Reserved Material Notice

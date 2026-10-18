@@ -37,6 +37,8 @@ core/                       Reines Java ohne Minecraft-Abhängigkeit. Regelkern 
   de.pf2craft.core.character   Charakterbogen-Modell, CharacterMath, PathbuilderImporter, CharacterJson, CheckId, GmEdit, PathbuilderId/-Response
   de.pf2craft.core.progression ClassProgression (+ Parser), ClassRegistry, LevelUp
   de.pf2craft.core.item        Gegenstandskatalog (Waffen/Rüstung/Schilde, Parser), ItemVisual (Optik nach Schadenswürfel), ItemStamp
+  de.pf2craft.core.monster     Monster-Core-Daten (492 Kreaturen, Parser/Katalog), NpcStats, NpcEdit (GM-Änderungen)
+  src/main/resources/pf2craft/monsters/  monster-core.json (nur Namen und Zahlen)
   src/main/resources/pf2craft/items/  Player-Core-Waffen, -Rüstungen, -Schilde (nur Namen und Zahlen)
   src/main/resources/pf2craft/classes/  Klassendaten (29 Klassen + index.json); Testdaten: 261 Pathbuilder-Fixtures
                             (MIT, MrPrimate/pathmuncher) in core/src/test/resources/pathbuilder/
@@ -50,9 +52,13 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
                                   PathbuilderFetcher, CharacterService (Import/Reset/Aufstieg), SheetService (Bogen, TP, GM-Edits)
     item/                         Pf2ItemFactory (Vanilla-Items für Waffen/Schild), CharacterItems (geben/ersetzen/entfernen),
                                   ItemData (Jar + config/pf2craft/items/*.json), Pf2Components, WeaponRef/ShieldRef
-    command/                      Pf2Commands (/roll, /gmroll, /pf2 gm|hp|sheet|character …)
+    npc/                          NpcEntity (Dorfbewohner-basiert), NpcService, NpcNetwork, GmSelection, CommandStaffItem
+                                  (Befehlsstab), MonsterDataLoader (Jar + config/pf2craft/monsters/*.json; Vorlagen
+                                  überschreiben nie Eingebautes, ID bekommt `-custom`, `-custom-2` …), Pf2Entities
+    command/                      Pf2Commands (/roll, /gmroll, /pf2 gm|hp|sheet|items|tools|npc|character …)
   src/client/java/de/pf2craft/client  nur Client: Pf2CraftClient, DiceScreen, RollHud, ImportScreen,
-                                  CharacterScreen (Reiter, Verdeckt, GM-Knöpfe), LevelUpScreen, ClientSheets
+                                  CharacterScreen (Reiter, Verdeckt, GM-Knöpfe), LevelUpScreen, ClientSheets,
+                                  NpcSpawnScreen, NpcSheetScreen (+ NPC-Renderer)
   src/main/resources/assets/pf2craft/lang/  en_us.json, de_de.json
 ```
 
@@ -109,6 +115,11 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
   Talente nur als Name (keine Effekte); auswahlbasierte Klassenverbesserungen (Doktrinen,
   Waffenmeisterschaft, Wissensränge) setzt der GM; keine Zauber/Inventar; Wurfbezeichnungen
   im Chat englisch; steigt der INT-Modifikator, muss der GM die zusätzliche trainierte Fertigkeit von Hand setzen.
+- Phase 3 Teil 1 (Gegenstände) vom Nutzer im Einzelspieler getestet. Teil 2 (NPCs, Befehlsstab) ist gebaut
+  und per Unit-Tests in `core` abgedeckt; der Ingame-Test durch den Nutzer steht noch aus.
+- Bekannte Grenzen Teil 2: NPCs handeln nicht von selbst und sind noch nicht im Kampf nutzbar; Platzhaltermodell
+  (Dorfbewohner); Strike-Boni im Werte-Fenster nicht editierbar; Zusatzeffekte (Grab, anhaltender Schaden)
+  nur als Namen/Hinweise; Spawn-Schutz kann Blockklicks von Nicht-OP-GMs verschlucken.
 
 ## Fahrplan
 
@@ -120,15 +131,17 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
    die bekannten Grenzen oben.*
 3. **Phase 3 – Kampfmodus:**
    - ✅ **Teil 1 – Gegenstände:** Waffen und Schild aus dem Pathbuilder-Import als Vanilla-Items
-     (Optik nach Schadenswürfel, Lore, Besitzer). *Ingame-Test durch den Nutzer steht noch aus.*
+     (Optik nach Schadenswürfel, Lore, Besitzer). *Vom Nutzer ingame getestet.*
+   - ✅ **Teil 2 – NPCs:** Monster-Core-Daten, NPC-Entity, Befehlsstab (spawnen, auswählen, Werte, hinlaufen),
+     `/pf2 npc …`, Vorlagen. *Gebaut; Ingame-Test durch den Nutzer steht noch aus.*
+   - **Teil 3 – Kampfkern, Teil 4 – Aktionsmenü, Teil 5 – Zustände** (offen), umfassen:
    - GM startet und beendet einen Kampf, Initiative mit Zugreihenfolge im HUD.
    - 3 Aktionen + 1 Reaktion pro Zug, Mehrfachangriffsmalus.
    - Angriff gegen RK mit Erfolgsgrad, Schaden, TP.
    - Zustände (frightened, off-guard, …).
    - Raster: 1 Block = 5 ft, Bewegung nach Speed. Wer nicht dran ist, kann nicht handeln.
-4. **Phase 4 – NPCs:**
-   - Eigene Entity mit Werteblock aus JSON.
-   - GM-Werkzeug zum Spawnen.
+4. **Phase 4 – NPCs im Kampf:**
+   - (Entity mit Werteblock und Spawn-Werkzeug sind seit Phase 3 Teil 2 gebaut.)
    - Steuerung im Kommandomodus (NPC anklicken → Ziel anklicken) und per „Übernehmen“ (Kamera/Steuerung in den NPC).
    - `/npc say` für Dialoge.
 5. **Phase 5:** Zauber, Gegenstände, mehr Inhalte, physische Würfel (werfbares Item mit Rollanimation).
