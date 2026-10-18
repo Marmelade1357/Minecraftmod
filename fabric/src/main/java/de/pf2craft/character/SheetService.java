@@ -1,6 +1,7 @@
 package de.pf2craft.character;
 
 import de.pf2craft.GmRoles;
+import de.pf2craft.combat.CombatService;
 import de.pf2craft.core.character.Ability;
 import de.pf2craft.core.character.CharacterJson;
 import de.pf2craft.core.character.CharacterMath;
@@ -165,6 +166,7 @@ public final class SheetService {
             CharacterSheet edited = GmEdit.apply(sheet.get(), field, value);
             CharacterStore.set(owner, edited);
             broadcast(gm.getServer(), owner, edited);
+            onHpChanged(owner, sheet.get().currentHp(), edited.currentHp());
         } catch (InvalidChoiceException e) {
             error(gm, Text.literal(e.getMessage()));
         }
@@ -204,11 +206,30 @@ public final class SheetService {
             return OptionalInt.empty();
         }
         long raw = (long) sheet.get().currentHp() + delta;
-        int hp = (int) Math.max(0, Math.min(CharacterMath.maxHp(sheet.get()), raw));
-        CharacterSheet updated = sheet.get().withCurrentHp(hp);
-        CharacterStore.set(target, updated);
-        broadcast(server, target, updated);
-        return OptionalInt.of(hp);
+        setCurrentHp(target, (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, raw)));
+        return OptionalInt.of(CharacterStore.get(target).map(CharacterSheet::currentHp).orElse(0));
+    }
+
+    /** Sets the current HP (clamped 0..max), stores and syncs it; 0 defeats the combatant, above 0 revives. */
+    public static void setCurrentHp(ServerPlayerEntity player, int hp) {
+        Optional<CharacterSheet> sheet = CharacterStore.get(player);
+        if (sheet.isEmpty()) {
+            return;
+        }
+        int clamped = Math.max(0, Math.min(CharacterMath.maxHp(sheet.get()), hp));
+        int before = sheet.get().currentHp();
+        CharacterSheet updated = sheet.get().withCurrentHp(clamped);
+        CharacterStore.set(player, updated);
+        broadcast(player.getServer(), player, updated);
+        onHpChanged(player, before, clamped);
+    }
+
+    private static void onHpChanged(ServerPlayerEntity player, int before, int after) {
+        if (after <= 0 && before > 0) {
+            CombatService.markDefeated(player.getUuid().toString());
+        } else if (after > 0 && before <= 0) {
+            CombatService.reviveIfNeeded(player.getUuid().toString());
+        }
     }
 
     // --- level-up ---------------------------------------------------------------------------

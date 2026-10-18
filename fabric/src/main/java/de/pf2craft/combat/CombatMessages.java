@@ -1,5 +1,9 @@
 package de.pf2craft.combat;
 
+import de.pf2craft.core.check.DegreeOfSuccess;
+import de.pf2craft.core.combat.AppliedPart;
+import java.util.List;
+import java.util.stream.Collectors;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -108,5 +112,79 @@ final class CombatMessages {
     static MutableText noParticipants() {
         return Text.translatableWithFallback("pf2craft.combat.no_participants",
                 "Nobody can fight: no characters or NPCs were found.");
+    }
+
+    // ---- attacks ---------------------------------------------------------------------------------------------
+
+    static MutableText noWeapon() {
+        return Text.translatableWithFallback("pf2craft.combat.attack.no_weapon",
+                "Hold your character's weapon in your main hand.");
+    }
+
+    static MutableText noAttackActions() {
+        return Text.translatableWithFallback("pf2craft.combat.attack.no_actions",
+                "You have no actions left to attack.");
+    }
+
+    static MutableText badTarget() {
+        return Text.translatableWithFallback("pf2craft.combat.attack.bad_target",
+                "You can only attack NPCs that are still standing.");
+    }
+
+    static MutableText tooFar() {
+        return Text.translatableWithFallback("pf2craft.combat.attack.too_far", "The target is too far away.");
+    }
+
+    static MutableText noTarget() {
+        return Text.translatableWithFallback("pf2craft.combat.attack.no_target",
+                "No NPC in view (within 16 blocks).");
+    }
+
+    /** The line everyone sees: no AC, no roll total, no hit points. {@code damage < 0} means a miss. */
+    static MutableText attackLine(String attacker, String target, int number, DegreeOfSuccess degree, int damage) {
+        MutableText outcome = switch (degree) {
+            case CRITICAL_SUCCESS -> Text.translatableWithFallback("pf2craft.combat.attack.crit_hit",
+                    "Hit! (critical)");
+            case SUCCESS -> Text.translatableWithFallback("pf2craft.combat.attack.hit", "Hit!");
+            case FAILURE -> Text.translatableWithFallback("pf2craft.combat.attack.miss", "Miss!");
+            case CRITICAL_FAILURE -> Text.translatableWithFallback("pf2craft.combat.attack.crit_miss",
+                    "Critical miss!");
+        };
+        if (damage >= 0) {
+            outcome.append(damage == 0
+                    ? Text.translatableWithFallback("pf2craft.combat.attack.no_damage", " - no damage")
+                    : Text.translatableWithFallback("pf2craft.combat.attack.damage", " - %s damage", damage));
+        }
+        Formatting color = switch (degree) {
+            case CRITICAL_SUCCESS -> Formatting.GOLD;
+            case SUCCESS -> Formatting.GREEN;
+            case FAILURE -> Formatting.GRAY;
+            case CRITICAL_FAILURE -> Formatting.RED;
+        };
+        return Text.translatableWithFallback("pf2craft.combat.attack.line", "%s attacks %s (attack %s): %s",
+                attacker, target, number, outcome).formatted(color);
+    }
+
+    /** GM-only detail lines: the numbers the players must not see. */
+    static List<Text> attackDetail(int natural, int total, int ac, int rangePenalty, List<AppliedPart> parts,
+                                   List<String> unmatched, int hpLeft, int hpMax) {
+        List<Text> lines = new java.util.ArrayList<>();
+        lines.add(Text.translatableWithFallback("pf2craft.combat.attack.gm_roll",
+                "[GM] d20 %s, total %s against AC %s (range penalty %s)", natural, total, ac, rangePenalty)
+                .formatted(Formatting.DARK_AQUA));
+        if (!parts.isEmpty()) {
+            String list = parts.stream().map(p -> p.type() + " " + p.rolled() + " -> " + p.applied())
+                    .collect(Collectors.joining(", "));
+            lines.add(Text.translatableWithFallback("pf2craft.combat.attack.gm_damage", "[GM] Damage: %s", list)
+                    .formatted(Formatting.DARK_AQUA));
+        }
+        if (!unmatched.isEmpty()) {
+            lines.add(Text.translatableWithFallback("pf2craft.combat.attack.gm_unmatched",
+                    "[GM] Note: %s not taken into account", String.join(", ", unmatched))
+                    .formatted(Formatting.DARK_AQUA));
+        }
+        lines.add(Text.translatableWithFallback("pf2craft.combat.attack.gm_hp", "[GM] Target has %s/%s HP left",
+                hpLeft, hpMax).formatted(Formatting.DARK_AQUA));
+        return lines;
     }
 }

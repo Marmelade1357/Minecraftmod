@@ -349,6 +349,24 @@ public final class CombatService {
         deactivate(id, null);
     }
 
+    /**
+     * A creature that was out at 0 HP is up again (HP raised): it takes part once more, the current turn pointer
+     * stays where it is. Does nothing for creatures that are active or not in the combat.
+     */
+    public static void reviveIfNeeded(String id) {
+        if (encounter == null || !containsId(id)) {
+            return;
+        }
+        DEFEATED.remove(id);
+        for (Encounter.Entry e : encounter.order()) {
+            if (e.combatant().id().equals(id) && !e.active()) {
+                encounter.setActive(id, true);
+                sync(null);
+                return;
+            }
+        }
+    }
+
     private static void deactivate(String id, @Nullable ServerPlayerEntity leaving) {
         boolean wasCurrent = currentId().filter(id::equals).isPresent();
         encounter.setActive(id, false);

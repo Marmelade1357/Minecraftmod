@@ -12,6 +12,7 @@ import de.pf2craft.GmRoles;
 import de.pf2craft.character.CharacterService;
 import de.pf2craft.character.CharacterStore;
 import de.pf2craft.character.SheetService;
+import de.pf2craft.combat.AttackService;
 import de.pf2craft.combat.CombatService;
 import de.pf2craft.combat.Enforcement;
 import de.pf2craft.core.character.CharacterSheet;
@@ -151,6 +152,11 @@ public final class Pf2Commands {
                                     CombatService.end(ctx.getSource().getPlayerOrThrow());
                                     return 1;
                                 }))
+                        .then(literal("attack")
+                                .then(argument("number", IntegerArgumentType.integer(1, 3))
+                                        .executes(ctx -> AttackService.attackLookedAt(
+                                                ctx.getSource().getPlayerOrThrow(),
+                                                IntegerArgumentType.getInteger(ctx, "number")) ? 1 : 0)))
                         .then(literal("endturn")
                                 .executes(ctx -> {
                                     CombatService.endTurn(ctx.getSource().getPlayerOrThrow());

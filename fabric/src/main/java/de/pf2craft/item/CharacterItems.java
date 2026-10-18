@@ -6,6 +6,7 @@ import de.pf2craft.core.character.Strike;
 import de.pf2craft.core.item.ItemStamp;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.UUID;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -67,6 +68,12 @@ public final class CharacterItems {
                 .filter(sheet -> ItemStamp.of(sheet) == ref.sheetStamp())
                 .filter(sheet -> ref.strikeIndex() >= 0 && ref.strikeIndex() < sheet.strikes().size())
                 .map(sheet -> sheet.strikes().get(ref.strikeIndex()));
+    }
+
+    /** Index of the strike behind a weapon item (same checks as {@link #strikeFor}), or empty. */
+    public static OptionalInt strikeIndexFor(ServerPlayerEntity holder, ItemStack stack) {
+        return strikeFor(holder, stack).isPresent()
+                ? OptionalInt.of(stack.get(Pf2Components.WEAPON).strikeIndex()) : OptionalInt.empty();
     }
 
     private static boolean ownedBy(ItemStack stack, UUID owner) {

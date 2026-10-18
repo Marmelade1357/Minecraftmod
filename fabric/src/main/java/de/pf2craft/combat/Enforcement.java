@@ -1,6 +1,7 @@
 package de.pf2craft.combat;
 
 import de.pf2craft.core.combat.Encounter;
+import de.pf2craft.npc.NpcEntity;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,6 +26,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -66,9 +68,24 @@ public final class Enforcement {
             ItemStack stack = player.getStackInHand(hand);
             return blocked(player) ? TypedActionResult.fail(stack) : TypedActionResult.pass(stack);
         });
-        // The current player's attack click belongs to the attack flow; only non-current ones are stopped here.
-        AttackEntityCallback.EVENT.register((player, world, hand, entity, hit) ->
-                blocked(player) ? ActionResult.FAIL : ActionResult.PASS);
+        // The vanilla attack is always cancelled for combatants; the current player's click opens the attack window.
+        AttackEntityCallback.EVENT.register((player, world, hand, entity, hit) -> {
+            if (blocked(player)) {
+                return ActionResult.FAIL;
+            }
+            if (player instanceof ServerPlayerEntity sp && CombatService.active()
+                    && CombatService.currentId().filter(sp.getUuid().toString()::equals).isPresent()) {
+                if (hand == Hand.MAIN_HAND) {
+                    if (entity instanceof NpcEntity) {
+                        AttackService.openFor(sp, entity);
+                    } else {
+                        AttackService.hint(sp, CombatMessages.badTarget());
+                    }
+                }
+                return ActionResult.FAIL;
+            }
+            return ActionResult.PASS;
+        });
         UseEntityCallback.EVENT.register((player, world, hand, entity, hit) ->
                 blocked(player) ? ActionResult.FAIL : ActionResult.PASS);
         // A respawned player is re-anchored where they appear.

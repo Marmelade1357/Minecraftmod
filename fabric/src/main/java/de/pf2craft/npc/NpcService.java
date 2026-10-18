@@ -4,7 +4,9 @@ import de.pf2craft.combat.CombatService;
 import de.pf2craft.core.monster.DamagePart;
 import de.pf2craft.core.monster.MonsterData;
 import de.pf2craft.core.monster.MonsterStrike;
+import de.pf2craft.core.monster.NpcEdit;
 import de.pf2craft.core.monster.NpcStats;
+import de.pf2craft.core.progression.InvalidChoiceException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -66,8 +68,26 @@ public final class NpcService {
         LAST_SPAWN.remove(player);
     }
 
+    /** Stores new stats; going to 0 HP defeats the NPC in a running combat, rising above 0 revives it. */
     public static void apply(NpcEntity npc, NpcStats stats) {
+        boolean wasDefeated = npc.stats() != null && npc.stats().defeated();
         npc.setStats(stats);
+        if (stats.defeated() && !wasDefeated) {
+            CombatService.markDefeated(npc.getUuid().toString());
+        } else if (!stats.defeated() && wasDefeated) {
+            CombatService.reviveIfNeeded(npc.getUuid().toString());
+        }
+    }
+
+    /** Lets the NPC lose {@code amount} hit points (never below 0). */
+    public static void damage(NpcEntity npc, int amount) {
+        NpcStats stats = npc.stats();
+        int hp = Math.max(0, stats.currentHp() - Math.max(0, amount));
+        try {
+            apply(npc, NpcEdit.apply(stats, "hp", String.valueOf(hp)));
+        } catch (InvalidChoiceException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public static void remove(NpcEntity npc) {

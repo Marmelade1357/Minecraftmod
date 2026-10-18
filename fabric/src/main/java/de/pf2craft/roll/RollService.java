@@ -40,6 +40,11 @@ public final class RollService {
         return true;
     }
 
+    /** The server's secure die roller, for damage rolls. */
+    public static DieRoller roller() {
+        return ROLLER;
+    }
+
     /** Rolls with the server's secure roller and tells nobody, e.g. for initiative. */
     public static RollResult rollQuiet(String expression) throws DiceParseException {
         return DiceExpression.parse(expression).roll(ROLLER);

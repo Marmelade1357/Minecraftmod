@@ -4,6 +4,7 @@ import de.pf2craft.network.CombatSyncPayload;
 import de.pf2craft.network.EndTurnPayload;
 import de.pf2craft.network.NpcSearchResultPayload;
 import de.pf2craft.network.NpcSheetPayload;
+import de.pf2craft.network.OpenAttackScreenPayload;
 import de.pf2craft.network.OpenCombatScreenPayload;
 import de.pf2craft.network.OpenImportPayload;
 import de.pf2craft.network.OpenNpcScreenPayload;
@@ -94,6 +95,8 @@ public class Pf2CraftClient implements ClientModInitializer {
                 (payload, context) -> ClientCombat.set(payload));
         ClientPlayNetworking.registerGlobalReceiver(OpenCombatScreenPayload.ID,
                 (payload, context) -> show(context.client(), () -> new CombatSetupScreen(payload)));
+        ClientPlayNetworking.registerGlobalReceiver(OpenAttackScreenPayload.ID,
+                (payload, context) -> show(context.client(), () -> new AttackScreen(payload)));
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
             ClientSheets.clear();
             ClientCombat.clear();
@@ -193,7 +196,8 @@ public class Pf2CraftClient implements ClientModInitializer {
         if (client.player != null && (current == null || current instanceof ChatScreen
                 || current instanceof ImportScreen || current instanceof CharacterScreen
                 || current instanceof DiceScreen || current instanceof NpcSpawnScreen
-                || current instanceof NpcSheetScreen || current instanceof CombatSetupScreen)) {
+                || current instanceof NpcSheetScreen || current instanceof CombatSetupScreen
+                || current instanceof AttackScreen)) {
             client.setScreen(screen.get());
         } else {
             pendingScreen = screen;
