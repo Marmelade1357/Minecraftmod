@@ -1,6 +1,9 @@
 package de.pf2craft.npc;
 
 import de.pf2craft.GmRoles;
+import de.pf2craft.combat.AttackService;
+import de.pf2craft.combat.CombatService;
+import de.pf2craft.combat.NpcWalk;
 import de.pf2craft.network.NpcSheetPayload;
 import de.pf2craft.network.OpenNpcScreenPayload;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -48,6 +51,10 @@ public class CommandStaffItem extends Item {
                             "The selected NPC is defeated or in another world.").formatted(Formatting.RED), true);
                     return;
                 }
+                if (CombatService.active()) {
+                    NpcWalk.walk(gm, npc, target);
+                    return;
+                }
                 npc.getNavigation().startMovingTo(target.getX() + 0.5, target.getY(), target.getZ() + 0.5,
                         WALK_SPEED);
             }, () -> gm.sendMessage(Text.translatableWithFallback("pf2craft.npc.none_selected",
@@ -59,10 +66,18 @@ public class CommandStaffItem extends Item {
 
     @Override
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
+        if (user instanceof ServerPlayerEntity gm && !(entity instanceof NpcEntity) && GmRoles.isGm(gm)
+                && attackWithSelected(gm, entity)) {
+            return ActionResult.success(user.getWorld().isClient);
+        }
         if (!(entity instanceof NpcEntity npc)) {
             return ActionResult.PASS;
         }
         if (user instanceof ServerPlayerEntity gm && requireGm(gm) && npc.stats() != null) {
+            if (!gm.isSneaking() && GmSelection.get(gm).filter(sel -> sel != npc).isPresent()
+                    && attackWithSelected(gm, npc)) {
+                return ActionResult.success(user.getWorld().isClient);
+            }
             if (gm.isSneaking()) {
                 NpcNetwork.sendSheet(gm, npc);
             } else {
@@ -72,6 +87,23 @@ public class CommandStaffItem extends Item {
             }
         }
         return ActionResult.success(user.getWorld().isClient);
+    }
+
+    /**
+     * With an NPC selected that is up in a running combat, a click on another creature starts that NPC's
+     * attack instead of selecting/inspecting. Returns whether the click was used.
+     */
+    private static boolean attackWithSelected(ServerPlayerEntity gm, LivingEntity target) {
+        if (!CombatService.active()) {
+            return false;
+        }
+        NpcEntity selected = GmSelection.get(gm).orElse(null);
+        if (selected == null || selected == target
+                || CombatService.currentId().filter(selected.getUuid().toString()::equals).isEmpty()) {
+            return false;
+        }
+        AttackService.openForNpc(gm, selected, target);
+        return true;
     }
 
     private static boolean requireGm(ServerPlayerEntity player) {

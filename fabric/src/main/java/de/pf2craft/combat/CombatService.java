@@ -56,6 +56,11 @@ public final class CombatService {
         return encounter != null;
     }
 
+    /** Whether the creature takes part in the running combat (active or not). */
+    public static boolean contains(UUID id) {
+        return encounter != null && containsId(id.toString());
+    }
+
     public static Optional<Encounter> encounter() {
         return Optional.ofNullable(encounter);
     }

@@ -7,6 +7,7 @@ import de.pf2craft.character.SheetService;
 import de.pf2craft.combat.AttackService;
 import de.pf2craft.combat.CombatService;
 import de.pf2craft.combat.Enforcement;
+import de.pf2craft.combat.NpcWalk;
 import de.pf2craft.command.Pf2Commands;
 import de.pf2craft.item.ItemData;
 import de.pf2craft.item.Pf2Items;
@@ -59,6 +60,7 @@ public class Pf2Craft implements ModInitializer {
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hit) ->
                 player.getStackInHand(hand).isOf(Pf2Items.COMMAND_STAFF) ? ActionResult.FAIL : ActionResult.PASS);
         Enforcement.register();
+        NpcWalk.register();
         Pf2Networking.registerPayloads();
         Pf2Networking.registerServerReceivers();
         CommandRegistrationCallback.EVENT.register(Pf2Commands::register);

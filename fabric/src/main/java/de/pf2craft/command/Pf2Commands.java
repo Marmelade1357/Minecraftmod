@@ -156,7 +156,12 @@ public final class Pf2Commands {
                                 .then(argument("number", IntegerArgumentType.integer(1, 3))
                                         .executes(ctx -> AttackService.attackLookedAt(
                                                 ctx.getSource().getPlayerOrThrow(),
-                                                IntegerArgumentType.getInteger(ctx, "number")) ? 1 : 0)))
+                                                IntegerArgumentType.getInteger(ctx, "number"), 0) ? 1 : 0)
+                                        .then(argument("strike", IntegerArgumentType.integer(0, 7))
+                                                .executes(ctx -> AttackService.attackLookedAt(
+                                                        ctx.getSource().getPlayerOrThrow(),
+                                                        IntegerArgumentType.getInteger(ctx, "number"),
+                                                        IntegerArgumentType.getInteger(ctx, "strike")) ? 1 : 0))))
                         .then(literal("endturn")
                                 .executes(ctx -> {
                                     CombatService.endTurn(ctx.getSource().getPlayerOrThrow());

@@ -294,5 +294,13 @@
   "screen.pf2craft.attack.strike": "Strike: %s",
   "screen.pf2craft.attack.cancel": "Cancel",
   "pf2craft.combat.can_end_players": "All players are unable to fight. The combat can be ended.",
-  "pf2craft.combat.attack_cooldown": "Not so fast!"
+  "pf2craft.combat.attack_cooldown": "Not so fast!",
+  "pf2craft.combat.npc_not_current": "The selected NPC is not up in the combat.",
+  "pf2craft.combat.no_path": "The NPC cannot find a path there.",
+  "pf2craft.combat.not_enough_actions": "Not enough actions left to walk that far.",
+  "pf2craft.combat.no_strikes": "This NPC has no strikes.",
+  "pf2craft.combat.attack.npc_no_actions": "The NPC has no actions left to attack.",
+  "pf2craft.combat.attack.bad_npc_target": "The target must be a fighting character or a standing NPC.",
+  "pf2craft.combat.attack.bad_strike": "The NPC has no such strike.",
+  "pf2craft.combat.attack.no_look_target": "No character or NPC in view (within 16 blocks)."
 }

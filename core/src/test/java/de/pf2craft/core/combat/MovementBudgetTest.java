@@ -103,4 +103,39 @@ class MovementBudgetTest {
     void stridesNeededAtSpeedZero() {
         assertEquals(Integer.MAX_VALUE, new MovementBudget(0).stridesNeededFor(3));
     }
+
+    @Test
+    void payWalkSpendsStridesAndKeepsTheRest() {
+        TurnState turn = new TurnState();
+        MovementBudget budget = new MovementBudget(25);
+        assertTrue(budget.payWalk(4, turn));
+        assertEquals(2, turn.actionsLeft());
+        assertEquals(1.0, budget.remainingInStride(), 1e-9);
+        // 1 block is still free, then the next stride is needed
+        assertTrue(budget.payWalk(1, turn));
+        assertEquals(2, turn.actionsLeft());
+        assertEquals(0.0, budget.remainingInStride(), 1e-9);
+        assertTrue(budget.payWalk(6, turn));
+        assertEquals(0, turn.actionsLeft());
+        assertEquals(4.0, budget.remainingInStride(), 1e-9);
+    }
+
+    @Test
+    void payWalkRefusedChangesNothing() {
+        TurnState turn = new TurnState();
+        MovementBudget budget = new MovementBudget(25);
+        assertTrue(budget.payWalk(2, turn));
+        assertFalse(budget.payWalk(40, turn));
+        assertEquals(2, turn.actionsLeft());
+        assertEquals(3.0, budget.remainingInStride(), 1e-9);
+    }
+
+    @Test
+    void payWalkZeroAndSpeedZero() {
+        TurnState turn = new TurnState();
+        assertTrue(new MovementBudget(25).payWalk(0, turn));
+        assertEquals(3, turn.actionsLeft());
+        assertFalse(new MovementBudget(0).payWalk(2, turn));
+        assertEquals(3, turn.actionsLeft());
+    }
 }

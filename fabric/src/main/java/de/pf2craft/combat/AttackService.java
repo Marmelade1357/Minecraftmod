@@ -3,6 +3,7 @@ package de.pf2craft.combat;
 import de.pf2craft.GmRoles;
 import de.pf2craft.Pf2Craft;
 import de.pf2craft.character.CharacterStore;
+import de.pf2craft.character.SheetService;
 import de.pf2craft.core.character.CharacterMath;
 import de.pf2craft.core.character.CharacterSheet;
 import de.pf2craft.core.character.Strike;
@@ -19,10 +20,12 @@ import de.pf2craft.core.combat.StrikeDamage;
 import de.pf2craft.core.dice.DiceParseException;
 import de.pf2craft.core.item.WeaponData;
 import de.pf2craft.core.monster.MonsterData;
+import de.pf2craft.core.monster.MonsterStrike;
 import de.pf2craft.item.CharacterItems;
 import de.pf2craft.item.ItemData;
 import de.pf2craft.network.AttackConfirmPayload;
 import de.pf2craft.network.OpenAttackScreenPayload;
+import de.pf2craft.npc.GmSelection;
 import de.pf2craft.npc.NpcEntity;
 import de.pf2craft.npc.NpcService;
 import de.pf2craft.roll.RollService;
@@ -34,12 +37,16 @@ import java.util.OptionalInt;
 import java.util.UUID;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 
 /**
  * A player's attack against an NPC: opens the attack window, then (on confirmation, or via the fallback
@@ -51,6 +58,8 @@ public final class AttackService {
     private static final int HINT_GAP_TICKS = 40;
     private static final double EPSILON = 1e-6;
     private static final int DEFAULT_THROWN_RANGE_FEET = 60;
+    /** The monster data has no range increments, so ranged monster strikes use 60 ft. */
+    private static final int MONSTER_RANGE_FEET = 60;
     private static final Map<UUID, Long> LAST_CONFIRM = new HashMap<>();
     private static final Map<UUID, Integer> LAST_HINT = new HashMap<>();
 
@@ -100,12 +109,36 @@ public final class AttackService {
 
     /** Handles the window's answer: nothing in it is trusted, the strike, bonus and target are re-derived. */
     public static void confirm(ServerPlayerEntity sender, AttackConfirmPayload payload) {
-        if (!payload.attackerId().equals(sender.getUuid()) || payload.strikeIndex() != 0
-                || payload.attackNumber() < 1 || payload.attackNumber() > 3) {
+        if (payload.attackNumber() < 1 || payload.attackNumber() > 3) {
+            return;
+        }
+        if (!payload.attackerId().equals(sender.getUuid())) {
+            confirmForNpc(sender, payload);
+            return;
+        }
+        if (payload.strikeIndex() != 0) {
             return;
         }
         Entity target = sender.getServerWorld().getEntityById(payload.targetEntityId());
         perform(sender, target, payload.attackNumber());
+    }
+
+    /** An NPC's attack chosen in the window: only a GM may send it, and only for the NPC whose turn it is. */
+    private static void confirmForNpc(ServerPlayerEntity sender, AttackConfirmPayload payload) {
+        if (!GmRoles.isGm(sender)
+                || !(sender.getServerWorld().getEntity(payload.attackerId()) instanceof NpcEntity npc)) {
+            return;
+        }
+        performNpc(sender, npc, sender.getServerWorld().getEntityById(payload.targetEntityId()),
+                payload.strikeIndex(), payload.attackNumber());
+    }
+
+    /** Fallback {@code /pf2 combat attack <n> [strike]}: a GM's selected NPC attacks, a player attacks. */
+    public static boolean attackLookedAt(ServerPlayerEntity player, int number, int strikeIndex) {
+        if (GmRoles.isGm(player)) {
+            return attackLookedAtByNpc(player, number, strikeIndex);
+        }
+        return attackLookedAt(player, number);
     }
 
     /** Fallback {@code /pf2 combat attack <n>}: attacks the NPC the player is looking at. */
@@ -158,25 +191,207 @@ public final class AttackService {
         int hpLeft = Math.max(0, npc.stats().currentHp() - Math.max(0, applied));
 
         String attackerName = nameOf(attacker, p.sheet());
-        String targetName = npc.stats().displayName();
-        MutableText publicLine = CombatMessages.attackLine(attackerName, targetName, number, degree, applied);
-        List<Text> detail = CombatMessages.attackDetail(outcome.natural(), outcome.total(), base.ac(),
-                p.rangePenalty(), damage == null ? List.of() : damage.parts(),
-                damage == null ? List.of() : damage.unmatched(), hpLeft, base.hp());
-        for (ServerPlayerEntity r : attacker.getServer().getPlayerManager().getPlayerList()) {
-            r.sendMessage(publicLine, false);
-            if (GmRoles.isGm(r)) {
-                detail.forEach(line -> r.sendMessage(line, false));
-            }
-        }
-        Pf2Craft.LOGGER.info("{} attacks {} ({}): d20 {} total {} vs AC {} -> {}, damage {}", attackerName,
-                targetName, number, outcome.natural(), outcome.total(), base.ac(), degree, applied);
+        announce(attacker, attackerName, npc.stats().displayName(), number, outcome, degree, applied, base.ac(),
+                p.rangePenalty(), damage, hpLeft, base.hp());
 
         if (applied > 0) {
             NpcService.damage(npc, applied); // may defeat the NPC and move the combat on
         }
         CombatService.sync(null);
         return true;
+    }
+
+    // ---- NPC attacks -----------------------------------------------------------------------------------------
+
+    /** Everything an NPC attack needs, derived from the server's own state. */
+    private record NpcPrepared(MonsterStrike strike, LivingEntity target, int rangePenalty, int ac,
+                               Defenses defenses) {
+    }
+
+    /** The staff click on a creature: checks the preconditions and opens the window for the GM. */
+    public static void openForNpc(ServerPlayerEntity gm, NpcEntity npc, Entity target) {
+        if (prepareNpc(gm, npc, target, 0) == null) {
+            return;
+        }
+        List<OpenAttackScreenPayload.StrikeOption> options = new java.util.ArrayList<>();
+        for (MonsterStrike strike : npc.stats().base().strikes()) {
+            if (options.size() >= OpenAttackScreenPayload.MAX_OPTIONS) {
+                break;
+            }
+            boolean agile = AttackMath.isAgile(strike.traits());
+            options.add(new OpenAttackScreenPayload.StrikeOption(clip(strike.name()), List.of(
+                    strike.attackBonus() + AttackMath.mapPenalty(1, agile),
+                    strike.attackBonus() + AttackMath.mapPenalty(2, agile),
+                    strike.attackBonus() + AttackMath.mapPenalty(3, agile)), agile));
+        }
+        int suggested = Math.min(3, CombatService.turn().nextAttackNumber());
+        if (ServerPlayNetworking.canSend(gm, OpenAttackScreenPayload.ID)) {
+            ServerPlayNetworking.send(gm, new OpenAttackScreenPayload(npc.getUuid(), target.getId(), options,
+                    suggested));
+        }
+    }
+
+    /** Fallback: the GM's selected NPC attacks the character or NPC the GM is looking at. */
+    private static boolean attackLookedAtByNpc(ServerPlayerEntity gm, int number, int strikeIndex) {
+        Optional<NpcEntity> npc = GmSelection.get(gm);
+        if (npc.isEmpty()) {
+            CombatMessages.error(gm, Text.translatableWithFallback("pf2craft.npc.none_selected",
+                    "No NPC selected. Right-click an NPC with the staff first."));
+            return false;
+        }
+        Vec3d start = gm.getEyePos();
+        Vec3d dir = gm.getRotationVec(1.0f);
+        double range = NpcService.LOOK_RANGE;
+        EntityHitResult hit = ProjectileUtil.raycast(gm, start, start.add(dir.multiply(range)),
+                gm.getBoundingBox().stretch(dir.multiply(range)).expand(1.0),
+                e -> e != npc.get() && !e.isSpectator() && (e instanceof NpcEntity || e instanceof ServerPlayerEntity),
+                range * range);
+        if (hit == null) {
+            CombatMessages.error(gm, CombatMessages.noLookTarget());
+            return false;
+        }
+        return performNpc(gm, npc.get(), hit.getEntity(), strikeIndex, number);
+    }
+
+    private static boolean performNpc(ServerPlayerEntity gm, NpcEntity npc, Entity target, int strikeIndex,
+                                      int number) {
+        long now = System.currentTimeMillis();
+        Long last = LAST_CONFIRM.get(gm.getUuid());
+        if (last != null && now - last < COOLDOWN_MS) {
+            hint(gm, CombatMessages.attackCooldown());
+            return false;
+        }
+        NpcPrepared p = prepareNpc(gm, npc, target, strikeIndex);
+        if (p == null) {
+            return false;
+        }
+        LAST_CONFIRM.put(gm.getUuid(), now);
+        CombatService.turn().spendActions(1);
+        CombatService.turn().recordAttack();
+
+        boolean agile = AttackMath.isAgile(p.strike().traits());
+        int natural;
+        try {
+            natural = RollService.rollQuiet("1d20").naturalD20().orElseThrow();
+        } catch (DiceParseException e) {
+            throw new IllegalStateException(e);
+        }
+        AttackOutcome outcome = AttackMath.resolve(natural, p.strike().attackBonus(),
+                AttackMath.mapPenalty(number, agile), p.rangePenalty(), p.ac());
+        DegreeOfSuccess degree = outcome.degree();
+        DamageOutcome damage = null;
+        if (degree.isSuccess()) {
+            List<DamageInstance> rolled = DamageRoller.roll(StrikeDamage.forMonster(p.strike()),
+                    degree == DegreeOfSuccess.CRITICAL_SUCCESS, RollService.roller());
+            damage = DamageResolver.resolve(rolled, p.defenses());
+        }
+        int applied = damage == null ? -1 : Math.max(0, damage.total());
+
+        int hpBefore;
+        int hpMax;
+        String targetName;
+        if (p.target() instanceof ServerPlayerEntity player) {
+            CharacterSheet sheet = CharacterStore.get(player).orElseThrow();
+            hpBefore = sheet.currentHp();
+            hpMax = CharacterMath.maxHp(sheet);
+            targetName = nameOf(player, sheet);
+        } else {
+            NpcEntity victim = (NpcEntity) p.target();
+            hpBefore = victim.stats().currentHp();
+            hpMax = victim.stats().base().hp();
+            targetName = victim.stats().displayName();
+        }
+        int hpLeft = Math.max(0, hpBefore - Math.max(0, applied));
+        announce(gm, npc.stats().displayName(), targetName, number, outcome, degree, applied, p.ac(),
+                p.rangePenalty(), damage, hpLeft, hpMax);
+
+        if (applied > 0) {
+            if (p.target() instanceof ServerPlayerEntity player) {
+                SheetService.setCurrentHp(player, hpLeft); // 0 HP takes the player out of the combat
+            } else {
+                NpcService.damage((NpcEntity) p.target(), applied);
+            }
+        }
+        CombatService.sync(null);
+        return true;
+    }
+
+    /** Public line for everybody (no AC, total or hit points), the numbers for the GMs, and a log line. */
+    private static void announce(ServerPlayerEntity actor, String attackerName, String targetName, int number,
+                                 AttackOutcome outcome, DegreeOfSuccess degree, int applied, int ac,
+                                 int rangePenalty, DamageOutcome damage, int hpLeft, int hpMax) {
+        MutableText publicLine = CombatMessages.attackLine(attackerName, targetName, number, degree, applied);
+        List<Text> detail = CombatMessages.attackDetail(outcome.natural(), outcome.total(), ac, rangePenalty,
+                damage == null ? List.of() : damage.parts(), damage == null ? List.of() : damage.unmatched(),
+                hpLeft, hpMax);
+        for (ServerPlayerEntity r : actor.getServer().getPlayerManager().getPlayerList()) {
+            r.sendMessage(publicLine, false);
+            if (GmRoles.isGm(r)) {
+                detail.forEach(line -> r.sendMessage(line, false));
+            }
+        }
+        Pf2Craft.LOGGER.info("{} attacks {} ({}): d20 {} total {} vs AC {} -> {}, damage {}", attackerName,
+                targetName, number, outcome.natural(), outcome.total(), ac, degree, applied);
+    }
+
+    /** Checks an NPC attack against the server's own state; failures go to the GM's chat, nothing is spent. */
+    private static NpcPrepared prepareNpc(ServerPlayerEntity gm, NpcEntity npc, Entity target, int strikeIndex) {
+        if (!GmRoles.isGm(gm)) {
+            return npcFail(gm, CombatMessages.notGm());
+        }
+        if (!CombatService.active()) {
+            return npcFail(gm, CombatMessages.notRunning());
+        }
+        if (npc.isRemoved() || npc.stats() == null || npc.getWorld() != gm.getWorld()
+                || CombatService.currentId().filter(npc.getUuid().toString()::equals).isEmpty()) {
+            return npcFail(gm, CombatMessages.npcNotCurrent());
+        }
+        if (CombatService.turn().actionsLeft() < 1) {
+            return npcFail(gm, CombatMessages.npcNoActions());
+        }
+        List<MonsterStrike> strikes = npc.stats().base().strikes();
+        if (strikes.isEmpty()) {
+            return npcFail(gm, CombatMessages.noStrikes());
+        }
+        if (strikeIndex < 0 || strikeIndex >= strikes.size()) {
+            return npcFail(gm, CombatMessages.badStrike());
+        }
+        MonsterStrike strike = strikes.get(strikeIndex);
+        int ac;
+        Defenses defenses;
+        if (target instanceof ServerPlayerEntity player && !GmRoles.isGm(player)
+                && CombatService.contains(player.getUuid()) && player.getWorld() == npc.getWorld()) {
+            Optional<CharacterSheet> sheet = CharacterStore.get(player);
+            if (sheet.isEmpty() || sheet.get().currentHp() <= 0) {
+                return npcFail(gm, CombatMessages.badNpcTarget());
+            }
+            ac = CharacterMath.armorClass(sheet.get());
+            defenses = Defenses.NONE;
+        } else if (target instanceof NpcEntity victim && victim != npc && !victim.isRemoved()
+                && victim.stats() != null && !victim.stats().defeated() && victim.getWorld() == npc.getWorld()) {
+            MonsterData base = victim.stats().base();
+            ac = base.ac();
+            defenses = new Defenses(base.resistances(), base.weaknesses(), base.immunities());
+        } else {
+            return npcFail(gm, CombatMessages.badNpcTarget());
+        }
+        double distance = edgeDistance(npc.getBoundingBox(), target.getBoundingBox());
+        OptionalInt rangePenalty;
+        if (strike.ranged()) {
+            rangePenalty = RangeRules.rangePenalty(Math.max(0, distance - EPSILON), MONSTER_RANGE_FEET);
+        } else {
+            rangePenalty = distance <= RangeRules.meleeReachBlocks(strike.traits()) + EPSILON
+                    ? OptionalInt.of(0) : OptionalInt.empty();
+        }
+        if (rangePenalty.isEmpty()) {
+            return npcFail(gm, CombatMessages.tooFar());
+        }
+        return new NpcPrepared(strike, (LivingEntity) target, rangePenalty.getAsInt(), ac, defenses);
+    }
+
+    private static NpcPrepared npcFail(ServerPlayerEntity gm, MutableText text) {
+        CombatMessages.error(gm, text);
+        return null;
     }
 
     // ---- validation ------------------------------------------------------------------------------------------

@@ -123,6 +123,45 @@ final class CombatMessages {
                 "Nobody can fight: no characters or NPCs were found.");
     }
 
+    // ---- NPC turns -------------------------------------------------------------------------------------------
+
+    static MutableText npcNotCurrent() {
+        return Text.translatableWithFallback("pf2craft.combat.npc_not_current",
+                "The selected NPC is not up in the combat.");
+    }
+
+    static MutableText noPath() {
+        return Text.translatableWithFallback("pf2craft.combat.no_path", "The NPC cannot find a path there.");
+    }
+
+    static MutableText notEnoughActions() {
+        return Text.translatableWithFallback("pf2craft.combat.not_enough_actions",
+                "Not enough actions left to walk that far.");
+    }
+
+    static MutableText noStrikes() {
+        return Text.translatableWithFallback("pf2craft.combat.no_strikes", "This NPC has no strikes.");
+    }
+
+    static MutableText npcNoActions() {
+        return Text.translatableWithFallback("pf2craft.combat.attack.npc_no_actions",
+                "The NPC has no actions left to attack.");
+    }
+
+    static MutableText badNpcTarget() {
+        return Text.translatableWithFallback("pf2craft.combat.attack.bad_npc_target",
+                "The target must be a fighting character or a standing NPC.");
+    }
+
+    static MutableText badStrike() {
+        return Text.translatableWithFallback("pf2craft.combat.attack.bad_strike", "The NPC has no such strike.");
+    }
+
+    static MutableText noLookTarget() {
+        return Text.translatableWithFallback("pf2craft.combat.attack.no_look_target",
+                "No character or NPC in view (within 16 blocks).");
+    }
+
     // ---- attacks ---------------------------------------------------------------------------------------------
 
     static MutableText noWeapon() {

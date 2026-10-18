@@ -294,5 +294,13 @@
   "screen.pf2craft.attack.strike": "Angriff: %s",
   "screen.pf2craft.attack.cancel": "Abbrechen",
   "pf2craft.combat.can_end_players": "Alle Spieler sind kampfunfähig. Der Kampf kann beendet werden.",
-  "pf2craft.combat.attack_cooldown": "Nicht so schnell!"
+  "pf2craft.combat.attack_cooldown": "Nicht so schnell!",
+  "pf2craft.combat.npc_not_current": "Der gewählte NSC ist im Kampf nicht an der Reihe.",
+  "pf2craft.combat.no_path": "Der NSC findet keinen Weg dorthin.",
+  "pf2craft.combat.not_enough_actions": "Nicht genug Aktionen, um so weit zu laufen.",
+  "pf2craft.combat.no_strikes": "Dieser NSC hat keine Angriffe.",
+  "pf2craft.combat.attack.npc_no_actions": "Der NSC hat keine Aktionen mehr zum Angreifen.",
+  "pf2craft.combat.attack.bad_npc_target": "Das Ziel muss ein kämpfender Charakter oder ein stehender NSC sein.",
+  "pf2craft.combat.attack.bad_strike": "Der NSC hat diesen Angriff nicht.",
+  "pf2craft.combat.attack.no_look_target": "Kein Charakter oder NSC im Blick (innerhalb von 16 Blöcken)."
 }

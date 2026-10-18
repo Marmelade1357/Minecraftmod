@@ -45,6 +45,23 @@ public final class MovementBudget {
         return true;
     }
 
+    /**
+     * Pays for a whole walk of {@code blocks} up front (used for NPCs, whose path is known): spends the Strides
+     * needed beyond what is left of the current one and keeps the unused rest of the last Stride. Returns false
+     * and changes nothing if the actions do not suffice.
+     */
+    public boolean payWalk(double blocks, TurnState turn) {
+        if (blocks <= 0) {
+            return true;
+        }
+        int strides = stridesNeededFor(Math.max(0, blocks - remainingInStride));
+        if (strides == Integer.MAX_VALUE || !turn.spendActions(strides)) {
+            return false;
+        }
+        remainingInStride = Math.max(0, remainingInStride + (double) strides * blocksPerStride - blocks);
+        return true;
+    }
+
     public int stridesNeededFor(double blocks) {
         if (blocks <= 0) {
             return 0;
