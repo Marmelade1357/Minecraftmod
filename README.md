@@ -43,8 +43,8 @@ groß oben auf dem Bildschirm (natürliche 20 golden, natürliche 1 rot) und im 
 | `/pf2 combat add` | alle Charaktere und NPCs im Umkreis von 32 Blöcken zum laufenden Kampf hinzufügen (Spielleiter oder OP) |
 | `/pf2 combat remove [<Ziel>]` | angesehenen NPC (oder das angegebene Ziel) aus dem Kampf nehmen (Spielleiter oder OP) |
 | `/pf2 combat anchor <Spieler> [<Position>]` | Kämpfer an der aktuellen bzw. angegebenen Position neu verankern, z. B. nach einem `/tp` (Spielleiter oder OP) |
-| `/pf2 combat endturn` | eigenen Zug beenden (jeder Kämpfer, der gerade dran ist) |
-| `/pf2 combat attack <1-3> [<Angriff 0-7>]` | Ersatz für den Linksklick: den angesehenen NPC (bis 16 Blöcke) mit dem 1., 2. oder 3. Angriff angreifen (jeder Kämpfer, der dran ist) |
+| `/pf2 combat endturn` | Zug beenden (Kämpfer, der dran ist; der Spielleiter auch den Zug eines NPCs) |
+| `/pf2 combat attack <1-3> [<Angriff 0-7>]` | Ersatz für den Linksklick. Spieler: den angesehenen NPC (bis 16 Blöcke) mit der Waffe in der Hand angreifen. Spielleiter: der **ausgewählte NPC, der gerade dran ist,** greift das angesehene Wesen an (optional mit dem Monsterangriff 0-7) |
 
 `/pf2 tools` gibt dem Spielleiter außerdem die **Kampfglocke**.
 
@@ -135,14 +135,15 @@ Mod bei Spielern mit Charakter „TP: x/y“. Vanilla-Schaden, -Tod und -Hunger 
 **Dein Zug:** 3 Aktionen und 1 Reaktion pro Zug. Wer nicht dran ist, ist eingefroren: Bewegung wird zurückgesetzt, Blöcke
 abbauen, setzen, benutzen und Interaktionen mit Entities sind gesperrt. Bewegung wird in Blöcken gezählt (1 Block = 5 ft):
 der erste Schritt beginnt ein Schreiten (1 Aktion) von Geschwindigkeit/5 Blöcken, danach ein weiteres, solange Aktionen übrig sind.
-Mit **Enter** (änderbar unter Steuerung → PF2 Craft) beendest du den Zug.
+Mit **Enter** (änderbar unter Steuerung → PF2 Craft) beendest du den Zug; der Spielleiter beendet damit auch die Züge der NPCs.
 
 **Angriff:** Waffe deines Charakters in die Haupthand nehmen und auf deinem Zug einen NPC **links anklicken**. Im Fenster wählst du
 den **1., 2. oder 3. Angriff** (der Mehrfachangriffsmalus ist eingerechnet, der passende Vorschlag ist hervorgehoben, jeder
-kann gewählt werden). Das Ergebnis („Treffer“, „kritisch“, „verfehlt“ …) und der verursachte Schaden gehen an alle;
+kann gewählt werden, aber nicht weniger als deine tatsächliche Zahl an Angriffen in diesem Zug). Das Ergebnis („Treffer“, „kritisch“, „verfehlt“ …) und der verursachte Schaden gehen an alle;
 RK, Wurf und TP des Ziels sieht nur der Spielleiter. Der Schaden wird nach Art berechnet (kritisch verdoppelt) mit Resistenzen,
 Schwächen und Immunitäten; Runen wie flaming, frost, shock, corrosive und thundering geben +1W6. Es gelten Reichweiten
-für Nah- und Fernkampf. Unbekannte Verteidigungsarten (z. B. Kaltes Eisen) werden dem Spielleiter gemeldet, aber nicht angewendet.
+für Nah- und Fernkampf. Damit der Klick auch weit entfernte Ziele erreicht, erhalten Kämpfer und Spielleiter während eines Kampfes
+eine vorübergehende Interaktionsreichweite von +12 Blöcken (wird nicht gespeichert, endet mit dem Kampf); ob ein Angriff möglich ist, entscheidet allein der Server. Unbekannte Verteidigungsarten (z. B. Kaltes Eisen) werden dem Spielleiter gemeldet, aber nicht angewendet.
 
 **NPC-Züge (Spielleiter):** Ist ein NPC dran, wähle ihn mit dem Befehlsstab. Rechtsklick auf einen Block lässt ihn laufen
 (in Schreiten bezahlt), Rechtsklick auf ein Ziel öffnet das Angriffsfenster mit den Angriffen des Monsters.

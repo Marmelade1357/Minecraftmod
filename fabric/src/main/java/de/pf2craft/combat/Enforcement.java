@@ -250,9 +250,12 @@ public final class Enforcement {
             return;
         }
         int before = CombatService.turn().actionsLeft();
+        int strideBefore = (int) Math.ceil(CombatService.budget().remainingInStride());
         if (CombatService.budget().tryMove(delta, CombatService.turn())) {
             lastAccepted = pos;
-            if (CombatService.turn().actionsLeft() != before) {
+            // The HUD shows whole blocks left in the stride: sync when that number or the actions change.
+            if (CombatService.turn().actionsLeft() != before
+                    || (int) Math.ceil(CombatService.budget().remainingInStride()) != strideBefore) {
                 CombatService.sync(null);
             }
         } else {

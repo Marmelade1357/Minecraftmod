@@ -103,6 +103,11 @@ public final class Pf2Commands {
                         .then(literal("add")
                                 .requires(Pf2Commands::isGmOrOp)
                                 .executes(ctx -> {
+                                    if (!CombatService.active()) {
+                                        ctx.getSource().sendError(Text.translatableWithFallback(
+                                                "pf2craft.combat.not_running", "No combat is running."));
+                                        return 0;
+                                    }
                                     int added = CombatService.addNearby(ctx.getSource().getPlayerOrThrow());
                                     ctx.getSource().sendFeedback(() -> Text.translatableWithFallback(
                                             "pf2craft.combat.added_count", "%s added to the combat.", added), false);
@@ -115,15 +120,12 @@ public final class Pf2Commands {
                                     if (npc.isEmpty()) {
                                         return 0;
                                     }
-                                    CombatService.removeFromGm(ctx.getSource().getPlayerOrThrow(),
-                                            npc.get().getUuid());
-                                    return 1;
+                                    return removeFromCombat(ctx, npc.get().getUuid());
                                 })
                                 .then(argument("target", EntityArgumentType.entity())
                                         .executes(ctx -> {
-                                            CombatService.removeFromGm(ctx.getSource().getPlayerOrThrow(),
+                                            return removeFromCombat(ctx,
                                                     EntityArgumentType.getEntity(ctx, "target").getUuid());
-                                            return 1;
                                         })))
                         .then(literal("anchor")
                                 .requires(Pf2Commands::isGmOrOp)
@@ -179,6 +181,23 @@ public final class Pf2Commands {
                                 .requires(Pf2Commands::isGmOrOp)
                                 .then(argument("player", EntityArgumentType.player())
                                         .executes(Pf2Commands::resetCharacter)))));
+    }
+
+    /** Command path of "remove": game masters and level-2 operators alike, with feedback. */
+    private static int removeFromCombat(CommandContext<ServerCommandSource> ctx, java.util.UUID id) {
+        if (!CombatService.active()) {
+            ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.combat.not_running",
+                    "No combat is running."));
+            return 0;
+        }
+        if (!CombatService.removeFromCommand(id)) {
+            ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.combat.not_participant",
+                    "That creature does not take part in the combat."));
+            return 0;
+        }
+        ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.combat.remove_done",
+                "Removed from the combat."), false);
+        return 1;
     }
 
     /** Holds the player where they now stand (after an optional move by the command itself). */

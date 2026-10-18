@@ -303,5 +303,9 @@
   "pf2craft.combat.attack.bad_npc_target": "Das Ziel muss ein kämpfender Charakter oder ein stehender NSC sein.",
   "pf2craft.combat.attack.bad_strike": "Der NSC hat diesen Angriff nicht.",
   "pf2craft.combat.attack.no_look_target": "Kein Charakter oder NSC im Blick (innerhalb von 16 Blöcken).",
-  "pf2craft.combat.path_partial": "Der NSC kommt nicht ganz dorthin und bleibt vorher stehen."
+  "pf2craft.combat.path_partial": "Der NSC kommt nicht ganz dorthin und bleibt vorher stehen.",
+  "pf2craft.combat.attack_number_low": "Du kannst keine niedrigere Angriffsnummer wählen, als du Angriffe gemacht hast.",
+  "pf2craft.combat.attack_error": "Der Angriff konnte nicht ausgewertet werden: %s",
+  "pf2craft.combat.not_participant": "Dieses Wesen nimmt nicht am Kampf teil.",
+  "pf2craft.combat.remove_done": "Aus dem Kampf genommen."
 }

@@ -136,8 +136,10 @@ public class Pf2CraftClient implements ClientModInitializer {
             }
         }
         while (endTurnKey.wasPressed()) {
+            // A GM also ends an NPC's turn (only GMs receive the exact hit points of NPC entries).
+            boolean gmNpcTurn = ClientCombat.current().map(e -> e.npc() && e.hp() >= 0).orElse(false);
             if (client.currentScreen == null && client.player != null
-                    && ClientCombat.isTurnOf(client.player.getUuid())
+                    && (ClientCombat.isTurnOf(client.player.getUuid()) || gmNpcTurn)
                     && ClientPlayNetworking.canSend(EndTurnPayload.ID)) {
                 ClientPlayNetworking.send(new EndTurnPayload());
             }

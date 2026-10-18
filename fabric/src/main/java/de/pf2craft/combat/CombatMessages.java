@@ -240,4 +240,14 @@ final class CombatMessages {
                 hpLeft, hpMax).formatted(Formatting.DARK_AQUA));
         return lines;
     }
+
+    static MutableText attackNumberLow() {
+        return Text.translatableWithFallback("pf2craft.combat.attack_number_low",
+                "You cannot choose a lower attack number than the attacks you have already made.");
+    }
+
+    static MutableText attackError(String detail) {
+        return Text.translatableWithFallback("pf2craft.combat.attack_error",
+                "The attack could not be resolved: %s", detail);
+    }
 }

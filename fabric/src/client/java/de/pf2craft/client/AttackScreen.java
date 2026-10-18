@@ -61,8 +61,9 @@ public class AttackScreen extends Screen {
             if (n == suggested) {
                 label = label.copy().formatted(Formatting.YELLOW, Formatting.BOLD);
             }
-            addDrawableChild(ButtonWidget.builder(label, b -> confirm(number))
+            ButtonWidget button = addDrawableChild(ButtonWidget.builder(label, b -> confirm(number))
                     .dimensions(x, rowY, w, BUTTON_H).build());
+            button.active = n >= suggested; // the real attack count is the floor
             rowY += BUTTON_H + GAP;
         }
         addDrawableChild(ButtonWidget.builder(Text.translatable("screen.pf2craft.attack.cancel"), b -> close())

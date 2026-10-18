@@ -159,46 +159,73 @@ public final class AttackService {
             return false;
         }
         Prepared p = prepare(attacker, target, false);
-        if (p == null) {
+        if (p == null || numberTooLow(attacker, number)) {
             return false;
         }
-        LAST_CONFIRM.put(attacker.getUuid(), now); // only an accepted attack starts the cooldown
-        // Nothing is rejected any more: from here on the action is spent.
-        CombatService.turn().spendActions(1);
-        CombatService.turn().recordAttack();
-
         NpcEntity npc = p.npc();
         MonsterData base = npc.stats().base();
         boolean agile = AttackMath.isAgile(p.strike().traits());
-        int natural;
+        // Everything that can throw is rolled before the action is spent.
+        AttackOutcome outcome;
+        DegreeOfSuccess degree;
+        DamageOutcome damage = null;
         try {
-            natural = RollService.rollQuiet("1d20").naturalD20().orElseThrow();
+            outcome = AttackMath.resolve(rollNatural(), CharacterMath.strikeAttack(p.sheet(), p.strikeIndex()),
+                    AttackMath.mapPenalty(number, agile), p.rangePenalty(), base.ac());
+            degree = outcome.degree();
+            if (degree.isSuccess()) {
+                List<DamageInstance> rolled = DamageRoller.roll(StrikeDamage.forStrike(p.sheet(), p.strikeIndex()),
+                        degree == DegreeOfSuccess.CRITICAL_SUCCESS, RollService.roller());
+                damage = DamageResolver.resolve(rolled,
+                        new Defenses(base.resistances(), base.weaknesses(), base.immunities()));
+            }
+        } catch (RuntimeException e) {
+            reportError(attacker, e);
+            return false;
+        }
+        LAST_CONFIRM.put(attacker.getUuid(), now); // only an accepted attack starts the cooldown
+        CombatService.turn().spendActions(1);
+        CombatService.turn().recordAttack();
+        try {
+            int applied = damage == null ? -1 : Math.max(0, damage.total());
+            int hpLeft = Math.max(0, npc.stats().currentHp() - Math.max(0, applied));
+            announce(attacker, nameOf(attacker, p.sheet()), npc.stats().displayName(), number, outcome, degree,
+                    applied, base.ac(), p.rangePenalty(), damage, hpLeft, base.hp());
+            if (applied > 0) {
+                NpcService.damage(npc, applied); // may defeat the NPC and move the combat on
+            }
+            CombatService.sync(null);
+        } catch (RuntimeException e) {
+            reportError(attacker, e);
+        }
+        return true;
+    }
+
+    private static int rollNatural() {
+        try {
+            return RollService.rollQuiet("1d20").naturalD20().orElseThrow();
         } catch (DiceParseException e) {
             throw new IllegalStateException(e);
         }
-        AttackOutcome outcome = AttackMath.resolve(natural, CharacterMath.strikeAttack(p.sheet(), p.strikeIndex()),
-                AttackMath.mapPenalty(number, agile), p.rangePenalty(), base.ac());
-        DegreeOfSuccess degree = outcome.degree();
+    }
 
-        DamageOutcome damage = null;
-        if (degree.isSuccess()) {
-            List<DamageInstance> rolled = DamageRoller.roll(StrikeDamage.forStrike(p.sheet(), p.strikeIndex()),
-                    degree == DegreeOfSuccess.CRITICAL_SUCCESS, RollService.roller());
-            damage = DamageResolver.resolve(rolled,
-                    new Defenses(base.resistances(), base.weaknesses(), base.immunities()));
+    /** A player may not pick a lower attack number than the real count (more attacks made = higher penalty). */
+    private static boolean numberTooLow(ServerPlayerEntity who, int number) {
+        if (number < Math.min(3, CombatService.turn().nextAttackNumber())) {
+            CombatMessages.error(who, CombatMessages.attackNumberLow());
+            return true;
         }
-        int applied = damage == null ? -1 : Math.max(0, damage.total());
-        int hpLeft = Math.max(0, npc.stats().currentHp() - Math.max(0, applied));
+        return false;
+    }
 
-        String attackerName = nameOf(attacker, p.sheet());
-        announce(attacker, attackerName, npc.stats().displayName(), number, outcome, degree, applied, base.ac(),
-                p.rangePenalty(), damage, hpLeft, base.hp());
-
-        if (applied > 0) {
-            NpcService.damage(npc, applied); // may defeat the NPC and move the combat on
+    /** An unexpected error while resolving an attack: logged and shown to the GMs, never thrown on. */
+    private static void reportError(ServerPlayerEntity actor, RuntimeException e) {
+        Pf2Craft.LOGGER.error("Attack failed", e);
+        for (ServerPlayerEntity r : actor.getServer().getPlayerManager().getPlayerList()) {
+            if (GmRoles.isGm(r)) {
+                CombatMessages.error(r, CombatMessages.attackError(String.valueOf(e.getMessage())));
+            }
         }
-        CombatService.sync(null);
-        return true;
     }
 
     // ---- NPC attacks -----------------------------------------------------------------------------------------
@@ -262,57 +289,59 @@ public final class AttackService {
             return false;
         }
         NpcPrepared p = prepareNpc(gm, npc, target, strikeIndex);
-        if (p == null) {
+        if (p == null || numberTooLow(gm, number)) {
+            return false;
+        }
+        boolean agile = AttackMath.isAgile(p.strike().traits());
+        AttackOutcome outcome;
+        DegreeOfSuccess degree;
+        DamageOutcome damage = null;
+        try {
+            outcome = AttackMath.resolve(rollNatural(), p.strike().attackBonus(),
+                    AttackMath.mapPenalty(number, agile), p.rangePenalty(), p.ac());
+            degree = outcome.degree();
+            if (degree.isSuccess()) {
+                List<DamageInstance> rolled = DamageRoller.roll(StrikeDamage.forMonster(p.strike()),
+                        degree == DegreeOfSuccess.CRITICAL_SUCCESS, RollService.roller());
+                damage = DamageResolver.resolve(rolled, p.defenses());
+            }
+        } catch (RuntimeException e) {
+            reportError(gm, e);
             return false;
         }
         LAST_CONFIRM.put(gm.getUuid(), now);
         CombatService.turn().spendActions(1);
         CombatService.turn().recordAttack();
-
-        boolean agile = AttackMath.isAgile(p.strike().traits());
-        int natural;
         try {
-            natural = RollService.rollQuiet("1d20").naturalD20().orElseThrow();
-        } catch (DiceParseException e) {
-            throw new IllegalStateException(e);
-        }
-        AttackOutcome outcome = AttackMath.resolve(natural, p.strike().attackBonus(),
-                AttackMath.mapPenalty(number, agile), p.rangePenalty(), p.ac());
-        DegreeOfSuccess degree = outcome.degree();
-        DamageOutcome damage = null;
-        if (degree.isSuccess()) {
-            List<DamageInstance> rolled = DamageRoller.roll(StrikeDamage.forMonster(p.strike()),
-                    degree == DegreeOfSuccess.CRITICAL_SUCCESS, RollService.roller());
-            damage = DamageResolver.resolve(rolled, p.defenses());
-        }
-        int applied = damage == null ? -1 : Math.max(0, damage.total());
-
-        int hpBefore;
-        int hpMax;
-        String targetName;
-        if (p.target() instanceof ServerPlayerEntity player) {
-            CharacterSheet sheet = CharacterStore.get(player).orElseThrow();
-            hpBefore = sheet.currentHp();
-            hpMax = CharacterMath.maxHp(sheet);
-            targetName = nameOf(player, sheet);
-        } else {
-            NpcEntity victim = (NpcEntity) p.target();
-            hpBefore = victim.stats().currentHp();
-            hpMax = victim.stats().base().hp();
-            targetName = victim.stats().displayName();
-        }
-        int hpLeft = Math.max(0, hpBefore - Math.max(0, applied));
-        announce(gm, npc.stats().displayName(), targetName, number, outcome, degree, applied, p.ac(),
-                p.rangePenalty(), damage, hpLeft, hpMax);
-
-        if (applied > 0) {
+            int applied = damage == null ? -1 : Math.max(0, damage.total());
+            int hpBefore;
+            int hpMax;
+            String targetName;
             if (p.target() instanceof ServerPlayerEntity player) {
-                SheetService.setCurrentHp(player, hpLeft); // 0 HP takes the player out of the combat
+                CharacterSheet sheet = CharacterStore.get(player).orElseThrow();
+                hpBefore = sheet.currentHp();
+                hpMax = CharacterMath.maxHp(sheet);
+                targetName = nameOf(player, sheet);
             } else {
-                NpcService.damage((NpcEntity) p.target(), applied);
+                NpcEntity victim = (NpcEntity) p.target();
+                hpBefore = victim.stats().currentHp();
+                hpMax = victim.stats().base().hp();
+                targetName = victim.stats().displayName();
             }
+            int hpLeft = Math.max(0, hpBefore - Math.max(0, applied));
+            announce(gm, npc.stats().displayName(), targetName, number, outcome, degree, applied, p.ac(),
+                    p.rangePenalty(), damage, hpLeft, hpMax);
+            if (applied > 0) {
+                if (p.target() instanceof ServerPlayerEntity player) {
+                    SheetService.setCurrentHp(player, hpLeft); // 0 HP takes the player out of the combat
+                } else {
+                    NpcService.damage((NpcEntity) p.target(), applied);
+                }
+            }
+            CombatService.sync(null);
+        } catch (RuntimeException e) {
+            reportError(gm, e);
         }
-        CombatService.sync(null);
         return true;
     }
 

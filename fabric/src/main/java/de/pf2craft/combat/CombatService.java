@@ -25,11 +25,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
@@ -49,7 +53,26 @@ public final class CombatService {
     private static MinecraftServer server;
     private static final Set<String> DEFEATED = new HashSet<>();
 
+    /** Temporary attribute bonus that lets the click reach far targets; the server's reach rules still decide. */
+    private static final Identifier REACH_ID = Pf2Craft.id("combat_reach");
+    private static final double REACH_BONUS = 12.0;
+
     private CombatService() {
+    }
+
+    private static void applyReach(ServerPlayerEntity player) {
+        EntityAttributeInstance range = player.getAttributeInstance(EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE);
+        if (range != null && range.getModifier(REACH_ID) == null) {
+            range.addTemporaryModifier(new EntityAttributeModifier(REACH_ID, REACH_BONUS,
+                    EntityAttributeModifier.Operation.ADD_VALUE));
+        }
+    }
+
+    private static void removeReach(ServerPlayerEntity player) {
+        EntityAttributeInstance range = player.getAttributeInstance(EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE);
+        if (range != null) {
+            range.removeModifier(REACH_ID);
+        }
     }
 
     public static boolean active() {
@@ -165,6 +188,15 @@ public final class CombatService {
         remove(id);
     }
 
+    /** Command path ({@code /pf2 combat remove}, permission checked by the command); false if not taking part. */
+    public static boolean removeFromCommand(UUID id) {
+        if (encounter == null || !containsId(id.toString())) {
+            return false;
+        }
+        remove(id);
+        return true;
+    }
+
     /** Takes a participant out of the running order; the turn moves on if it was the current one. */
     public static void remove(UUID uuid) {
         String id = uuid.toString();
@@ -190,6 +222,9 @@ public final class CombatService {
         if (encounter != null) {
             sync(null);
         }
+        if (removedPlayer != null && !GmRoles.isGm(removedPlayer)) {
+            removeReach(removedPlayer);
+        }
         if (removedPlayer != null && !GmRoles.isGm(removedPlayer)
                 && ServerPlayNetworking.canSend(removedPlayer, CombatSyncPayload.ID)) {
             ServerPlayNetworking.send(removedPlayer, CombatSyncPayload.inactive());
@@ -198,10 +233,7 @@ public final class CombatService {
 
     /** Fallback for /pf2 combat add: everything near the GM that is not yet taking part. */
     public static int addNearby(ServerPlayerEntity gm) {
-        if (!GmRoles.isGm(gm)) {
-            CombatMessages.error(gm, CombatMessages.notGm());
-            return 0;
-        }
+        // The command checks "game master or permission level 2"; no role check here.
         if (encounter == null) {
             CombatMessages.error(gm, CombatMessages.notRunning());
             return 0;
@@ -245,6 +277,7 @@ public final class CombatService {
         Pf2Craft.LOGGER.info("Combat started with {} participants", fresh.order().size());
 
         for (ServerPlayerEntity r : recipients(null)) {
+            applyReach(r);
             boolean viewerGm = GmRoles.isGm(r);
             r.sendMessage(CombatMessages.started(), false);
             r.sendMessage(CombatMessages.round(1), false);
@@ -272,6 +305,10 @@ public final class CombatService {
         }
         int init = rollInitiative(c);
         encounter.add(c, init);
+        ServerPlayerEntity joined = gm.getServer().getPlayerManager().getPlayer(id);
+        if (joined != null) {
+            applyReach(joined);
+        }
         for (ServerPlayerEntity r : recipients(null)) {
             r.sendMessage(c.npc() && !GmRoles.isGm(r)
                     ? CombatMessages.lateJoinHidden(c.name()) : CombatMessages.lateJoin(c.name(), init), false);
@@ -341,6 +378,9 @@ public final class CombatService {
             if (sheet.isPresent() && sheet.get().currentHp() > 0) {
                 encounter.setActive(id, true);
             }
+        }
+        if (GmRoles.isGm(player) || containsId(id)) {
+            applyReach(player);
         }
         sync(null);
     }
@@ -456,6 +496,9 @@ public final class CombatService {
         DEFEATED.clear();
         Enforcement.onCombatEnded();
         Pf2Craft.LOGGER.info("Combat ended");
+        if (server != null) {
+            server.getPlayerManager().getPlayerList().forEach(CombatService::removeReach);
+        }
         for (ServerPlayerEntity r : audience) {
             r.sendMessage(CombatMessages.ended(), false);
             if (ServerPlayNetworking.canSend(r, CombatSyncPayload.ID)) {
