@@ -8,14 +8,17 @@ import java.util.Set;
 import java.util.UUID;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -24,6 +27,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 
 /**
  * Makes the combat rules binding for players: whoever is not up is held in place and cannot interact, the
@@ -38,12 +42,16 @@ public final class Enforcement {
     private static final int FOOD_INTERVAL = 20;
 
     /** Where frozen combatant players are held. */
-    private static final Map<UUID, Vec3d> ANCHORS = new HashMap<>();
+    private record Anchor(Vec3d pos, RegistryKey<World> world) {
+    }
+
+    private static final Map<UUID, Anchor> ANCHORS = new HashMap<>();
     private static final Map<UUID, Integer> LAST_TURN_MSG = new HashMap<>();
     private static final Map<UUID, Integer> LAST_ACTION_MSG = new HashMap<>();
     private static String trackedCurrent;
     private static Object trackedBudget;
     private static Vec3d lastAccepted;
+    private static RegistryKey<World> lastAcceptedWorld;
 
     private Enforcement() {
     }
@@ -61,6 +69,10 @@ public final class Enforcement {
         // The current player's attack click belongs to the attack flow; only non-current ones are stopped here.
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hit) ->
                 blocked(player) ? ActionResult.FAIL : ActionResult.PASS);
+        UseEntityCallback.EVENT.register((player, world, hand, entity, hit) ->
+                blocked(player) ? ActionResult.FAIL : ActionResult.PASS);
+        // A respawned player is re-anchored where they appear.
+        ServerPlayerEvents.AFTER_RESPAWN.register((old, fresh, alive) -> reanchor(fresh.getUuid()));
         PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, be) -> !blocked(player));
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) ->
                 !(entity instanceof ServerPlayerEntity) || bypasses(source));
@@ -75,6 +87,16 @@ public final class Enforcement {
         LAST_ACTION_MSG.remove(id);
     }
 
+    /** Holds the player where they stand now (GM repositioning, respawn); clears their message limits. */
+    public static void reanchor(UUID id) {
+        ANCHORS.remove(id);
+        LAST_TURN_MSG.remove(id);
+        LAST_ACTION_MSG.remove(id);
+        if (trackedCurrent != null && trackedCurrent.equals(id.toString())) {
+            lastAccepted = null; // re-seeded from the current position next tick
+        }
+    }
+
     /** Called when the combat ends or the server stops. */
     public static void onCombatEnded() {
         ANCHORS.clear();
@@ -83,6 +105,7 @@ public final class Enforcement {
         trackedCurrent = null;
         trackedBudget = null;
         lastAccepted = null;
+        lastAcceptedWorld = null;
     }
 
     private static boolean bypasses(DamageSource source) {
@@ -139,7 +162,7 @@ public final class Enforcement {
         // Turn change: the previous player is held where their turn ended.
         if (current == null ? trackedCurrent != null : !current.equals(trackedCurrent)) {
             if (trackedCurrent != null && lastAccepted != null) {
-                ANCHORS.put(UUID.fromString(trackedCurrent), lastAccepted);
+                ANCHORS.put(UUID.fromString(trackedCurrent), new Anchor(lastAccepted, lastAcceptedWorld));
             }
             trackedCurrent = current;
             lastAccepted = null;
@@ -172,11 +195,13 @@ public final class Enforcement {
 
     private static void hold(ServerPlayerEntity p) {
         Vec3d pos = p.getPos();
-        Vec3d anchor = ANCHORS.get(p.getUuid());
-        if (anchor == null) {
-            ANCHORS.put(p.getUuid(), pos);
+        RegistryKey<World> world = p.getServerWorld().getRegistryKey();
+        Anchor held = ANCHORS.get(p.getUuid());
+        if (held == null || held.world() != world) {
+            ANCHORS.put(p.getUuid(), new Anchor(pos, world)); // first sight or another dimension: hold here
             return;
         }
+        Vec3d anchor = held.pos();
         double dx = pos.x - anchor.x;
         double dz = pos.z - anchor.z;
         boolean jumped = pos.y - anchor.y > JUMP;
@@ -184,14 +209,16 @@ public final class Enforcement {
             double y = jumped ? anchor.y : pos.y;
             teleport(p, anchor.x, y, anchor.z);
         } else if (p.isOnGround()) {
-            ANCHORS.put(p.getUuid(), new Vec3d(anchor.x, pos.y, anchor.z));
+            ANCHORS.put(p.getUuid(), new Anchor(new Vec3d(anchor.x, pos.y, anchor.z), world));
         }
     }
 
     private static void moveCurrent(ServerPlayerEntity p) {
         Vec3d pos = p.getPos();
-        if (lastAccepted == null) {
+        RegistryKey<World> world = p.getServerWorld().getRegistryKey();
+        if (lastAccepted == null || lastAcceptedWorld != world) {
             lastAccepted = pos;
+            lastAcceptedWorld = world;
             return;
         }
         double dx = pos.x - lastAccepted.x;

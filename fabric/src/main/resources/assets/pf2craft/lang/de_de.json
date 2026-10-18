@@ -237,6 +237,7 @@
   "pf2craft.combat.not_running": "Es läuft kein Kampf.",
   "pf2craft.combat.not_gm": "Das darf nur ein Spielleiter.",
   "pf2craft.combat.no_actions": "Du hast keine Aktionen mehr zum Bewegen.",
+  "pf2craft.combat.anchored": "%s wird jetzt an der aktuellen Position gehalten.",
   "pf2craft.combat.not_your_turn": "Du bist nicht dran.",
   "pf2craft.combat.already_running": "Es läuft bereits ein Kampf.",
   "pf2craft.combat.no_participants": "Niemand kann kämpfen: keine Charaktere oder NSCs gefunden.",

@@ -13,6 +13,7 @@ import de.pf2craft.character.CharacterService;
 import de.pf2craft.character.CharacterStore;
 import de.pf2craft.character.SheetService;
 import de.pf2craft.combat.CombatService;
+import de.pf2craft.combat.Enforcement;
 import de.pf2craft.core.character.CharacterSheet;
 import de.pf2craft.core.dice.DiceParseException;
 import de.pf2craft.core.monster.MonsterData;
@@ -31,10 +32,12 @@ import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 
 /**
  * {@code /roll <dice>}, {@code /gmroll <dice>} (secret) and {@code /pf2 gm add|remove|list}.
@@ -121,6 +124,21 @@ public final class Pf2Commands {
                                                     EntityArgumentType.getEntity(ctx, "target").getUuid());
                                             return 1;
                                         })))
+                        .then(literal("anchor")
+                                .requires(Pf2Commands::isGmOrOp)
+                                .then(argument("target", EntityArgumentType.player())
+                                        .executes(ctx -> {
+                                            ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "target");
+                                            return anchor(ctx, target);
+                                        })
+                                        .then(argument("pos", Vec3ArgumentType.vec3())
+                                                .executes(ctx -> {
+                                                    ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "target");
+                                                    Vec3d pos = Vec3ArgumentType.getVec3(ctx, "pos");
+                                                    target.teleport(target.getServerWorld(), pos.x, pos.y, pos.z,
+                                                            target.getYaw(), target.getPitch());
+                                                    return anchor(ctx, target);
+                                                }))))
                         .then(literal("next")
                                 .requires(Pf2Commands::isGmOrOp)
                                 .executes(ctx -> {
@@ -150,6 +168,14 @@ public final class Pf2Commands {
                                 .requires(Pf2Commands::isGmOrOp)
                                 .then(argument("player", EntityArgumentType.player())
                                         .executes(Pf2Commands::resetCharacter)))));
+    }
+
+    /** Holds the player where they now stand (after an optional move by the command itself). */
+    private static int anchor(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity target) {
+        Enforcement.reanchor(target.getUuid());
+        ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.combat.anchored",
+                "%s is now held at the current position.", target.getName()), true);
+        return 1;
     }
 
     private static boolean isGmOrOp(ServerCommandSource source) {
