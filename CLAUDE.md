@@ -26,7 +26,7 @@ deutsch. **Code, Kommentare, Bezeichner und Commit-Messages sind englisch.**
 | Sprachen | Englisch + Deutsch (`en_us.json`, `de_de.json`) | Bei neuen Texten **immer beide** Dateien pflegen. In der deutschen Version heißen Würfel „W“ (W20), in der englischen „d“. |
 | Charaktere | Import aus **Pathbuilder 2e** (JSON-Export, 6-stellige ID), Stufenaufstieg im Spiel nach Freigabe durch den GM | Bestätigt. Spart den Nachbau der Charaktererschaffung; geführte Erschaffung im Spiel ist als „Schritt B“ offen. |
 | Inhalte (geplant) | Datengetrieben als JSON (Monster, Zauber, Gegenstände) | Die Gruppe soll selbst Inhalte ergänzen können. |
-| Lizenz | Mechanik nach ORC-Lizenz umsetzen | **Keine Regeltexte von AoN massenhaft kopieren.** Kurze eigene Zusammenfassungen sind in Ordnung. |
+| Lizenz | Mechanik nach ORC-Lizenz umsetzen; Golarion-Eigennamen über die Paizo Community Use Policy (kostenlos, nicht kommerziell, Pflichthinweis, keine Paizo-Logos/-Bilder) | **Keine Regeltexte von AoN massenhaft kopieren.** Kurze eigene Zusammenfassungen sind in Ordnung. Pflichttexte stehen in `NOTICE.md`; die Mod darf nie Geld kosten. |
 
 ## Projektstruktur
 
@@ -36,6 +36,8 @@ core/                       Reines Java ohne Minecraft-Abhängigkeit. Regelkern 
   de.pf2craft.core.check    DegreeOfSuccess (Erfolgsgrade inkl. nat. 20/1)
   de.pf2craft.core.character   Charakterbogen-Modell, CharacterMath, PathbuilderImporter, CharacterJson, CheckId, GmEdit, PathbuilderId/-Response
   de.pf2craft.core.progression ClassProgression (+ Parser), ClassRegistry, LevelUp
+  de.pf2craft.core.item        Gegenstandskatalog (Waffen/Rüstung/Schilde, Parser), ItemVisual (Optik nach Schadenswürfel), ItemStamp
+  src/main/resources/pf2craft/items/  Player-Core-Waffen, -Rüstungen, -Schilde (nur Namen und Zahlen)
   src/main/resources/pf2craft/classes/  Klassendaten (29 Klassen + index.json); Testdaten: 261 Pathbuilder-Fixtures
                             (MIT, MrPrimate/pathmuncher) in core/src/test/resources/pathbuilder/
 fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
@@ -46,6 +48,8 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
     roll/                         RollService (serverseitig würfeln/verteilen), RollMessages (Chat-Text)
     character/                    CharacterStore (Data Attachment), ClassData (Jar + config/pf2craft/classes/*.json),
                                   PathbuilderFetcher, CharacterService (Import/Reset/Aufstieg), SheetService (Bogen, TP, GM-Edits)
+    item/                         Pf2ItemFactory (Vanilla-Items für Waffen/Schild), CharacterItems (geben/ersetzen/entfernen),
+                                  ItemData (Jar + config/pf2craft/items/*.json), Pf2Components, WeaponRef/ShieldRef
     command/                      Pf2Commands (/roll, /gmroll, /pf2 gm|hp|sheet|character …)
   src/client/java/de/pf2craft/client  nur Client: Pf2CraftClient, DiceScreen, RollHud, ImportScreen,
                                   CharacterScreen (Reiter, Verdeckt, GM-Knöpfe), LevelUpScreen, ClientSheets
@@ -115,6 +119,8 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
    *Noch offen: geführte Charaktererschaffung im Spiel („Schritt B“), Mehrspielertest,
    die bekannten Grenzen oben.*
 3. **Phase 3 – Kampfmodus:**
+   - ✅ **Teil 1 – Gegenstände:** Waffen und Schild aus dem Pathbuilder-Import als Vanilla-Items
+     (Optik nach Schadenswürfel, Lore, Besitzer). *Ingame-Test durch den Nutzer steht noch aus.*
    - GM startet und beendet einen Kampf, Initiative mit Zugreihenfolge im HUD.
    - 3 Aktionen + 1 Reaktion pro Zug, Mehrfachangriffsmalus.
    - Angriff gegen RK mit Erfolgsgrad, Schaden, TP.

@@ -3,7 +3,7 @@
   "id": "pf2craft",
   "version": "${version}",
   "name": "PF2 Craft",
-  "description": "Play Pathfinder 2e pen & paper sessions in Minecraft: dice, characters, encounters and GM-controlled NPCs.",
+  "description": "Play Pathfinder 2e pen & paper sessions in Minecraft: dice, characters, encounters and GM-controlled NPCs. Unofficial fan project; see NOTICE.md for the Paizo Community Use Policy and ORC License notices.",
   "authors": [],
   "license": "All-Rights-Reserved",
   "environment": "*",

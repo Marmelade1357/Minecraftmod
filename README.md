@@ -63,6 +63,21 @@ Ein Klick auf den Rangbuchstaben vor einer Fertigkeit oder einem Rettungswurf ä
 **Eigene Klassen und Anpassungen:** Die Klassendaten (29 Klassen) liegen als JSON in der Mod.
 Dateien in `config/pf2craft/classes/*.json` auf dem Server überschreiben sie oder ergänzen eigene Klassen.
 
+### Waffen und Ausrüstung
+
+Beim Import aus Pathbuilder bekommt jeder Spieler seine Waffen und seinen Schild als Minecraft-Gegenstände
+(Fäuste/unbewaffnete Angriffe ausgenommen).
+- **Aussehen nach Schadenswürfel:** W4 Holz, W6 Gold, W8 Diamant, W10/W12 Netherit; die Form richtet sich
+  nach der Waffengruppe (Schwert, Axt, Spitzhacke, Bogen, Armbrust, Dreizack, Stock). Schilde sind der Vanilla-Schild.
+- **Tooltip:** Name wie „+1 Striking Rapier“, graue Zeilen mit Schaden (z. B. „1W6 Hieb“), Eigenschaften,
+  Runen und Besitzer. Die Gegenstände sind unzerstörbar.
+- **Neu importieren** ersetzt diese Gegenstände, **Charakter zurücksetzen** entfernt sie. Ist das Inventar voll,
+  fallen sie vor die Füße des Spielers (mit Hinweis im Chat).
+- **Eigene Gegenstände:** Dateien in `config/pf2craft/items/{weapons,armor,shields}.json` auf dem Server
+  überschreiben die eingebauten Werte (Zuordnung über den Namen).
+
+Lizenz- und Urheberhinweise stehen in [NOTICE.md](NOTICE.md).
+
 ### Bekannte Grenzen
 - Taste **C** kollidiert mit der Vanilla-Belegung „Hotbar-Aktivator speichern“; eine der beiden Tasten unter Steuerung umbelegen.
 - Talente werden nur mit Namen geführt, ihre Effekte werden nicht berechnet.
@@ -75,7 +90,7 @@ Dateien in `config/pf2craft/classes/*.json` auf dem Server überschreiben sie od
 ## Projektstruktur
 
 ```
-core/    Regelkern in reinem Java (Würfel, Erfolgsgrade, Charaktere, Klassen-Aufstieg …), ohne Minecraft, mit Unit-Tests
+core/    Regelkern in reinem Java (Würfel, Erfolgsgrade, Charaktere, Klassen-Aufstieg, Gegenstandskatalog …), ohne Minecraft, mit Unit-Tests
 fabric/  die eigentliche Mod: Netzwerk, Befehle, Würfelfenster, HUD, Charakterbogen
 ```
 
@@ -103,3 +118,4 @@ Der Regelkern wird direkt in die Mod-Jar kompiliert.
 
 Pathfinder ist eine Marke von Paizo Inc. Die Spielmechanik von Pathfinder 2e (Remaster) steht unter
 der ORC-Lizenz. Regeltexte von Archives of Nethys werden nicht kopiert.
+Die Mod ist kostenlos und nicht kommerziell; Details und Pflichthinweise (Paizo Community Use Policy, ORC) in [NOTICE.md](NOTICE.md).
