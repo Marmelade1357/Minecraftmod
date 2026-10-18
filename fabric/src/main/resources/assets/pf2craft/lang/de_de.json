@@ -143,7 +143,7 @@
   "pf2craft.npc.unknown": "Unbekanntes Monster: %s",
   "pf2craft.npc.spawned": "%s erschaffen.",
   "pf2craft.npc.removed": "%s entfernt.",
-  "pf2craft.npc.none_in_view": "Kein NSC im Blick (innerhalb von 16 Blöcken).",
+  "pf2craft.npc.none_in_view": "Kein NSC im Blick (innerhalb von 16 Blöcken) und keiner ausgewählt.",
   "pf2craft.npc.info.header": "%s (%s, Stufe %s)",
   "pf2craft.npc.info.defense": "TP %s/%s, RK %s, Zäh %s, Ref %s, Wil %s, Wahrnehmung %s, Tempo %s Fuß",
   "pf2craft.npc.info.strike": "%s %s: %s",
@@ -215,5 +215,8 @@
   "pf2craft.damage.type.spells": "Zauber",
   "pf2craft.damage.type.splash-damage": "Splitterschaden",
   "pf2craft.damage.type.area-damage": "Flächenschaden",
-  "pf2craft.damage.type.wood": "Holz"
+  "pf2craft.damage.type.wood": "Holz",
+  "pf2craft.npc.limit": "Diese Welt hat bereits die Höchstzahl von %s NPCs.",
+  "pf2craft.npc.spawn_failed": "Der NPC konnte hier nicht erschaffen werden.",
+  "pf2craft.npc.cannot_walk": "Der ausgewählte NPC ist besiegt oder in einer anderen Welt."
 }

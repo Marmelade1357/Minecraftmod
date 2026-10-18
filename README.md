@@ -94,8 +94,13 @@ Die NPCs stammen aus den Monsterdaten (Monster Core, 492 Kreaturen). `/pf2 tools
 - **auf einen Block** (NPC ausgewählt): der NPC läuft dorthin.
 
 **Vorlagen:** Gespeicherte Vorlagen liegen in `config/pf2craft/monsters/` auf dem Server und erscheinen in der
-Monstersuche. Eine Vorlage überschreibt nie ein eingebautes Monster: Ist die ID vergeben, wird `-custom`,
-`-custom-2` … angehängt. Alle `*.json`-Dateien in diesem Ordner werden geladen.
+Monstersuche. Gespeicherte Vorlagen überschreiben nie ein eingebautes Monster: Ist die ID vergeben, wird `-custom`,
+`-custom-2` … angehängt. (Eine von Hand in den Ordner gelegte Datei mit der ID eines eingebauten Monsters ersetzt es
+dagegen.) Alle `*.json`-Dateien in diesem Ordner werden geladen.
+
+**Ersatzbefehle:** `/pf2 npc spawn <id>` (ohne Tab-Vervollständigung der IDs; besser das Stab-Fenster benutzen),
+`/pf2 npc info` und `/pf2 npc remove` wirken auf den NPC, den du ansiehst (bis 16 Blöcke), sonst auf den
+ausgewählten; `/pf2 npc hp <Wert>` setzt die TP des ausgewählten NPCs. Pro Welt sind höchstens 200 NPCs erlaubt.
 
 **Besiegte NPCs:** Bei 0 TP legt sich ein NPC auf den Boden.
 

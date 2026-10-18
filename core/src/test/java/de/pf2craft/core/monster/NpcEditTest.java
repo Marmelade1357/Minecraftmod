@@ -9,6 +9,15 @@ import de.pf2craft.core.progression.InvalidChoiceException;
 import org.junit.jupiter.api.Test;
 
 class NpcEditTest {
+    @Test
+    void diceCountIsBounded() {
+        String tpl = NpcTestData.KOBOLD_WARRIOR;
+        assertEquals("999d6", MonsterParser.parse(tpl.replace("1d6", "999d6")).get(0).strikes().get(0)
+                .damage().get(0).dice());
+        assertThrows(IllegalArgumentException.class, () -> MonsterParser.parse(tpl.replace("1d6", "0d6")));
+        assertThrows(IllegalArgumentException.class, () -> MonsterParser.parse(tpl.replace("1d6", "1000d6")));
+    }
+
     private static NpcStats fresh() {
         return NpcStats.fresh(NpcTestData.kobold());
     }
@@ -65,6 +74,10 @@ class NpcEditTest {
         assertThrows(InvalidChoiceException.class, () -> NpcEdit.apply(fresh(), "name", ""));
         assertThrows(InvalidChoiceException.class, () -> NpcEdit.apply(fresh(), "name", "x".repeat(33)));
         assertEquals("Kobold 1", NpcEdit.apply(fresh(), "name", "Kobold 1").displayName());
+        assertThrows(InvalidChoiceException.class, () -> NpcEdit.apply(fresh(), "name", "   "));
+        assertThrows(InvalidChoiceException.class, () -> NpcEdit.apply(fresh(), "name", "a" + (char) 10 + "b"));
+        assertThrows(InvalidChoiceException.class, () -> NpcEdit.apply(fresh(), "name", "a" + (char) 0 + "b"));
+        assertEquals("Kobold 2", NpcEdit.apply(fresh(), "name", "  Kobold 2 ").displayName());
     }
 
     @Test

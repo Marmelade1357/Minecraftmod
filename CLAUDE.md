@@ -58,7 +58,7 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
     command/                      Pf2Commands (/roll, /gmroll, /pf2 gm|hp|sheet|items|tools|npc|character …)
   src/client/java/de/pf2craft/client  nur Client: Pf2CraftClient, DiceScreen, RollHud, ImportScreen,
                                   CharacterScreen (Reiter, Verdeckt, GM-Knöpfe), LevelUpScreen, ClientSheets,
-                                  NpcSpawnScreen, NpcSheetScreen (+ NPC-Renderer)
+                                  NpcSpawnScreen, NpcSheetScreen (der NPC-Renderer wird in Pf2CraftClient registriert)
   src/main/resources/assets/pf2craft/lang/  en_us.json, de_de.json
 ```
 

@@ -41,6 +41,7 @@ public final class NpcNetwork {
 
     public static void onDisconnect(ServerPlayerEntity player) {
         LAST_SEARCH.remove(player.getUuid());
+        NpcService.forgetPlayer(player.getUuid());
         GmSelection.clear(player);
     }
 
@@ -82,9 +83,15 @@ public final class NpcNetwork {
                     payload.monsterId()).formatted(Formatting.RED), false);
             return;
         }
-        NpcEntity npc = NpcService.spawn(gm, data.get());
+        NpcService.SpawnResult result = NpcService.spawn(gm, data.get());
+        if (result.npc() == null) {
+            if (result.error() != null) {
+                gm.sendMessage(result.error().copy().formatted(Formatting.RED), false);
+            }
+            return;
+        }
         gm.sendMessage(Text.translatableWithFallback("pf2craft.npc.spawned", "Spawned %s.",
-                npc.stats().displayName()), false);
+                result.npc().stats().displayName()), false);
     }
 
     public static void edit(ServerPlayerEntity gm, NpcEditPayload payload) {

@@ -143,7 +143,7 @@
   "pf2craft.npc.unknown": "Unknown monster: %s",
   "pf2craft.npc.spawned": "Spawned %s.",
   "pf2craft.npc.removed": "Removed %s.",
-  "pf2craft.npc.none_in_view": "No NPC in view (within 16 blocks).",
+  "pf2craft.npc.none_in_view": "No NPC in view (within 16 blocks) and none selected.",
   "pf2craft.npc.info.header": "%s (%s, level %s)",
   "pf2craft.npc.info.defense": "HP %s/%s, AC %s, Fort %s, Ref %s, Will %s, Perception %s, Speed %s ft.",
   "pf2craft.npc.info.strike": "%s %s: %s",
@@ -215,5 +215,8 @@
   "pf2craft.damage.type.spells": "spells",
   "pf2craft.damage.type.splash-damage": "splash damage",
   "pf2craft.damage.type.area-damage": "area damage",
-  "pf2craft.damage.type.wood": "wood"
+  "pf2craft.damage.type.wood": "wood",
+  "pf2craft.npc.limit": "This world already has the maximum of %s NPCs.",
+  "pf2craft.npc.spawn_failed": "The NPC could not be spawned here.",
+  "pf2craft.npc.cannot_walk": "The selected NPC is defeated or in another world."
 }

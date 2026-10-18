@@ -19,7 +19,7 @@ public final class MonsterParser {
     private static final Set<String> DAMAGE_TYPES = Set.of("bludgeoning", "piercing", "slashing", "fire",
             "cold", "electricity", "acid", "sonic", "vitality", "void", "force", "spirit", "mental",
             "poison", "bleed", "precision", "untyped");
-    private static final Pattern DICE = Pattern.compile("^\\d+d(4|6|8|10|12)$");
+    private static final Pattern DICE = Pattern.compile("^[1-9]\\d{0,2}d(4|6|8|10|12)$");
 
     private MonsterParser() {
     }

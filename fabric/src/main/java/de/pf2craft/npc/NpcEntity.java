@@ -32,6 +32,7 @@ public class NpcEntity extends VillagerEntity {
     public NpcEntity(EntityType<? extends VillagerEntity> type, World world) {
         super(type, world);
         setPersistent();
+        setCanPickUpLoot(false);
     }
 
     public NpcStats stats() {
@@ -59,6 +60,10 @@ public class NpcEntity extends VillagerEntity {
         if (stats == null) {
             discard();
             return;
+        }
+        // A name tag must not rename the NPC: the stat block owns the name.
+        if (getCustomName() == null || !stats.displayName().equals(getCustomName().getString())) {
+            setCustomName(Text.literal(stats.displayName()));
         }
         updatePose();
     }

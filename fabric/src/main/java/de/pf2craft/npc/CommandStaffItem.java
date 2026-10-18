@@ -42,12 +42,17 @@ public class CommandStaffItem extends Item {
     public ActionResult useOnBlock(ItemUsageContext context) {
         if (context.getPlayer() instanceof ServerPlayerEntity gm && requireGm(gm)) {
             BlockPos target = context.getBlockPos().up();
-            GmSelection.get(gm).ifPresentOrElse(
-                    npc -> npc.getNavigation().startMovingTo(target.getX() + 0.5, target.getY(),
-                            target.getZ() + 0.5, WALK_SPEED),
-                    () -> gm.sendMessage(Text.translatableWithFallback("pf2craft.npc.none_selected",
-                            "No NPC selected. Right-click an NPC with the staff first.")
-                            .formatted(Formatting.RED), true));
+            GmSelection.get(gm).ifPresentOrElse(npc -> {
+                if (npc.getWorld() != gm.getWorld() || npc.stats().defeated()) {
+                    gm.sendMessage(Text.translatableWithFallback("pf2craft.npc.cannot_walk",
+                            "The selected NPC is defeated or in another world.").formatted(Formatting.RED), true);
+                    return;
+                }
+                npc.getNavigation().startMovingTo(target.getX() + 0.5, target.getY(), target.getZ() + 0.5,
+                        WALK_SPEED);
+            }, () -> gm.sendMessage(Text.translatableWithFallback("pf2craft.npc.none_selected",
+                    "No NPC selected. Right-click an NPC with the staff first.")
+                    .formatted(Formatting.RED), true));
         }
         return ActionResult.success(context.getWorld().isClient);
     }

@@ -116,9 +116,15 @@ public final class Pf2Commands {
                     "Unknown monster: %s", id));
             return 0;
         }
-        NpcEntity npc = NpcService.spawn(gm, data.get());
+        NpcService.SpawnResult result = NpcService.spawn(gm, data.get());
+        if (result.npc() == null) {
+            if (result.error() != null) {
+                ctx.getSource().sendError(result.error());
+            }
+            return 0;
+        }
         ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.npc.spawned",
-                "Spawned %s.", npc.stats().displayName()), false);
+                "Spawned %s.", result.npc().stats().displayName()), false);
         return 1;
     }
 
@@ -175,9 +181,9 @@ public final class Pf2Commands {
     private static Optional<NpcEntity> lookedAtNpc(CommandContext<ServerCommandSource> ctx)
             throws CommandSyntaxException {
         ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
-        Optional<NpcEntity> npc = GmSelection.get(player);
+        Optional<NpcEntity> npc = NpcService.lookedAt(player);
         if (npc.isEmpty()) {
-            npc = NpcService.lookedAt(player);
+            npc = GmSelection.get(player);
         }
         if (npc.isEmpty()) {
             ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.npc.none_in_view",

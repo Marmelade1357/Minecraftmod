@@ -4,7 +4,10 @@ import de.pf2craft.core.monster.DamagePart;
 import de.pf2craft.core.monster.MonsterData;
 import de.pf2craft.core.monster.MonsterStrike;
 import de.pf2craft.core.monster.NpcStats;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -18,13 +21,32 @@ import net.minecraft.util.math.Vec3d;
 /** Server-side operations on NPCs: spawn, change stats, remove, describe, find the one a player looks at. */
 public final class NpcService {
     public static final double LOOK_RANGE = 16.0;
+    public static final int MAX_NPCS_PER_WORLD = 200;
+    private static final long SPAWN_COOLDOWN_MS = 250;
+    private static final Map<UUID, Long> LAST_SPAWN = new ConcurrentHashMap<>();
 
     private NpcService() {
     }
 
+    /**
+     * Outcome of {@link #spawn}: the NPC, or {@code error} explaining why not. Both are {@code null} when the
+     * request was dropped by the spawn cooldown.
+     */
+    public record SpawnResult(NpcEntity npc, Text error) {
+    }
+
     /** Spawns a fresh NPC one block in front of the GM, facing them. */
-    public static NpcEntity spawn(ServerPlayerEntity gm, MonsterData data) {
+    public static SpawnResult spawn(ServerPlayerEntity gm, MonsterData data) {
+        long now = System.currentTimeMillis();
+        Long last = LAST_SPAWN.put(gm.getUuid(), now);
+        if (last != null && now - last < SPAWN_COOLDOWN_MS) {
+            return new SpawnResult(null, null);
+        }
         ServerWorld world = gm.getServerWorld();
+        if (world.getEntitiesByType(Pf2Entities.NPC, e -> true).size() >= MAX_NPCS_PER_WORLD) {
+            return new SpawnResult(null, Text.translatableWithFallback("pf2craft.npc.limit",
+                    "This world already has the maximum of %s NPCs.", MAX_NPCS_PER_WORLD));
+        }
         Vec3d look = Vec3d.fromPolar(0, gm.getYaw()).normalize();
         Vec3d pos = gm.getPos().add(look);
         NpcEntity npc = new NpcEntity(Pf2Entities.NPC, world);
@@ -32,8 +54,15 @@ public final class NpcService {
         npc.setHeadYaw(npc.getYaw());
         npc.setBodyYaw(npc.getYaw());
         npc.setStats(NpcStats.fresh(data));
-        world.spawnEntity(npc);
-        return npc;
+        if (!world.spawnEntity(npc)) {
+            return new SpawnResult(null, Text.translatableWithFallback("pf2craft.npc.spawn_failed",
+                    "The NPC could not be spawned here."));
+        }
+        return new SpawnResult(npc, null);
+    }
+
+    public static void forgetPlayer(UUID player) {
+        LAST_SPAWN.remove(player);
     }
 
     public static void apply(NpcEntity npc, NpcStats stats) {

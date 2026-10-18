@@ -50,13 +50,14 @@ public final class NpcEdit {
                 return edited(stats, with(b, number(value, -1, 25), b.perception(), b.ac(), b.fortitude(),
                         b.reflex(), b.will(), b.hp(), b.speed(), b.strikes()));
             case "name":
-                if (value.isEmpty() || value.length() > NAME_MAX) {
+                String name = value.trim();
+                if (name.isBlank() || name.length() > NAME_MAX) {
                     throw new InvalidChoiceException("Name must be 1 to " + NAME_MAX + " characters.");
                 }
-                if (value.indexOf('\u00a7') >= 0) {
-                    throw new InvalidChoiceException("Name must not contain formatting codes.");
+                if (name.indexOf('\u00a7') >= 0 || name.chars().anyMatch(Character::isISOControl)) {
+                    throw new InvalidChoiceException("Name must not contain formatting or control characters.");
                 }
-                return new NpcStats(b, value, stats.currentHp());
+                return new NpcStats(b, name, stats.currentHp());
             default:
                 if (field.startsWith("strike:") && field.endsWith(":bonus")) {
                     return strikeBonus(stats, field, value);

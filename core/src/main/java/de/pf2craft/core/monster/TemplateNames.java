@@ -2,10 +2,13 @@ package de.pf2craft.core.monster;
 
 import java.util.Locale;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 /** Safe file names for NPC templates saved under the config folder. */
 public final class TemplateNames {
     private static final int MAX_LENGTH = 64;
+    /** Names Windows cannot use as a file name (with any extension). */
+    private static final Pattern RESERVED = Pattern.compile("con|prn|aux|nul|com[1-9]|lpt[1-9]");
 
     private TemplateNames() {
     }
@@ -16,7 +19,12 @@ public final class TemplateNames {
         if (name.length() > MAX_LENGTH) {
             name = trimDashes(name.substring(0, MAX_LENGTH));
         }
-        return (name.isEmpty() ? "template" : name) + ".json";
+        if (name.isEmpty()) {
+            name = "template";
+        } else if (RESERVED.matcher(name).matches()) {
+            name = "template-" + name;
+        }
+        return name + ".json";
     }
 
     /**

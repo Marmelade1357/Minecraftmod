@@ -16,6 +16,16 @@ class TemplateNamesTest {
     }
 
     @Test
+    void windowsReservedNamesAreRenamed() {
+        assertEquals("template-con.json", TemplateNames.fileName("Con"));
+        assertEquals("template-nul.json", TemplateNames.fileName("nul"));
+        assertEquals("template-com1.json", TemplateNames.fileName("COM1"));
+        assertEquals("template-lpt9.json", TemplateNames.fileName("lpt9"));
+        assertEquals("console.json", TemplateNames.fileName("console"));
+        assertEquals("com10.json", TemplateNames.fileName("com10"));
+    }
+
+    @Test
     void freeIdKeepsFreeBase() {
         assertEquals("goblin-boss", TemplateNames.freeId("Goblin Boss", id -> false));
     }
