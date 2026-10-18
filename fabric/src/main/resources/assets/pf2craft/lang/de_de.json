@@ -263,5 +263,11 @@
   "screen.pf2craft.combat.running": "Ein Kampf läuft.",
   "screen.pf2craft.combat.skip": "Zug überspringen",
   "screen.pf2craft.combat.end": "Kampf beenden",
-  "screen.pf2craft.combat.end_confirm": "Wirklich beenden? Nochmal klicken"
+  "screen.pf2craft.combat.end_confirm": "Wirklich beenden? Nochmal klicken",
+  "pf2craft.combat.removed": "%s wurde aus dem Kampf genommen.",
+  "pf2craft.combat.added_count": "%s zum Kampf hinzugefügt.",
+  "screen.pf2craft.combat.participants": "Teilnehmer",
+  "screen.pf2craft.combat.candidates": "Zum Kampf hinzufügen",
+  "screen.pf2craft.combat.add_selected": "Hinzufügen",
+  "screen.pf2craft.combat.remove": "Aus dem Kampf nehmen"
 }

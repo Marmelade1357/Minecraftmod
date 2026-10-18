@@ -2,7 +2,6 @@ package de.pf2craft.combat;
 
 import de.pf2craft.GmRoles;
 import de.pf2craft.network.OpenCombatScreenPayload;
-import java.util.List;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -25,7 +24,7 @@ public class CombatItem extends Item {
             if (!GmRoles.isGm(gm)) {
                 CombatMessages.error(gm, CombatMessages.notGm());
             } else if (CombatService.active()) {
-                ServerPlayNetworking.send(gm, new OpenCombatScreenPayload(true, List.of()));
+                ServerPlayNetworking.send(gm, new OpenCombatScreenPayload(true, CombatService.newCandidates(gm)));
             } else {
                 ServerPlayNetworking.send(gm, new OpenCombatScreenPayload(false, CombatService.candidates(gm)));
             }

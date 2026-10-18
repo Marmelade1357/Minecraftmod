@@ -63,6 +63,11 @@ final class CombatMessages {
                 "%s is gone and was removed from the order.", name).formatted(Formatting.GOLD);
     }
 
+    static MutableText removed(String name) {
+        return Text.translatableWithFallback("pf2craft.combat.removed",
+                "%s was removed from the combat.", name).formatted(Formatting.GOLD);
+    }
+
     static MutableText canEnd() {
         return Text.translatableWithFallback("pf2craft.combat.can_end", "The combat can be ended.")
                 .formatted(Formatting.GOLD);

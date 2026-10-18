@@ -263,5 +263,11 @@
   "screen.pf2craft.combat.running": "A combat is running.",
   "screen.pf2craft.combat.skip": "Skip turn",
   "screen.pf2craft.combat.end": "End combat",
-  "screen.pf2craft.combat.end_confirm": "Really end? Click again"
+  "screen.pf2craft.combat.end_confirm": "Really end? Click again",
+  "pf2craft.combat.removed": "%s was removed from the combat.",
+  "pf2craft.combat.added_count": "%s added to the combat.",
+  "screen.pf2craft.combat.participants": "Participants",
+  "screen.pf2craft.combat.candidates": "Add to combat",
+  "screen.pf2craft.combat.add_selected": "Add",
+  "screen.pf2craft.combat.remove": "Remove from combat"
 }

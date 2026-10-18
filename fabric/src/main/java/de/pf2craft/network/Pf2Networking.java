@@ -38,6 +38,7 @@ public final class Pf2Networking {
         PayloadTypeRegistry.playS2C().register(CombatSyncPayload.ID, CombatSyncPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(CombatStartPayload.ID, CombatStartPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(CombatControlPayload.ID, CombatControlPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(CombatRemovePayload.ID, CombatRemovePayload.CODEC);
         PayloadTypeRegistry.playC2S().register(EndTurnPayload.ID, EndTurnPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(OpenCombatScreenPayload.ID, OpenCombatScreenPayload.CODEC);
     }
@@ -69,6 +70,8 @@ public final class Pf2Networking {
                 (payload, context) -> CombatService.startFromGm(context.player(), payload.participants()));
         ServerPlayNetworking.registerGlobalReceiver(CombatControlPayload.ID,
                 (payload, context) -> CombatService.control(context.player(), payload.action()));
+        ServerPlayNetworking.registerGlobalReceiver(CombatRemovePayload.ID,
+                (payload, context) -> CombatService.removeFromGm(context.player(), payload.id()));
         ServerPlayNetworking.registerGlobalReceiver(EndTurnPayload.ID,
                 (payload, context) -> CombatService.endTurn(context.player()));
         ServerPlayNetworking.registerGlobalReceiver(RollRequestPayload.ID, (payload, context) -> {

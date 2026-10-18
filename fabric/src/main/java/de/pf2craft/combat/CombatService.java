@@ -126,7 +126,84 @@ public final class CombatService {
             CombatMessages.error(gm, CombatMessages.notGm());
             return;
         }
+        if (encounter != null) {
+            // A running combat: the list means "add these"; those already taking part are ignored.
+            for (UUID id : new LinkedHashSet<>(participantIds)) {
+                add(gm, id);
+            }
+            return;
+        }
         start(gm.getServer(), gm, participantIds);
+    }
+
+    /** Candidates near the GM that do not yet take part in the running combat. */
+    public static List<OpenCombatScreenPayload.Candidate> newCandidates(ServerPlayerEntity gm) {
+        List<OpenCombatScreenPayload.Candidate> result = new ArrayList<>();
+        for (OpenCombatScreenPayload.Candidate c : candidates(gm)) {
+            if (encounter == null || !containsId(c.id().toString())) {
+                result.add(c);
+            }
+        }
+        return result;
+    }
+
+    public static void removeFromGm(ServerPlayerEntity gm, UUID id) {
+        if (!GmRoles.isGm(gm)) {
+            CombatMessages.error(gm, CombatMessages.notGm());
+            return;
+        }
+        if (encounter == null) {
+            CombatMessages.error(gm, CombatMessages.notRunning());
+            return;
+        }
+        remove(id);
+    }
+
+    /** Takes a participant out of the running order; the turn moves on if it was the current one. */
+    public static void remove(UUID uuid) {
+        String id = uuid.toString();
+        if (encounter == null || !containsId(id)) {
+            return;
+        }
+        boolean wasCurrent = currentId().filter(id::equals).isPresent();
+        String name = encounter.order().stream().filter(e -> e.combatant().id().equals(id))
+                .map(e -> e.combatant().name()).findFirst().orElse(id);
+        List<ServerPlayerEntity> audience = recipients(null);
+        ServerPlayerEntity removedPlayer = server.getPlayerManager().getPlayer(uuid);
+        encounter.remove(id);
+        DEFEATED.remove(id);
+        for (ServerPlayerEntity r : audience) {
+            r.sendMessage(CombatMessages.removed(name), false);
+        }
+        if (wasCurrent) {
+            nextTurn(null);
+        } else if (!encounter.hasActive(true) && !encounter.hasActive(false)) {
+            finish(null);
+        }
+        if (encounter != null) {
+            sync(null);
+        }
+        if (removedPlayer != null && !GmRoles.isGm(removedPlayer)
+                && ServerPlayNetworking.canSend(removedPlayer, CombatSyncPayload.ID)) {
+            ServerPlayNetworking.send(removedPlayer, CombatSyncPayload.inactive());
+        }
+    }
+
+    /** Fallback for /pf2 combat add: everything near the GM that is not yet taking part. */
+    public static int addNearby(ServerPlayerEntity gm) {
+        if (!GmRoles.isGm(gm)) {
+            CombatMessages.error(gm, CombatMessages.notGm());
+            return 0;
+        }
+        if (encounter == null) {
+            CombatMessages.error(gm, CombatMessages.notRunning());
+            return 0;
+        }
+        int before = encounter.order().size();
+        for (UUID id : nearbyIds(gm.getServerWorld(), gm.getPos())) {
+            add(gm, id);
+        }
+        return encounter == null ? 0 : encounter.order().size() - before;
     }
 
     /** @return whether a combat was started */

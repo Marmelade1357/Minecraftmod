@@ -96,6 +96,31 @@ public final class Pf2Commands {
                         .then(literal("status")
                                 .requires(Pf2Commands::isGmOrOp)
                                 .executes(Pf2Commands::combatStatus))
+                        .then(literal("add")
+                                .requires(Pf2Commands::isGmOrOp)
+                                .executes(ctx -> {
+                                    int added = CombatService.addNearby(ctx.getSource().getPlayerOrThrow());
+                                    ctx.getSource().sendFeedback(() -> Text.translatableWithFallback(
+                                            "pf2craft.combat.added_count", "%s added to the combat.", added), false);
+                                    return added;
+                                }))
+                        .then(literal("remove")
+                                .requires(Pf2Commands::isGmOrOp)
+                                .executes(ctx -> {
+                                    Optional<NpcEntity> npc = lookedAtNpc(ctx);
+                                    if (npc.isEmpty()) {
+                                        return 0;
+                                    }
+                                    CombatService.removeFromGm(ctx.getSource().getPlayerOrThrow(),
+                                            npc.get().getUuid());
+                                    return 1;
+                                })
+                                .then(argument("target", EntityArgumentType.entity())
+                                        .executes(ctx -> {
+                                            CombatService.removeFromGm(ctx.getSource().getPlayerOrThrow(),
+                                                    EntityArgumentType.getEntity(ctx, "target").getUuid());
+                                            return 1;
+                                        })))
                         .then(literal("next")
                                 .requires(Pf2Commands::isGmOrOp)
                                 .executes(ctx -> {
