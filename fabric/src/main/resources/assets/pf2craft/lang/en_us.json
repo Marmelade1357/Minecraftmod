@@ -138,5 +138,13 @@
   "pf2craft.items.owner": "Owner: %s",
   "pf2craft.items.dropped": "Your inventory is full: %s was dropped at your feet.",
   "pf2craft.items.shield": "AC +%s, Hardness %s, HP %s",
-  "pf2craft.items.reissued": "Re-issued the character items of %s."
+  "pf2craft.items.reissued": "Re-issued the character items of %s.",
+  "entity.pf2craft.npc": "NPC",
+  "pf2craft.npc.unknown": "Unknown monster: %s",
+  "pf2craft.npc.spawned": "Spawned %s.",
+  "pf2craft.npc.removed": "Removed %s.",
+  "pf2craft.npc.none_in_view": "No NPC in view (within 16 blocks).",
+  "pf2craft.npc.info.header": "%s (%s, level %s)",
+  "pf2craft.npc.info.defense": "HP %s/%s, AC %s, Fort %s, Ref %s, Will %s, Perception %s, Speed %s ft.",
+  "pf2craft.npc.info.strike": "%s %s: %s"
 }

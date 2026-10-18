@@ -4,6 +4,7 @@ import de.pf2craft.network.OpenImportPayload;
 import de.pf2craft.network.RollResultPayload;
 import de.pf2craft.network.SheetRequestPayload;
 import de.pf2craft.network.SheetSyncPayload;
+import de.pf2craft.npc.Pf2Entities;
 import de.pf2craft.roll.RollMessages;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -13,11 +14,13 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.entity.VillagerEntityRenderer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -77,6 +80,7 @@ public class Pf2CraftClient implements ClientModInitializer {
         });
 
         HudRenderCallback.EVENT.register(RollHud::render);
+        EntityRendererRegistry.register(Pf2Entities.NPC, VillagerEntityRenderer::new);
     }
 
     private static void tick(MinecraftClient client) {

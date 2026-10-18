@@ -14,7 +14,11 @@ import de.pf2craft.character.CharacterStore;
 import de.pf2craft.character.SheetService;
 import de.pf2craft.core.character.CharacterSheet;
 import de.pf2craft.core.dice.DiceParseException;
+import de.pf2craft.core.monster.MonsterData;
 import de.pf2craft.item.CharacterItems;
+import de.pf2craft.npc.MonsterDataLoader;
+import de.pf2craft.npc.NpcEntity;
+import de.pf2craft.npc.NpcService;
 import de.pf2craft.roll.RollService;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -64,6 +68,15 @@ public final class Pf2Commands {
                         .requires(Pf2Commands::isGmOrOp)
                         .then(argument("player", EntityArgumentType.player())
                                 .executes(Pf2Commands::reissueItems)))
+                .then(literal("npc")
+                        .requires(Pf2Commands::isGmOrOp)
+                        .then(literal("spawn")
+                                .then(argument("id", StringArgumentType.word())
+                                        .executes(Pf2Commands::spawnNpc)))
+                        .then(literal("info")
+                                .executes(Pf2Commands::npcInfo))
+                        .then(literal("remove")
+                                .executes(Pf2Commands::removeNpc)))
                 .then(literal("sheet")
                         .requires(Pf2Commands::isGmOrOp)
                         .then(argument("player", EntityArgumentType.player())
@@ -81,6 +94,52 @@ public final class Pf2Commands {
     private static boolean isGmOrOp(ServerCommandSource source) {
         ServerPlayerEntity player = source.getPlayer();
         return source.hasPermissionLevel(2) || (player != null && GmRoles.isGm(player));
+    }
+
+    private static int spawnNpc(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        ServerPlayerEntity gm = ctx.getSource().getPlayerOrThrow();
+        String id = StringArgumentType.getString(ctx, "id");
+        Optional<MonsterData> data = MonsterDataLoader.catalog().byId(id);
+        if (data.isEmpty()) {
+            ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.npc.unknown",
+                    "Unknown monster: %s", id));
+            return 0;
+        }
+        NpcEntity npc = NpcService.spawn(gm, data.get());
+        ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.npc.spawned",
+                "Spawned %s.", npc.stats().displayName()), true);
+        return 1;
+    }
+
+    private static int npcInfo(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        Optional<NpcEntity> npc = lookedAtNpc(ctx);
+        if (npc.isEmpty()) {
+            return 0;
+        }
+        ctx.getSource().sendFeedback(() -> NpcService.info(npc.get()), false);
+        return 1;
+    }
+
+    private static int removeNpc(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        Optional<NpcEntity> npc = lookedAtNpc(ctx);
+        if (npc.isEmpty()) {
+            return 0;
+        }
+        String name = npc.get().stats().displayName();
+        NpcService.remove(npc.get());
+        ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.npc.removed",
+                "Removed %s.", name), true);
+        return 1;
+    }
+
+    private static Optional<NpcEntity> lookedAtNpc(CommandContext<ServerCommandSource> ctx)
+            throws CommandSyntaxException {
+        Optional<NpcEntity> npc = NpcService.lookedAt(ctx.getSource().getPlayerOrThrow());
+        if (npc.isEmpty()) {
+            ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.npc.none_in_view",
+                    "No NPC in view (within 16 blocks)."));
+        }
+        return npc;
     }
 
     private static int importCharacter(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {

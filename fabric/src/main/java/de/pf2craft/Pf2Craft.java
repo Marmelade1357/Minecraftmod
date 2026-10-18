@@ -8,6 +8,8 @@ import de.pf2craft.command.Pf2Commands;
 import de.pf2craft.item.ItemData;
 import de.pf2craft.item.Pf2Components;
 import de.pf2craft.network.Pf2Networking;
+import de.pf2craft.npc.MonsterDataLoader;
+import de.pf2craft.npc.Pf2Entities;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -28,8 +30,10 @@ public class Pf2Craft implements ModInitializer {
     public void onInitialize() {
         Pf2Components.register();
         CharacterStore.register();
+        Pf2Entities.register();
         ServerLifecycleEvents.SERVER_STARTING.register(ClassData::load);
         ServerLifecycleEvents.SERVER_STARTING.register(ItemData::load);
+        ServerLifecycleEvents.SERVER_STARTING.register(MonsterDataLoader::load);
         ServerPlayConnectionEvents.JOIN.register(
                 (handler, sender, server) -> CharacterService.onJoin(handler.player));
         ServerPlayConnectionEvents.DISCONNECT.register(

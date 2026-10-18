@@ -138,5 +138,13 @@
   "pf2craft.items.owner": "Besitzer: %s",
   "pf2craft.items.dropped": "Dein Inventar ist voll: %s liegt zu deinen Füßen.",
   "pf2craft.items.shield": "RK +%s, Härte %s, TP %s",
-  "pf2craft.items.reissued": "Die Charakter-Gegenstände von %s wurden neu ausgegeben."
+  "pf2craft.items.reissued": "Die Charakter-Gegenstände von %s wurden neu ausgegeben.",
+  "entity.pf2craft.npc": "NSC",
+  "pf2craft.npc.unknown": "Unbekanntes Monster: %s",
+  "pf2craft.npc.spawned": "%s erschaffen.",
+  "pf2craft.npc.removed": "%s entfernt.",
+  "pf2craft.npc.none_in_view": "Kein NSC im Blick (innerhalb von 16 Blöcken).",
+  "pf2craft.npc.info.header": "%s (%s, Stufe %s)",
+  "pf2craft.npc.info.defense": "TP %s/%s, RK %s, Zäh %s, Ref %s, Wil %s, Wahrnehmung %s, Tempo %s Fuß",
+  "pf2craft.npc.info.strike": "%s %s: %s"
 }
