@@ -8,6 +8,7 @@ import de.pf2craft.combat.AttackService;
 import de.pf2craft.combat.CombatService;
 import de.pf2craft.combat.Enforcement;
 import de.pf2craft.combat.NpcWalk;
+import de.pf2craft.npc.CommandStaffItem;
 import de.pf2craft.command.Pf2Commands;
 import de.pf2craft.item.ItemData;
 import de.pf2craft.item.Pf2Items;
@@ -21,7 +22,9 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +60,16 @@ public class Pf2Craft implements ModInitializer {
                     AttackService.forget(handler.player.getUuid());
                 });
         // The staff is a tool, not a weapon: hitting anything with it does nothing.
-        AttackEntityCallback.EVENT.register((player, world, hand, entity, hit) ->
-                player.getStackInHand(hand).isOf(Pf2Items.COMMAND_STAFF) ? ActionResult.FAIL : ActionResult.PASS);
+        // Exception: a left-click on an NPC selects it.
+        AttackEntityCallback.EVENT.register((player, world, hand, entity, hit) -> {
+            if (!player.getStackInHand(hand).isOf(Pf2Items.COMMAND_STAFF)) {
+                return ActionResult.PASS;
+            }
+            if (player instanceof ServerPlayerEntity sp && hand == Hand.MAIN_HAND) {
+                CommandStaffItem.leftClick(sp, entity);
+            }
+            return ActionResult.FAIL;
+        });
         Enforcement.register();
         NpcWalk.register();
         Pf2Networking.registerPayloads();

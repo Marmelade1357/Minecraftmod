@@ -1,6 +1,7 @@
 package de.pf2craft.npc;
 
 import de.pf2craft.combat.CombatService;
+import de.pf2craft.combat.NpcWalk;
 import de.pf2craft.core.monster.DamagePart;
 import de.pf2craft.core.monster.MonsterData;
 import de.pf2craft.core.monster.MonsterStrike;
@@ -73,6 +74,7 @@ public final class NpcService {
         boolean wasDefeated = npc.stats() != null && npc.stats().defeated();
         npc.setStats(stats);
         if (stats.defeated() && !wasDefeated) {
+            NpcWalk.cancel(npc);
             CombatService.markDefeated(npc.getUuid().toString());
         } else if (!stats.defeated() && wasDefeated) {
             CombatService.reviveIfNeeded(npc.getUuid().toString());

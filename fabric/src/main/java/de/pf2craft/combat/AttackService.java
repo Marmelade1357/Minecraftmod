@@ -210,7 +210,7 @@ public final class AttackService {
 
     /** The staff click on a creature: checks the preconditions and opens the window for the GM. */
     public static void openForNpc(ServerPlayerEntity gm, NpcEntity npc, Entity target) {
-        if (prepareNpc(gm, npc, target, 0) == null) {
+        if (prepareNpc(gm, npc, target, 0, true) == null) {
             return;
         }
         List<OpenAttackScreenPayload.StrikeOption> options = new java.util.ArrayList<>();
@@ -336,6 +336,15 @@ public final class AttackService {
 
     /** Checks an NPC attack against the server's own state; failures go to the GM's chat, nothing is spent. */
     private static NpcPrepared prepareNpc(ServerPlayerEntity gm, NpcEntity npc, Entity target, int strikeIndex) {
+        return prepareNpc(gm, npc, target, strikeIndex, false);
+    }
+
+    /**
+     * @param opening when true (window is being opened) the chosen strike is not known yet: the range is only
+     *                required to suit at least one strike; the confirmation validates the chosen one.
+     */
+    private static NpcPrepared prepareNpc(ServerPlayerEntity gm, NpcEntity npc, Entity target, int strikeIndex,
+                                          boolean opening) {
         if (!GmRoles.isGm(gm)) {
             return npcFail(gm, CombatMessages.notGm());
         }
@@ -376,17 +385,29 @@ public final class AttackService {
             return npcFail(gm, CombatMessages.badNpcTarget());
         }
         double distance = edgeDistance(npc.getBoundingBox(), target.getBoundingBox());
-        OptionalInt rangePenalty;
-        if (strike.ranged()) {
-            rangePenalty = RangeRules.rangePenalty(Math.max(0, distance - EPSILON), MONSTER_RANGE_FEET);
-        } else {
-            rangePenalty = distance <= RangeRules.meleeReachBlocks(strike.traits()) + EPSILON
-                    ? OptionalInt.of(0) : OptionalInt.empty();
+        OptionalInt rangePenalty = monsterRangePenalty(strike, distance);
+        if (opening) {
+            rangePenalty = OptionalInt.empty();
+            for (MonsterStrike candidate : strikes) {
+                OptionalInt penalty = monsterRangePenalty(candidate, distance);
+                if (penalty.isPresent()) {
+                    rangePenalty = penalty;
+                    break;
+                }
+            }
         }
         if (rangePenalty.isEmpty()) {
             return npcFail(gm, CombatMessages.tooFar());
         }
         return new NpcPrepared(strike, (LivingEntity) target, rangePenalty.getAsInt(), ac, defenses);
+    }
+
+    private static OptionalInt monsterRangePenalty(MonsterStrike strike, double distance) {
+        if (strike.ranged()) {
+            return RangeRules.rangePenalty(Math.max(0, distance - EPSILON), MONSTER_RANGE_FEET);
+        }
+        return distance <= RangeRules.meleeReachBlocks(strike.traits()) + EPSILON
+                ? OptionalInt.of(0) : OptionalInt.empty();
     }
 
     private static NpcPrepared npcFail(ServerPlayerEntity gm, MutableText text) {

@@ -56,6 +56,9 @@ public final class NpcWalk {
             CombatMessages.error(gm, CombatMessages.noPath());
             return;
         }
+        if (!path.reachesTarget()) {
+            gm.sendMessage(CombatMessages.pathPartial());
+        }
         double length = length(path);
         if (!CombatService.budget().payWalk(length, CombatService.turn())) {
             CombatMessages.error(gm, CombatMessages.notEnoughActions());
@@ -64,6 +67,13 @@ public final class NpcWalk {
         WALKS.put(npc.getUuid(), new Walk(length, npc.getPos()));
         npc.getNavigation().startMovingAlong(path, WALK_SPEED);
         CombatService.sync(null);
+    }
+
+    /** The NPC was defeated: forget its paid walk and stop it. */
+    public static void cancel(NpcEntity npc) {
+        if (WALKS.remove(npc.getUuid()) != null) {
+            npc.getNavigation().stop();
+        }
     }
 
     /** Path length in blocks: the sum of the distances from node to node. */

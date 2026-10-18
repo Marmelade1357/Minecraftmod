@@ -302,5 +302,6 @@
   "pf2craft.combat.attack.npc_no_actions": "Der NSC hat keine Aktionen mehr zum Angreifen.",
   "pf2craft.combat.attack.bad_npc_target": "Das Ziel muss ein kämpfender Charakter oder ein stehender NSC sein.",
   "pf2craft.combat.attack.bad_strike": "Der NSC hat diesen Angriff nicht.",
-  "pf2craft.combat.attack.no_look_target": "Kein Charakter oder NSC im Blick (innerhalb von 16 Blöcken)."
+  "pf2craft.combat.attack.no_look_target": "Kein Charakter oder NSC im Blick (innerhalb von 16 Blöcken).",
+  "pf2craft.combat.path_partial": "Der NSC kommt nicht ganz dorthin und bleibt vorher stehen."
 }

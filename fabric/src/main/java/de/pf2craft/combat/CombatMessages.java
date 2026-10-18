@@ -139,6 +139,11 @@ final class CombatMessages {
                 "Not enough actions left to walk that far.");
     }
 
+    static MutableText pathPartial() {
+        return Text.translatableWithFallback("pf2craft.combat.path_partial",
+                "The NPC cannot get all the way there and will stop short.").formatted(Formatting.YELLOW);
+    }
+
     static MutableText noStrikes() {
         return Text.translatableWithFallback("pf2craft.combat.no_strikes", "This NPC has no strikes.");
     }

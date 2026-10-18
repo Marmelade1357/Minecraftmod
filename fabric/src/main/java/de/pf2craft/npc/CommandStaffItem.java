@@ -74,7 +74,8 @@ public class CommandStaffItem extends Item {
             return ActionResult.PASS;
         }
         if (user instanceof ServerPlayerEntity gm && requireGm(gm) && npc.stats() != null) {
-            if (!gm.isSneaking() && GmSelection.get(gm).filter(sel -> sel != npc).isPresent()
+            if (!gm.isSneaking() && !npc.stats().defeated()
+                    && GmSelection.get(gm).filter(sel -> sel != npc).isPresent()
                     && attackWithSelected(gm, npc)) {
                 return ActionResult.success(user.getWorld().isClient);
             }
@@ -87,6 +88,16 @@ public class CommandStaffItem extends Item {
             }
         }
         return ActionResult.success(user.getWorld().isClient);
+    }
+
+    /** Left-click with the staff: an NPC is always selected (even while another NPC is up in a combat). */
+    public static void leftClick(ServerPlayerEntity player, net.minecraft.entity.Entity entity) {
+        if (!(entity instanceof NpcEntity npc) || npc.stats() == null || !requireGm(player)) {
+            return;
+        }
+        GmSelection.select(player, npc);
+        player.sendMessage(Text.translatableWithFallback("pf2craft.npc.selected", "Selected: %s",
+                npc.stats().displayName()), true);
     }
 
     /**
