@@ -69,6 +69,10 @@ public final class NpcWalk {
         CombatService.sync(null);
     }
 
+    public static boolean walking(UUID id) {
+        return WALKS.containsKey(id);
+    }
+
     /** The NPC was defeated: forget its paid walk and stop it. */
     public static void cancel(NpcEntity npc) {
         if (WALKS.remove(npc.getUuid()) != null) {

@@ -135,7 +135,10 @@ Mod bei Spielern mit Charakter „TP: x/y“. Vanilla-Schaden, -Tod und -Hunger 
 **Dein Zug:** 3 Aktionen und 1 Reaktion pro Zug. Wer nicht dran ist, ist eingefroren: Bewegung wird zurückgesetzt, Blöcke
 abbauen, setzen, benutzen und Interaktionen mit Entities sind gesperrt. Bewegung wird in Blöcken gezählt (1 Block = 5 ft):
 der erste Schritt beginnt ein Schreiten (1 Aktion) von Geschwindigkeit/5 Blöcken, danach ein weiteres, solange Aktionen übrig sind.
-Mit **Enter** (änderbar unter Steuerung → PF2 Craft) beendest du den Zug; der Spielleiter beendet damit auch die Züge der NPCs.
+Mit **Enter** (änderbar unter Steuerung → PF2 Craft) beendest du den Zug früher; der Spielleiter beendet damit auch die Züge der NPCs.
+Sind alle 3 Aktionen aufgebraucht (und ein begonnenes Schreiten zu Ende gelaufen), endet der Zug etwa 1 Sekunde später von selbst.
+Ein Angriff unterbricht ein Schreiten: der Rest der Strecke verfällt, weitere Schritte beginnen ein neues Schreiten (1 Aktion).
+Wartende Kämpfer können sich außerdem nicht bewegen oder springen (Tempo und Sprungkraft sind auf 0 gesetzt).
 
 **Angriff:** Waffe deines Charakters in die Haupthand nehmen und auf deinem Zug einen NPC **links anklicken**. Im Fenster wählst du
 den **1., 2. oder 3. Angriff** (der Mehrfachangriffsmalus ist eingerechnet, der passende Vorschlag ist hervorgehoben, jeder

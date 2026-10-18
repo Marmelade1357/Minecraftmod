@@ -225,12 +225,20 @@ public final class Enforcement {
             present.add(id);
             if (e.active() && e.combatant().id().equals(current)) {
                 ANCHORS.remove(id);
+                CombatService.removeFreeze(p);
                 moveCurrent(p);
             } else {
+                CombatService.applyFreeze(p);
                 hold(p);
             }
         }
         ANCHORS.keySet().retainAll(present);
+        for (ServerPlayerEntity p : server.getPlayerManager().getPlayerList()) {
+            if (!present.contains(p.getUuid())) {
+                CombatService.removeFreeze(p); // never leave a freeze on someone who is not a waiting combatant
+            }
+        }
+        CombatService.tickAutoEnd(server.getTicks());
     }
 
     private static void hold(ServerPlayerEntity p) {

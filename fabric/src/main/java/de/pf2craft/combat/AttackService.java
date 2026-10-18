@@ -188,6 +188,7 @@ public final class AttackService {
         LAST_CONFIRM.put(attacker.getUuid(), now); // only an accepted attack starts the cooldown
         CombatService.turn().spendActions(1);
         CombatService.turn().recordAttack();
+        CombatService.budget().interrupt(); // a Stride cannot be resumed after another action
         try {
             int applied = damage == null ? -1 : Math.max(0, damage.total());
             int hpLeft = Math.max(0, npc.stats().currentHp() - Math.max(0, applied));
@@ -314,6 +315,7 @@ public final class AttackService {
         LAST_CONFIRM.put(gm.getUuid(), now);
         CombatService.turn().spendActions(1);
         CombatService.turn().recordAttack();
+        CombatService.budget().interrupt(); // a Stride cannot be resumed after another action
         try {
             int applied = damage == null ? -1 : Math.max(0, damage.total());
             int hpBefore;

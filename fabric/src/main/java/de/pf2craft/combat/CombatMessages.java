@@ -47,6 +47,11 @@ final class CombatMessages {
                 .formatted(Formatting.YELLOW);
     }
 
+    static MutableText turnAutoEnd(String name) {
+        return Text.translatableWithFallback("pf2craft.combat.turn_auto_end", "%s: turn ended automatically", name)
+                .formatted(Formatting.GRAY);
+    }
+
     static MutableText yourTurn() {
         return Text.translatableWithFallback("pf2craft.combat.your_turn", "It is your turn!")
                 .formatted(Formatting.GREEN, Formatting.BOLD);

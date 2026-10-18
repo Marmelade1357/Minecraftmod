@@ -227,6 +227,7 @@
   "pf2craft.combat.out": "(out)",
   "pf2craft.combat.round": "Round %s",
   "pf2craft.combat.turn": "%s is up.",
+  "pf2craft.combat.turn_auto_end": "%s: turn ended automatically",
   "pf2craft.combat.your_turn": "It is your turn!",
   "pf2craft.combat.late_join": "%s joins the combat (initiative %s).",
   "pf2craft.combat.late_join_hidden": "%s joins the combat.",
