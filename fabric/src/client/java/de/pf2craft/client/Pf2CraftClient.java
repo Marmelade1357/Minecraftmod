@@ -1,6 +1,9 @@
 package de.pf2craft.client;
 
+import de.pf2craft.network.NpcSearchResultPayload;
+import de.pf2craft.network.NpcSheetPayload;
 import de.pf2craft.network.OpenImportPayload;
+import de.pf2craft.network.OpenNpcScreenPayload;
 import de.pf2craft.network.RollResultPayload;
 import de.pf2craft.network.SheetRequestPayload;
 import de.pf2craft.network.SheetSyncPayload;
@@ -62,6 +65,24 @@ public class Pf2CraftClient implements ClientModInitializer {
             waitingForOwnSheet = -1;
             show(client, ImportScreen::new);
         });
+        ClientPlayNetworking.registerGlobalReceiver(OpenNpcScreenPayload.ID, (payload, context) -> {
+            if ("spawn".equals(payload.screen())) {
+                show(context.client(), NpcSpawnScreen::new);
+            }
+        });
+        ClientPlayNetworking.registerGlobalReceiver(NpcSearchResultPayload.ID, (payload, context) -> {
+            if (context.client().currentScreen instanceof NpcSpawnScreen screen) {
+                screen.onResults(payload.entries());
+            }
+        });
+        ClientPlayNetworking.registerGlobalReceiver(NpcSheetPayload.ID, (payload, context) -> {
+            if (context.client().currentScreen instanceof NpcSheetScreen screen
+                    && screen.entityId() == payload.entityId()) {
+                screen.update(payload.json());
+            } else {
+                show(context.client(), () -> new NpcSheetScreen(payload.entityId(), payload.json()));
+            }
+        });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
             ClientSheets.clear();
             waitingForOwnSheet = -1;
@@ -75,6 +96,10 @@ public class Pf2CraftClient implements ClientModInitializer {
             if (current instanceof ImportScreen screen) {
                 screen.onServerMessage(message);
             } else if (current instanceof LevelUpScreen screen) {
+                screen.onServerMessage(message);
+            } else if (current instanceof NpcSheetScreen screen) {
+                screen.onServerMessage(message);
+            } else if (current instanceof NpcSpawnScreen screen) {
                 screen.onServerMessage(message);
             }
         });
@@ -147,7 +172,8 @@ public class Pf2CraftClient implements ClientModInitializer {
         Screen current = client.currentScreen;
         if (client.player != null && (current == null || current instanceof ChatScreen
                 || current instanceof ImportScreen || current instanceof CharacterScreen
-                || current instanceof DiceScreen)) {
+                || current instanceof DiceScreen || current instanceof NpcSpawnScreen
+                || current instanceof NpcSheetScreen)) {
             client.setScreen(screen.get());
         } else {
             pendingScreen = screen;

@@ -1,5 +1,6 @@
 package de.pf2craft;
 
+import de.pf2craft.item.Pf2Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
@@ -18,6 +19,11 @@ public final class GmRoles {
 
     /** @return {@code true} if the role changed */
     public static boolean setGm(ServerPlayerEntity player, boolean gm) {
-        return gm ? player.addCommandTag(TAG) : player.removeCommandTag(TAG);
+        if (!gm) {
+            return player.removeCommandTag(TAG);
+        }
+        boolean changed = player.addCommandTag(TAG);
+        Pf2Items.giveStaff(player);
+        return changed;
     }
 }

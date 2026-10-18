@@ -3,6 +3,7 @@ package de.pf2craft.network;
 import de.pf2craft.character.CharacterService;
 import de.pf2craft.character.SheetService;
 import de.pf2craft.core.dice.DiceParseException;
+import de.pf2craft.npc.NpcNetwork;
 import de.pf2craft.roll.RollService;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -26,6 +27,13 @@ public final class Pf2Networking {
         PayloadTypeRegistry.playC2S().register(GmEditPayload.ID, GmEditPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(GrantLevelUpPayload.ID, GrantLevelUpPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(LevelUpPayload.ID, LevelUpPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(NpcSearchPayload.ID, NpcSearchPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(NpcSearchResultPayload.ID, NpcSearchResultPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(NpcSpawnPayload.ID, NpcSpawnPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(NpcSheetPayload.ID, NpcSheetPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(NpcEditPayload.ID, NpcEditPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(NpcActionPayload.ID, NpcActionPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(OpenNpcScreenPayload.ID, OpenNpcScreenPayload.CODEC);
     }
 
     public static void registerServerReceivers() {
@@ -43,6 +51,14 @@ public final class Pf2Networking {
         ServerPlayNetworking.registerGlobalReceiver(LevelUpPayload.ID,
                 (payload, context) -> SheetService.levelUp(context.player(), payload.skillIncrease(),
                         payload.boosts(), payload.featNames()));
+        ServerPlayNetworking.registerGlobalReceiver(NpcSearchPayload.ID,
+                (payload, context) -> NpcNetwork.search(context.player(), payload));
+        ServerPlayNetworking.registerGlobalReceiver(NpcSpawnPayload.ID,
+                (payload, context) -> NpcNetwork.spawn(context.player(), payload));
+        ServerPlayNetworking.registerGlobalReceiver(NpcEditPayload.ID,
+                (payload, context) -> NpcNetwork.edit(context.player(), payload));
+        ServerPlayNetworking.registerGlobalReceiver(NpcActionPayload.ID,
+                (payload, context) -> NpcNetwork.action(context.player(), payload));
         ServerPlayNetworking.registerGlobalReceiver(RollRequestPayload.ID, (payload, context) -> {
             ServerPlayerEntity player = context.player();
             if (!RollService.checkCooldown(player)) {

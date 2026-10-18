@@ -15,7 +15,12 @@ import de.pf2craft.character.SheetService;
 import de.pf2craft.core.character.CharacterSheet;
 import de.pf2craft.core.dice.DiceParseException;
 import de.pf2craft.core.monster.MonsterData;
+import de.pf2craft.core.monster.NpcEdit;
+import de.pf2craft.core.monster.NpcStats;
+import de.pf2craft.core.progression.InvalidChoiceException;
 import de.pf2craft.item.CharacterItems;
+import de.pf2craft.item.Pf2Items;
+import de.pf2craft.npc.GmSelection;
 import de.pf2craft.npc.MonsterDataLoader;
 import de.pf2craft.npc.NpcEntity;
 import de.pf2craft.npc.NpcService;
@@ -76,7 +81,13 @@ public final class Pf2Commands {
                         .then(literal("info")
                                 .executes(Pf2Commands::npcInfo))
                         .then(literal("remove")
-                                .executes(Pf2Commands::removeNpc)))
+                                .executes(Pf2Commands::removeNpc))
+                        .then(literal("hp")
+                                .then(argument("value", IntegerArgumentType.integer())
+                                        .executes(Pf2Commands::npcHp))))
+                .then(literal("tools")
+                        .requires(source -> source.getPlayer() != null && GmRoles.isGm(source.getPlayer()))
+                        .executes(Pf2Commands::giveTools))
                 .then(literal("sheet")
                         .requires(Pf2Commands::isGmOrOp)
                         .then(argument("player", EntityArgumentType.player())
@@ -132,9 +143,42 @@ public final class Pf2Commands {
         return 1;
     }
 
+    private static int npcHp(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        Optional<NpcEntity> npc = GmSelection.get(ctx.getSource().getPlayerOrThrow());
+        if (npc.isEmpty()) {
+            ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.npc.none_selected",
+                    "No NPC selected. Right-click an NPC with the staff first."));
+            return 0;
+        }
+        try {
+            NpcService.apply(npc.get(), NpcEdit.apply(npc.get().stats(), "hp",
+                    String.valueOf(IntegerArgumentType.getInteger(ctx, "value"))));
+        } catch (InvalidChoiceException e) {
+            ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.npc.edit_failed",
+                    "Invalid value: %s", e.getMessage()));
+            return 0;
+        }
+        NpcStats stats = npc.get().stats();
+        ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.npc.hp_set",
+                "%s now has %s HP.", stats.displayName(), stats.currentHp()), false);
+        return 1;
+    }
+
+    private static int giveTools(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        boolean given = Pf2Items.giveStaff(ctx.getSource().getPlayerOrThrow());
+        ctx.getSource().sendFeedback(() -> Text.translatableWithFallback(
+                given ? "pf2craft.npc.staff_given" : "pf2craft.npc.staff_present",
+                given ? "You received the command staff." : "You already carry the command staff."), false);
+        return 1;
+    }
+
     private static Optional<NpcEntity> lookedAtNpc(CommandContext<ServerCommandSource> ctx)
             throws CommandSyntaxException {
-        Optional<NpcEntity> npc = NpcService.lookedAt(ctx.getSource().getPlayerOrThrow());
+        ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+        Optional<NpcEntity> npc = GmSelection.get(player);
+        if (npc.isEmpty()) {
+            npc = NpcService.lookedAt(player);
+        }
         if (npc.isEmpty()) {
             ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.npc.none_in_view",
                     "No NPC in view (within 16 blocks)."));

@@ -80,6 +80,17 @@ Beim Import aus Pathbuilder bekommt jeder Spieler seine Waffen und seinen Schild
 
 Lizenz- und Urheberhinweise stehen in [NOTICE.md](NOTICE.md).
 
+### Befehlsstab (NPCs, nur Spielleiter)
+`/pf2 tools` gibt dem Spielleiter den **Befehlsstab** (wird auch bei `/pf2 gm add` ausgegeben). Rechtsklick:
+- **in die Luft:** Fenster „NPC hinzufügen“ (Monster suchen, anklicken, der NPC erscheint neben dir).
+- **auf einen NPC:** wählt ihn aus (Anzeige über der Hotbar). **Schleichen + Rechtsklick:** Werte-Fenster mit Bearbeitung,
+  „Als Vorlage speichern“ (nach `config/pf2craft/monsters/`) und „Entfernen“.
+- **auf einen Block** (NPC ausgewählt): der NPC läuft dorthin.
+
+Ersatzbefehle: `/pf2 npc spawn|info|remove` (wirken auf den ausgewählten NPC, sonst auf den angesehenen) und
+`/pf2 npc hp <Wert>` für die aktuellen TP des ausgewählten NPCs. Hinweis: Blockklicks in der Spawn-Schutzzone des Servers
+(`spawn-protection`) erreichen die Mod nur bei Operatoren.
+
 ### Bekannte Grenzen
 - Taste **C** kollidiert mit der Vanilla-Belegung „Hotbar-Aktivator speichern“; eine der beiden Tasten unter Steuerung umbelegen.
 - Talente werden nur mit Namen geführt, ihre Effekte werden nicht berechnet.

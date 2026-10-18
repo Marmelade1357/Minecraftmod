@@ -18,12 +18,21 @@ import net.minecraft.server.MinecraftServer;
 public final class MonsterDataLoader {
     private static final String JAR_FILE = "/pf2craft/monsters/monster-core.json";
     private static volatile MonsterCatalog catalog = new MonsterCatalog(List.of());
+    private static List<MonsterData> loaded = List.of();
 
     private MonsterDataLoader() {
     }
 
     public static MonsterCatalog catalog() {
         return catalog;
+    }
+
+    /** Adds (or replaces, by id) one monster in the in-memory catalog, e.g. a freshly saved template. */
+    public static synchronized void add(MonsterData data) {
+        List<MonsterData> all = new ArrayList<>(loaded);
+        all.add(data);
+        loaded = List.copyOf(all);
+        catalog = new MonsterCatalog(loaded);
     }
 
     public static void load(MinecraftServer server) {
@@ -50,7 +59,10 @@ public final class MonsterDataLoader {
                 Pf2Craft.LOGGER.error("Cannot list {}: {}", dir, e.getMessage());
             }
         }
-        catalog = new MonsterCatalog(all);
+        synchronized (MonsterDataLoader.class) {
+            loaded = List.copyOf(all);
+            catalog = new MonsterCatalog(loaded);
+        }
         Pf2Craft.LOGGER.info("Loaded {} monster(s)", catalog.size());
     }
 }

@@ -41,6 +41,7 @@ public final class NpcService {
     }
 
     public static void remove(NpcEntity npc) {
+        GmSelection.forget(npc.getUuid());
         npc.discard();
     }
 
