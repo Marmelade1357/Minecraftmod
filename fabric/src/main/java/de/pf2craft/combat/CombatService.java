@@ -172,7 +172,7 @@ public final class CombatService {
                         e.active()), false);
             }
         }
-        announceTurn(first.get());
+        announceTurn(first.get(), null);
         sync(null);
         return true;
     }
@@ -220,7 +220,7 @@ public final class CombatService {
             CombatMessages.error(gm, CombatMessages.notRunning());
             return;
         }
-        finish();
+        finish(null);
     }
 
     public static void endTurn(ServerPlayerEntity actor) {
@@ -291,10 +291,39 @@ public final class CombatService {
 
     // ---- turn handling ---------------------------------------------------------------------------------------
 
+    /**
+     * Removes NPC combatants whose entity is gone (removed or not loaded) from the order. Deactivating the
+     * current one advances the turn; inactive entries are skipped, so this cannot recurse endlessly.
+     */
+    public static void purgeGone() {
+        if (encounter == null || server == null) {
+            return;
+        }
+        for (Encounter.Entry e : List.copyOf(encounter.order())) {
+            if (encounter == null) {
+                return;
+            }
+            Combatant c = e.combatant();
+            if (c.npc() && e.active() && findNpc(server, UUID.fromString(c.id())) == null) {
+                for (ServerPlayerEntity gm : recipients(null)) {
+                    if (GmRoles.isGm(gm)) {
+                        gm.sendMessage(CombatMessages.npcGone(c.name()), false);
+                    }
+                }
+                markDefeated(c.id());
+            }
+        }
+    }
+
     private static void nextTurn(@Nullable ServerPlayerEntity exclude) {
+        Optional<String> before = currentId();
+        purgeGone();
+        if (encounter == null || !currentId().equals(before)) {
+            return; // the purge already moved on (or ended the combat)
+        }
         Optional<Combatant> next = encounter.advance();
         if (next.isEmpty()) {
-            finish();
+            finish(exclude);
             return;
         }
         budget = new MovementBudget(speedOf(next.get().id()));
@@ -304,12 +333,12 @@ public final class CombatService {
                 r.sendMessage(CombatMessages.round(announcedRound), false);
             }
         }
-        announceTurn(next.get());
+        announceTurn(next.get(), exclude);
         sync(exclude);
     }
 
-    private static void announceTurn(Combatant c) {
-        for (ServerPlayerEntity r : recipients(null)) {
+    private static void announceTurn(Combatant c, @Nullable ServerPlayerEntity exclude) {
+        for (ServerPlayerEntity r : recipients(exclude)) {
             r.sendMessage(CombatMessages.turn(c.name()), false);
             if (r.getUuid().toString().equals(c.id())) {
                 r.sendMessage(CombatMessages.yourTurn(), true);
@@ -317,8 +346,8 @@ public final class CombatService {
         }
     }
 
-    private static void finish() {
-        List<ServerPlayerEntity> audience = recipients(null);
+    private static void finish(@Nullable ServerPlayerEntity exclude) {
+        List<ServerPlayerEntity> audience = recipients(exclude);
         encounter = null;
         DEFEATED.clear();
         Pf2Craft.LOGGER.info("Combat ended");
@@ -355,6 +384,7 @@ public final class CombatService {
 
     /** Sends the current state, built per recipient, to every online combatant player and every GM. */
     public static void sync(@Nullable ServerPlayerEntity exclude) {
+        purgeGone();
         if (encounter == null || server == null) {
             return;
         }

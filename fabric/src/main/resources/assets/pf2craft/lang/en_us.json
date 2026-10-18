@@ -238,5 +238,6 @@
   "pf2craft.combat.not_gm": "Only a game master can do that.",
   "pf2craft.combat.not_your_turn": "It is not your turn.",
   "pf2craft.combat.already_running": "A combat is already running.",
-  "pf2craft.combat.no_participants": "Nobody can fight: no characters or NPCs were found."
+  "pf2craft.combat.no_participants": "Nobody can fight: no characters or NPCs were found.",
+  "pf2craft.combat.npc_gone": "%s is gone and was removed from the order."
 }

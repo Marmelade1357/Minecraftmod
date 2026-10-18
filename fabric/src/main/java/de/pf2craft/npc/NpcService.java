@@ -1,5 +1,6 @@
 package de.pf2craft.npc;
 
+import de.pf2craft.combat.CombatService;
 import de.pf2craft.core.monster.DamagePart;
 import de.pf2craft.core.monster.MonsterData;
 import de.pf2craft.core.monster.MonsterStrike;
@@ -72,6 +73,7 @@ public final class NpcService {
     public static void remove(NpcEntity npc) {
         GmSelection.forget(npc.getUuid());
         npc.discard();
+        CombatService.purgeGone();
     }
 
     /** The NPC the player is looking at within {@link #LOOK_RANGE} blocks, if any. */
