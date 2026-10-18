@@ -116,7 +116,7 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
   Waffenmeisterschaft, Wissensränge) setzt der GM; keine Zauber/Inventar; Wurfbezeichnungen
   im Chat englisch; steigt der INT-Modifikator, muss der GM die zusätzliche trainierte Fertigkeit von Hand setzen.
 - Phase 3 Teil 1 (Gegenstände) vom Nutzer im Einzelspieler getestet. Teil 2 (NPCs, Befehlsstab) ist gebaut
-  und per Unit-Tests in `core` abgedeckt; der Ingame-Test durch den Nutzer steht noch aus.
+  und per Unit-Tests in `core` abgedeckt; vom Nutzer im Einzelspieler getestet (spawnen, auswählen, Werte, hinlaufen, hinlegen): funktioniert.
 - Bekannte Grenzen Teil 2: NPCs handeln nicht von selbst und sind noch nicht im Kampf nutzbar; Platzhaltermodell
   (Dorfbewohner); Strike-Boni im Werte-Fenster nicht editierbar; Zusatzeffekte (Grab, anhaltender Schaden)
   nur als Namen/Hinweise; Spawn-Schutz kann Blockklicks von Nicht-OP-GMs verschlucken.
@@ -133,7 +133,7 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
    - ✅ **Teil 1 – Gegenstände:** Waffen und Schild aus dem Pathbuilder-Import als Vanilla-Items
      (Optik nach Schadenswürfel, Lore, Besitzer). *Vom Nutzer ingame getestet.*
    - ✅ **Teil 2 – NPCs:** Monster-Core-Daten, NPC-Entity, Befehlsstab (spawnen, auswählen, Werte, hinlaufen),
-     `/pf2 npc …`, Vorlagen. *Gebaut; Ingame-Test durch den Nutzer steht noch aus.*
+     `/pf2 npc …`, Vorlagen. *Vom Nutzer ingame getestet.*
    - **Teil 3 – Kampfkern, Teil 4 – Aktionsmenü, Teil 5 – Zustände** (offen), umfassen:
    - GM startet und beendet einen Kampf, Initiative mit Zugreihenfolge im HUD.
    - 3 Aktionen + 1 Reaktion pro Zug, Mehrfachangriffsmalus.
