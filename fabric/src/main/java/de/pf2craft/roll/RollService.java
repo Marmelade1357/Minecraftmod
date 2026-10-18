@@ -40,6 +40,11 @@ public final class RollService {
         return true;
     }
 
+    /** Rolls with the server's secure roller and tells nobody, e.g. for initiative. */
+    public static RollResult rollQuiet(String expression) throws DiceParseException {
+        return DiceExpression.parse(expression).roll(ROLLER);
+    }
+
     /**
      * Rolls {@code expression}. Public rolls go to everyone; secret rolls only to the roller
      * and the GMs, everyone else just learns that a secret roll happened.

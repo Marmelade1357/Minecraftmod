@@ -24,6 +24,7 @@ public final class GmRoles {
         }
         boolean changed = player.addCommandTag(TAG);
         Pf2Items.giveStaff(player);
+        Pf2Items.giveBell(player);
         return changed;
     }
 }

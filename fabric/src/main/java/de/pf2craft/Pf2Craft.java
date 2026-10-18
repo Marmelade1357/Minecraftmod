@@ -4,6 +4,7 @@ import de.pf2craft.character.CharacterService;
 import de.pf2craft.character.CharacterStore;
 import de.pf2craft.character.ClassData;
 import de.pf2craft.character.SheetService;
+import de.pf2craft.combat.CombatService;
 import de.pf2craft.command.Pf2Commands;
 import de.pf2craft.item.ItemData;
 import de.pf2craft.item.Pf2Items;
@@ -39,10 +40,15 @@ public class Pf2Craft implements ModInitializer {
         ServerLifecycleEvents.SERVER_STARTING.register(ClassData::load);
         ServerLifecycleEvents.SERVER_STARTING.register(ItemData::load);
         ServerLifecycleEvents.SERVER_STARTING.register(MonsterDataLoader::load);
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> CombatService.reset());
         ServerPlayConnectionEvents.JOIN.register(
-                (handler, sender, server) -> CharacterService.onJoin(handler.player));
+                (handler, sender, server) -> {
+                    CharacterService.onJoin(handler.player);
+                    CombatService.onJoin(handler.player);
+                });
         ServerPlayConnectionEvents.DISCONNECT.register(
                 (handler, server) -> {
+                    CombatService.onDisconnect(handler.player);
                     SheetService.onDisconnect(handler.player);
                     NpcNetwork.onDisconnect(handler.player);
                 });

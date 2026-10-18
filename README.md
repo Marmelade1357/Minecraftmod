@@ -36,6 +36,8 @@ groß oben auf dem Bildschirm (natürliche 20 golden, natürliche 1 rot) und im 
 | `/pf2 npc info` | Werte des ausgewählten (sonst angesehenen, max. 16 Blöcke) NPCs im Chat (Spielleiter oder OP) |
 | `/pf2 npc remove` | ausgewählten (sonst angesehenen) NPC entfernen (Spielleiter oder OP) |
 | `/pf2 npc hp <Wert>` | aktuelle TP des ausgewählten NPCs setzen (Spielleiter oder OP) |
+| `/pf2 combat start\|status\|next\|end` | Kampf starten (alle Charaktere und NPCs im Umkreis von 32 Blöcken), Stand anzeigen, Zug überspringen, Kampf beenden (Spielleiter oder OP). `/pf2 tools` gibt dem Spielleiter außerdem die Kampfglocke. |
+| `/pf2 combat endturn` | eigenen Zug beenden (Spieler, der gerade dran ist) |
 
 „Spielleiter oder OP“ heißt: Spieler mit GM-Rolle oder Berechtigungsstufe 2.
 

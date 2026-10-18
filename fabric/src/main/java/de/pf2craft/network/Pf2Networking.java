@@ -2,6 +2,7 @@ package de.pf2craft.network;
 
 import de.pf2craft.character.CharacterService;
 import de.pf2craft.character.SheetService;
+import de.pf2craft.combat.CombatService;
 import de.pf2craft.core.dice.DiceParseException;
 import de.pf2craft.npc.NpcNetwork;
 import de.pf2craft.roll.RollService;
@@ -34,6 +35,11 @@ public final class Pf2Networking {
         PayloadTypeRegistry.playC2S().register(NpcEditPayload.ID, NpcEditPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(NpcActionPayload.ID, NpcActionPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(OpenNpcScreenPayload.ID, OpenNpcScreenPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(CombatSyncPayload.ID, CombatSyncPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(CombatStartPayload.ID, CombatStartPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(CombatControlPayload.ID, CombatControlPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(EndTurnPayload.ID, EndTurnPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(OpenCombatScreenPayload.ID, OpenCombatScreenPayload.CODEC);
     }
 
     public static void registerServerReceivers() {
@@ -59,6 +65,12 @@ public final class Pf2Networking {
                 (payload, context) -> NpcNetwork.edit(context.player(), payload));
         ServerPlayNetworking.registerGlobalReceiver(NpcActionPayload.ID,
                 (payload, context) -> NpcNetwork.action(context.player(), payload));
+        ServerPlayNetworking.registerGlobalReceiver(CombatStartPayload.ID,
+                (payload, context) -> CombatService.startFromGm(context.player(), payload.participants()));
+        ServerPlayNetworking.registerGlobalReceiver(CombatControlPayload.ID,
+                (payload, context) -> CombatService.control(context.player(), payload.action()));
+        ServerPlayNetworking.registerGlobalReceiver(EndTurnPayload.ID,
+                (payload, context) -> CombatService.endTurn(context.player()));
         ServerPlayNetworking.registerGlobalReceiver(RollRequestPayload.ID, (payload, context) -> {
             ServerPlayerEntity player = context.player();
             if (!RollService.checkCooldown(player)) {

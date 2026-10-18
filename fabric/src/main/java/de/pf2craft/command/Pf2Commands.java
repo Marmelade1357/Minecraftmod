@@ -12,6 +12,7 @@ import de.pf2craft.GmRoles;
 import de.pf2craft.character.CharacterService;
 import de.pf2craft.character.CharacterStore;
 import de.pf2craft.character.SheetService;
+import de.pf2craft.combat.CombatService;
 import de.pf2craft.core.character.CharacterSheet;
 import de.pf2craft.core.dice.DiceParseException;
 import de.pf2craft.core.monster.MonsterData;
@@ -88,6 +89,30 @@ public final class Pf2Commands {
                 .then(literal("tools")
                         .requires(source -> source.getPlayer() != null && GmRoles.isGm(source.getPlayer()))
                         .executes(Pf2Commands::giveTools))
+                .then(literal("combat")
+                        .then(literal("start")
+                                .requires(Pf2Commands::isGmOrOp)
+                                .executes(Pf2Commands::combatStart))
+                        .then(literal("status")
+                                .requires(Pf2Commands::isGmOrOp)
+                                .executes(Pf2Commands::combatStatus))
+                        .then(literal("next")
+                                .requires(Pf2Commands::isGmOrOp)
+                                .executes(ctx -> {
+                                    CombatService.skip(ctx.getSource().getPlayerOrThrow());
+                                    return 1;
+                                }))
+                        .then(literal("end")
+                                .requires(Pf2Commands::isGmOrOp)
+                                .executes(ctx -> {
+                                    CombatService.end(ctx.getSource().getPlayerOrThrow());
+                                    return 1;
+                                }))
+                        .then(literal("endturn")
+                                .executes(ctx -> {
+                                    CombatService.endTurn(ctx.getSource().getPlayerOrThrow());
+                                    return 1;
+                                })))
                 .then(literal("sheet")
                         .requires(Pf2Commands::isGmOrOp)
                         .then(argument("player", EntityArgumentType.player())
@@ -170,7 +195,29 @@ public final class Pf2Commands {
         return 1;
     }
 
+    private static int combatStart(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        ServerPlayerEntity executor = ctx.getSource().getPlayerOrThrow();
+        CombatService.start(ctx.getSource().getServer(), executor,
+                CombatService.nearbyIds(executor.getServerWorld(), executor.getPos()));
+        return 1;
+    }
+
+    private static int combatStatus(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        ServerPlayerEntity executor = ctx.getSource().getPlayerOrThrow();
+        java.util.List<Text> lines = CombatService.statusLines(GmRoles.isGm(executor));
+        if (lines.isEmpty()) {
+            ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.combat.not_running",
+                    "No combat is running."));
+            return 0;
+        }
+        for (Text line : lines) {
+            ctx.getSource().sendFeedback(() -> line, false);
+        }
+        return 1;
+    }
+
     private static int giveTools(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        Pf2Items.giveBell(ctx.getSource().getPlayerOrThrow());
         boolean given = Pf2Items.giveStaff(ctx.getSource().getPlayerOrThrow());
         ctx.getSource().sendFeedback(() -> Text.translatableWithFallback(
                 given ? "pf2craft.npc.staff_given" : "pf2craft.npc.staff_present",
