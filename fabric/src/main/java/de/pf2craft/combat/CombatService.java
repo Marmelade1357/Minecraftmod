@@ -75,40 +75,10 @@ public final class CombatService {
         }
     }
 
-    private static final Identifier FREEZE_SPEED_ID = Pf2Craft.id("freeze_speed");
-    private static final Identifier FREEZE_JUMP_ID = Pf2Craft.id("freeze_jump");
     private static final int AUTO_END_DELAY = 20;
 
     private static String autoEndId;
     private static int autoEndAt;
-
-    /**
-     * Makes a waiting combatant unable to walk or jump, so the client does not predict movement that the server
-     * then rubber-bands back. Temporary modifiers are never saved; the teleport-back stays the authority.
-     */
-    static void applyFreeze(ServerPlayerEntity player) {
-        EntityAttributeInstance speed = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-        if (speed != null && speed.getModifier(FREEZE_SPEED_ID) == null) {
-            speed.addTemporaryModifier(new EntityAttributeModifier(FREEZE_SPEED_ID, -1.0,
-                    EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
-        }
-        EntityAttributeInstance jump = player.getAttributeInstance(EntityAttributes.GENERIC_JUMP_STRENGTH);
-        if (jump != null && jump.getModifier(FREEZE_JUMP_ID) == null) {
-            jump.addTemporaryModifier(new EntityAttributeModifier(FREEZE_JUMP_ID, -1.0,
-                    EntityAttributeModifier.Operation.ADD_VALUE));
-        }
-    }
-
-    static void removeFreeze(ServerPlayerEntity player) {
-        EntityAttributeInstance speed = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-        if (speed != null && speed.getModifier(FREEZE_SPEED_ID) != null) {
-            speed.removeModifier(FREEZE_SPEED_ID);
-        }
-        EntityAttributeInstance jump = player.getAttributeInstance(EntityAttributes.GENERIC_JUMP_STRENGTH);
-        if (jump != null && jump.getModifier(FREEZE_JUMP_ID) != null) {
-            jump.removeModifier(FREEZE_JUMP_ID);
-        }
-    }
 
     /** Whether the current combatant has used up everything the turn offers (see tickAutoEnd). */
     private static boolean turnSpent(Combatant c) {
@@ -311,9 +281,6 @@ public final class CombatService {
         }
         if (encounter != null) {
             sync(null);
-        }
-        if (removedPlayer != null) {
-            removeFreeze(removedPlayer);
         }
         if (removedPlayer != null && !GmRoles.isGm(removedPlayer)) {
             removeReach(removedPlayer);
@@ -592,7 +559,6 @@ public final class CombatService {
         Pf2Craft.LOGGER.info("Combat ended");
         if (server != null) {
             server.getPlayerManager().getPlayerList().forEach(CombatService::removeReach);
-            server.getPlayerManager().getPlayerList().forEach(CombatService::removeFreeze);
         }
         for (ServerPlayerEntity r : audience) {
             r.sendMessage(CombatMessages.ended(), false);

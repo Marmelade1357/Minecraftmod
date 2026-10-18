@@ -31,17 +31,17 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 /**
- * Makes the combat rules binding for players: whoever is not up is held in place and cannot interact, the
+ * Makes the combat rules binding for players: whoever is not up may only move on their block and cannot interact, the
  * active player's walking costs Strides, and vanilla damage and hunger are switched off. Server thread only.
  * Nothing here runs per tick unless a combat is active (except the food refill every 20 ticks).
  */
 public final class Enforcement {
-    private static final double DRIFT = 0.02;
-    private static final double JUMP = 0.5;
+    private static final double EDGE = 0.05; // tolerance so standing on the block edge does not flicker
     private static final double MAX_STEP = 2.5;
     private static final int MESSAGE_GAP_TICKS = 40;
     private static final int FOOD_INTERVAL = 20;
@@ -225,22 +225,16 @@ public final class Enforcement {
             present.add(id);
             if (e.active() && e.combatant().id().equals(current)) {
                 ANCHORS.remove(id);
-                CombatService.removeFreeze(p);
                 moveCurrent(p);
             } else {
-                CombatService.applyFreeze(p);
                 hold(p);
             }
         }
         ANCHORS.keySet().retainAll(present);
-        for (ServerPlayerEntity p : server.getPlayerManager().getPlayerList()) {
-            if (!present.contains(p.getUuid())) {
-                CombatService.removeFreeze(p); // never leave a freeze on someone who is not a waiting combatant
-            }
-        }
         CombatService.tickAutoEnd(server.getTicks());
     }
 
+    /** A waiting combatant may move freely on the block where their turn ended, but not leave it. */
     private static void hold(ServerPlayerEntity p) {
         Vec3d pos = p.getPos();
         RegistryKey<World> world = p.getServerWorld().getRegistryKey();
@@ -250,14 +244,11 @@ public final class Enforcement {
             return;
         }
         Vec3d anchor = held.pos();
-        double dx = pos.x - anchor.x;
-        double dz = pos.z - anchor.z;
-        boolean jumped = pos.y - anchor.y > JUMP;
-        if (dx * dx + dz * dz > DRIFT * DRIFT || jumped) {
-            double y = jumped ? anchor.y : pos.y;
-            teleport(p, anchor.x, y, anchor.z);
-        } else if (p.isOnGround()) {
-            ANCHORS.put(p.getUuid(), new Anchor(new Vec3d(anchor.x, pos.y, anchor.z), world));
+        double minX = MathHelper.floor(anchor.x) - EDGE;
+        double minZ = MathHelper.floor(anchor.z) - EDGE;
+        boolean outside = pos.x < minX || pos.x > minX + 1 + 2 * EDGE || pos.z < minZ || pos.z > minZ + 1 + 2 * EDGE;
+        if (outside) {
+            teleport(p, anchor.x, pos.y, anchor.z);
         }
     }
 
