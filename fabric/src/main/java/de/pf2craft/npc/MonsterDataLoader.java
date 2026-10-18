@@ -30,6 +30,7 @@ public final class MonsterDataLoader {
     /** Adds (or replaces, by id) one monster in the in-memory catalog, e.g. a freshly saved template. */
     public static synchronized void add(MonsterData data) {
         List<MonsterData> all = new ArrayList<>(loaded);
+        all.removeIf(m -> m.id().equals(data.id()));
         all.add(data);
         loaded = List.copyOf(all);
         catalog = new MonsterCatalog(loaded);

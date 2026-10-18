@@ -39,7 +39,7 @@ public class NpcSheetScreen extends Screen {
     private static final int HEADER_H = 14;
     private static final int ROW_STEP = 22;
     private static final int ROW_H = 18;
-    private static final int LABEL_W = 56;
+    private static final int LABEL_W = 68;
     private static final int SET_W = 46;
     private static final int STEP_W = 16;
     private static final int FOOTER_H = 20;

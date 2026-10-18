@@ -156,7 +156,7 @@
   "pf2craft.npc.hp_set": "%s now has %s HP.",
   "pf2craft.npc.staff_given": "You received the command staff.",
   "pf2craft.npc.staff_present": "You already carry the command staff.",
-  "pf2craft.npc.template_saved": "Template saved: %s",
+  "pf2craft.npc.template_saved": "Template saved: %s (id %s)",
   "pf2craft.npc.template_failed": "Could not save the template: %s",
   "screen.pf2craft.npc.spawn.title": "Add NPC",
   "screen.pf2craft.npc.spawn.search": "Search",

@@ -125,8 +125,9 @@ public final class NpcNetwork {
     private static void saveTemplate(ServerPlayerEntity gm, NpcEntity npc) {
         NpcStats stats = npc.stats();
         MonsterData b = stats.base();
-        String fileName = TemplateNames.fileName(stats.displayName());
-        String id = fileName.substring(0, fileName.length() - ".json".length());
+        String id = TemplateNames.freeId(stats.displayName(),
+                candidate -> MonsterDataLoader.catalog().byId(candidate).isPresent());
+        String fileName = id + ".json";
         MonsterData template = new MonsterData(id, stats.displayName(), b.level(), b.size(), b.traits(),
                 b.perception(), b.ac(), b.fortitude(), b.reflex(), b.will(), b.hp(), b.speed(), b.strikes(),
                 b.resistances(), b.weaknesses(), b.immunities(), b.skills(), b.abilities());
@@ -142,7 +143,7 @@ public final class NpcNetwork {
         }
         MonsterDataLoader.add(template);
         gm.sendMessage(Text.translatableWithFallback("pf2craft.npc.template_saved",
-                "Template saved: %s", fileName), false);
+                "Template saved: %s (id %s)", fileName, id), false);
     }
 
     /** The NPC with this entity id if the sender is a GM and the NPC is loaded and near; else tells the GM. */
