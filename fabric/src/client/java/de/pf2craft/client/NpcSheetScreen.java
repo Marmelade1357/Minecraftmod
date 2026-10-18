@@ -34,6 +34,12 @@ import org.lwjgl.glfw.GLFW;
  * resistances, abilities) scrolls.
  */
 public class NpcSheetScreen extends Screen {
+    /** Only dims the game behind the window; the vanilla background blur would smear the text. */
+    @Override
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderInGameBackground(context);
+    }
+
     private static final int PANEL_W = 340;
     private static final int PANEL_H = 280;
     private static final int HEADER_H = 14;

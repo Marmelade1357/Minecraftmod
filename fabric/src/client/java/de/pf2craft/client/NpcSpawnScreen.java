@@ -21,6 +21,12 @@ import org.lwjgl.glfw.GLFW;
  * go to the server (debounced); the list scrolls with the mouse wheel. Sized for ~640x360 scaled pixels.
  */
 public class NpcSpawnScreen extends Screen {
+    /** Only dims the game behind the window; the vanilla background blur would smear the text. */
+    @Override
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderInGameBackground(context);
+    }
+
     private static final int PANEL_W = 300;
     private static final int PANEL_H = 280;
     private static final int HEADER_H = 14;

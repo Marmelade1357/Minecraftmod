@@ -114,6 +114,10 @@ public final class CombatService {
     /** Characters (non-GM) and living NPCs near the GM, for the combat screen. */
     public static List<OpenCombatScreenPayload.Candidate> candidates(ServerPlayerEntity gm) {
         List<OpenCombatScreenPayload.Candidate> result = new ArrayList<>();
+        if (CharacterStore.get(gm).isPresent()) {
+            // The requesting GM's own character may be ticked in the window (opt-in).
+            result.add(new OpenCombatScreenPayload.Candidate(gm.getUuid(), clip(playerName(gm)), false));
+        }
         for (Entity e : nearby(gm.getServerWorld(), gm.getPos())) {
             if (e instanceof ServerPlayerEntity p) {
                 result.add(new OpenCombatScreenPayload.Candidate(p.getUuid(), clip(playerName(p)), false));
@@ -195,6 +199,19 @@ public final class CombatService {
         }
         remove(id);
         return true;
+    }
+
+    /** {@code /pf2 combat add <players>}: adds the named players (a GM only with a character), permission by command. */
+    public static int addPlayers(ServerPlayerEntity actor, Collection<ServerPlayerEntity> players) {
+        if (encounter == null) {
+            CombatMessages.error(actor, CombatMessages.notRunning());
+            return 0;
+        }
+        int before = encounter.order().size();
+        for (ServerPlayerEntity p : players) {
+            add(actor, p.getUuid());
+        }
+        return encounter == null ? 0 : encounter.order().size() - before;
     }
 
     /** Takes a participant out of the running order; the turn moves on if it was the current one. */
@@ -598,9 +615,7 @@ public final class CombatService {
     private static Combatant resolve(MinecraftServer srv, UUID id) {
         ServerPlayerEntity player = srv.getPlayerManager().getPlayer(id);
         if (player != null) {
-            if (GmRoles.isGm(player)) {
-                return null;
-            }
+            // A game master takes part only when listed explicitly and with a character.
             return CharacterStore.get(player)
                     .map(s -> new Combatant(id.toString(), playerName(player, s), false,
                             CharacterMath.perception(s)))

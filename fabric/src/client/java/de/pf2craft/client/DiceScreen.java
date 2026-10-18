@@ -18,6 +18,12 @@ import org.lwjgl.glfw.GLFW;
  * optional label, then roll openly or secretly. The pool is kept between openings.
  */
 public class DiceScreen extends Screen {
+    /** Only dims the game behind the window; the vanilla background blur would smear the text. */
+    @Override
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderInGameBackground(context);
+    }
+
     private static final int[] DICE = {4, 6, 8, 10, 12, 20, 100};
     private static final int MAX_PER_DIE = 20;
     private static final int MAX_MODIFIER = 99;

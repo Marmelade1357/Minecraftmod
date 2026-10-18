@@ -113,6 +113,17 @@ public final class Pf2Commands {
                                             "pf2craft.combat.added_count", "%s added to the combat.", added), false);
                                     return added;
                                 }))
+                        .then(literal("add")
+                                .requires(Pf2Commands::isGmOrOp)
+                                .then(argument("players", EntityArgumentType.players())
+                                        .executes(ctx -> {
+                                            int added = CombatService.addPlayers(ctx.getSource().getPlayerOrThrow(),
+                                                    EntityArgumentType.getPlayers(ctx, "players"));
+                                            ctx.getSource().sendFeedback(() -> Text.translatableWithFallback(
+                                                    "pf2craft.combat.added_count", "%s added to the combat.", added),
+                                                    false);
+                                            return added;
+                                        })))
                         .then(literal("remove")
                                 .requires(Pf2Commands::isGmOrOp)
                                 .executes(ctx -> {

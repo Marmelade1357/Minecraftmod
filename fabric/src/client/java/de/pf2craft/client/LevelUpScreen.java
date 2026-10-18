@@ -30,6 +30,12 @@ import net.minecraft.util.Formatting;
  * (the server validates everything again). Closes on the next sheet sync after sending.
  */
 public class LevelUpScreen extends Screen {
+    /** Only dims the game behind the window; the vanilla background blur would smear the text. */
+    @Override
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderInGameBackground(context);
+    }
+
     private static final int PANEL_W = 300;
     private static final int BUTTON_H = 20;
     private static final int FIELD_H = 18;

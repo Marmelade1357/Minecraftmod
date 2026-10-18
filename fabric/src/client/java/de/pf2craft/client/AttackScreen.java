@@ -35,6 +35,12 @@ public class AttackScreen extends Screen {
         this.suggested = Math.max(1, Math.min(3, payload.suggestedNumber()));
     }
 
+    /** Only dims the game behind the window; the vanilla background blur would smear the text. */
+    @Override
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderInGameBackground(context);
+    }
+
     @Override
     protected void init() {
         clearChildren();

@@ -1,9 +1,12 @@
 package de.pf2craft.combat;
 
+import de.pf2craft.GmRoles;
 import de.pf2craft.core.combat.Encounter;
+import de.pf2craft.item.Pf2Items;
 import de.pf2craft.npc.NpcEntity;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -61,17 +64,20 @@ public final class Enforcement {
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(Enforcement::tick);
         UseBlockCallback.EVENT.register((player, world, hand, hit) ->
-                blocked(player) ? ActionResult.FAIL : ActionResult.PASS);
+                blockedUse(player) ? ActionResult.FAIL : ActionResult.PASS);
         AttackBlockCallback.EVENT.register((player, world, hand, pos, dir) ->
                 blocked(player) ? ActionResult.FAIL : ActionResult.PASS);
         UseItemCallback.EVENT.register((player, world, hand) -> {
             ItemStack stack = player.getStackInHand(hand);
-            return blocked(player) ? TypedActionResult.fail(stack) : TypedActionResult.pass(stack);
+            return blockedUse(player) ? TypedActionResult.fail(stack) : TypedActionResult.pass(stack);
         });
         // The vanilla attack is always cancelled for combatants; the current player's click opens the attack window.
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hit) -> {
-            if (blocked(player)) {
+            if (blockedUse(player)) {
                 return ActionResult.FAIL;
+            }
+            if (holdsGmItem(player)) {
+                return ActionResult.PASS; // the bell and the staff do their own thing
             }
             if (player instanceof ServerPlayerEntity sp && CombatService.active()
                     && CombatService.currentId().filter(sp.getUuid().toString()::equals).isPresent()) {
@@ -87,7 +93,7 @@ public final class Enforcement {
             return ActionResult.PASS;
         });
         UseEntityCallback.EVENT.register((player, world, hand, entity, hit) ->
-                blocked(player) ? ActionResult.FAIL : ActionResult.PASS);
+                blockedUse(player) ? ActionResult.FAIL : ActionResult.PASS);
         // A respawned player is re-anchored where they appear.
         ServerPlayerEvents.AFTER_RESPAWN.register((old, fresh, alive) -> reanchor(fresh.getUuid()));
         PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, be) -> !blocked(player));
@@ -127,6 +133,23 @@ public final class Enforcement {
 
     private static boolean bypasses(DamageSource source) {
         return source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY);
+    }
+
+    private static boolean holdsGmItem(PlayerEntity player) {
+        if (!(player instanceof ServerPlayerEntity sp) || !GmRoles.isGm(sp)) {
+            return false;
+        }
+        for (ItemStack stack : List.of(sp.getMainHandStack(), sp.getOffHandStack())) {
+            if (stack.isOf(Pf2Items.COMBAT_BELL) || stack.isOf(Pf2Items.COMMAND_STAFF)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Like {@link #blocked} for using items, blocks and entities: a GM combatant keeps the bell and staff usable. */
+    private static boolean blockedUse(PlayerEntity player) {
+        return !holdsGmItem(player) && blocked(player);
     }
 
     /** True for a combatant player who may not act right now (not current, or out of the order). */

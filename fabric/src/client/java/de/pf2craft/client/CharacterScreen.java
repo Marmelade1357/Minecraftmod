@@ -45,6 +45,12 @@ import org.lwjgl.glfw.GLFW;
  * - / + buttons and the skill rank letters cycle the rank; the server checks the GM role.
  */
 public class CharacterScreen extends Screen {
+    /** Only dims the game behind the window; the vanilla background blur would smear the text. */
+    @Override
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderInGameBackground(context);
+    }
+
     private enum Tab { OVERVIEW, SKILLS, FEATS }
 
     private enum Align { LEFT, CENTER, RIGHT }

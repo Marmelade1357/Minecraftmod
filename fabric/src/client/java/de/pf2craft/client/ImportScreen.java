@@ -16,6 +16,12 @@ import org.lwjgl.glfw.GLFW;
  * as the server syncs the own sheet; import errors from the server are shown in the status line.
  */
 public class ImportScreen extends Screen {
+    /** Only dims the game behind the window; the vanilla background blur would smear the text. */
+    @Override
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderInGameBackground(context);
+    }
+
     private static final int PANEL_W = 240;
     private static final int MAX_ID_LENGTH = 10;
     /** The button is locked this long after a click; the server refuses parallel imports anyway. */

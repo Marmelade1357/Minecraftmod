@@ -135,7 +135,9 @@ public final class AttackService {
 
     /** Fallback {@code /pf2 combat attack <n> [strike]}: a GM's selected NPC attacks, a player attacks. */
     public static boolean attackLookedAt(ServerPlayerEntity player, int number, int strikeIndex) {
-        if (GmRoles.isGm(player)) {
+        // A GM whose own character is up attacks like a player; otherwise the selected NPC attacks.
+        if (GmRoles.isGm(player)
+                && CombatService.currentId().filter(player.getUuid().toString()::equals).isEmpty()) {
             return attackLookedAtByNpc(player, number, strikeIndex);
         }
         return attackLookedAt(player, number);
@@ -397,7 +399,7 @@ public final class AttackService {
         MonsterStrike strike = strikes.get(strikeIndex);
         int ac;
         Defenses defenses;
-        if (target instanceof ServerPlayerEntity player && !GmRoles.isGm(player)
+        if (target instanceof ServerPlayerEntity player
                 && CombatService.contains(player.getUuid()) && player.getWorld() == npc.getWorld()) {
             Optional<CharacterSheet> sheet = CharacterStore.get(player);
             if (sheet.isEmpty() || sheet.get().currentHp() <= 0) {

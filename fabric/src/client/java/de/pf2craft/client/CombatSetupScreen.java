@@ -73,9 +73,22 @@ public class CombatSetupScreen extends Screen {
         } else {
             for (OpenCombatScreenPayload.Candidate c : payload.candidates()) {
                 (c.npc() ? rightRows : leftRows).add(new Row(c.id(), c.name()));
-                ticked.add(c.id());
+                if (!isOwnCharacter(c.id())) {
+                    ticked.add(c.id()); // a GM's own character is opt-in
+                }
             }
         }
+    }
+
+    private static boolean isOwnCharacter(UUID id) {
+        net.minecraft.client.MinecraftClient mc = net.minecraft.client.MinecraftClient.getInstance();
+        return mc.player != null && mc.player.getUuid().equals(id);
+    }
+
+    /** Only dims the game behind the window; the vanilla background blur would smear the text. */
+    @Override
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderInGameBackground(context);
     }
 
     @Override
