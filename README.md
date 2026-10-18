@@ -29,6 +29,7 @@ groß oben auf dem Bildschirm (natürliche 20 golden, natürliche 1 rot) und im 
 | `/pf2 character import <ID>` | eigenen Charakter aus Pathbuilder 2e importieren (ersetzt einen vorhandenen) |
 | `/pf2 character reset <Spieler>` | Charakter eines Spielers löschen (Spielleiter oder OP) |
 | `/pf2 sheet <Spieler>` | Charakterbogen eines Spielers ansehen (Spielleiter oder OP) |
+| `/pf2 items <Spieler>` | Waffen und Schild eines Spielers aus dem gespeicherten Bogen neu ausgeben (Spielleiter oder OP) |
 | `/pf2 hp <Spieler> <Menge>` | TP eines Spielers ändern, negativ = Schaden (Spielleiter oder OP) |
 
 „Spielleiter oder OP“ heißt: Spieler mit GM-Rolle oder Berechtigungsstufe 2.
@@ -70,7 +71,8 @@ Beim Import aus Pathbuilder bekommt jeder Spieler seine Waffen und seinen Schild
 - **Aussehen nach Schadenswürfel:** W4 Holz, W6 Gold, W8 Diamant, W10/W12 Netherit; die Form richtet sich
   nach der Waffengruppe (Schwert, Axt, Spitzhacke, Bogen, Armbrust, Dreizack, Stock). Schilde sind der Vanilla-Schild.
 - **Tooltip:** Name wie „+1 Striking Rapier“, graue Zeilen mit Schaden (z. B. „1W6 Hieb“), Eigenschaften,
-  Runen und Besitzer. Die Gegenstände sind unzerstörbar.
+  Runen und Besitzer. Die Gegenstände nutzen sich nicht ab, können aber verloren gehen; der Spielleiter
+  gibt sie mit `/pf2 items <Spieler>` neu aus (ohne neuen Import, Stufenaufstiege bleiben erhalten).
 - **Neu importieren** ersetzt diese Gegenstände, **Charakter zurücksetzen** entfernt sie. Ist das Inventar voll,
   fallen sie vor die Füße des Spielers (mit Hinweis im Chat).
 - **Eigene Gegenstände:** Dateien in `config/pf2craft/items/{weapons,armor,shields}.json` auf dem Server

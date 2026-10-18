@@ -26,7 +26,10 @@ public final class CharacterItems {
         PlayerInventory inventory = player.getInventory();
         for (ItemStack stack : Pf2ItemFactory.create(player.getUuid(), sheet)) {
             Text name = stack.getName();
-            if (!inventory.insertStack(stack)) {
+            // Creative mode reports success even when nothing fits, so check for room first.
+            boolean hasRoom = inventory.getEmptySlot() != -1
+                    || inventory.getOccupiedSlotWithRoomForStack(stack) != -1;
+            if (!hasRoom || !inventory.insertStack(stack)) {
                 ItemEntity dropped = player.dropItem(stack, false, false);
                 if (dropped != null) {
                     // Lay it at the feet instead of throwing it forward like a Q-drop.

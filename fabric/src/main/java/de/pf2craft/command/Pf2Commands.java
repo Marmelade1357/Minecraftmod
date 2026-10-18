@@ -10,9 +10,13 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.pf2craft.GmRoles;
 import de.pf2craft.character.CharacterService;
+import de.pf2craft.character.CharacterStore;
 import de.pf2craft.character.SheetService;
+import de.pf2craft.core.character.CharacterSheet;
 import de.pf2craft.core.dice.DiceParseException;
+import de.pf2craft.item.CharacterItems;
 import de.pf2craft.roll.RollService;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import net.minecraft.command.CommandRegistryAccess;
@@ -56,6 +60,10 @@ public final class Pf2Commands {
                         .then(argument("player", EntityArgumentType.player())
                                 .then(argument("amount", IntegerArgumentType.integer())
                                         .executes(Pf2Commands::changeHp))))
+                .then(literal("items")
+                        .requires(Pf2Commands::isGmOrOp)
+                        .then(argument("player", EntityArgumentType.player())
+                                .executes(Pf2Commands::reissueItems)))
                 .then(literal("sheet")
                         .requires(Pf2Commands::isGmOrOp)
                         .then(argument("player", EntityArgumentType.player())
@@ -92,6 +100,20 @@ public final class Pf2Commands {
         }
         ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.character.hp_changed",
                 "%s now has %s HP.", target.getDisplayName(), hp.getAsInt()), true);
+        return 1;
+    }
+
+    private static int reissueItems(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "player");
+        Optional<CharacterSheet> sheet = CharacterStore.get(target);
+        if (sheet.isEmpty()) {
+            ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.character.none",
+                    "%s has no character.", target.getDisplayName()));
+            return 0;
+        }
+        CharacterItems.replace(target, sheet.get());
+        ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.items.reissued",
+                "Re-issued the character items of %s.", target.getDisplayName()), true);
         return 1;
     }
 

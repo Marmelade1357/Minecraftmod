@@ -7,6 +7,7 @@ import de.pf2craft.core.character.Ability;
 import de.pf2craft.core.character.ArmorClass;
 import de.pf2craft.core.character.CharacterSheet;
 import de.pf2craft.core.character.HitPoints;
+import de.pf2craft.core.character.Shield;
 import de.pf2craft.core.character.Strike;
 import java.util.List;
 import java.util.Map;
@@ -21,10 +22,14 @@ class ItemStampTest {
     }
 
     private static CharacterSheet sheet(int level, List<Strike> strikes, int hp) {
+        return sheet(level, strikes, hp, Optional.empty());
+    }
+
+    private static CharacterSheet sheet(int level, List<Strike> strikes, int hp, Optional<Shield> shield) {
         return new CharacterSheet("August", "Fighter", "Kholo", "", "", level, Ability.STR,
                 Map.of(Ability.STR, 18), Map.of(), List.of(), new HitPoints(8, 10, 2, 0), 25,
                 new ArmorClass("heavy", OptionalInt.of(0), 6), strikes, List.of(), List.of(), hp,
-                false, Optional.empty());
+                false, shield);
     }
 
     @Test
@@ -51,5 +56,21 @@ class ItemStampTest {
     void hpChangeKeepsStamp() {
         CharacterSheet s = sheet(5, List.of(scythe(1)), 75);
         assertEquals(ItemStamp.of(s), ItemStamp.of(s.withCurrentHp(12)));
+    }
+
+    private static CharacterSheet shielded(Shield shield) {
+        return sheet(5, List.of(scythe(1)), 75, Optional.of(shield));
+    }
+
+    @Test
+    void changedShieldGivesDifferentStamp() {
+        CharacterSheet base = sheet(5, List.of(scythe(1)), 75);
+        CharacterSheet steel = shielded(new Shield("Steel Shield", 2, 5, 20, 10));
+        CharacterSheet tower = shielded(new Shield("Tower Shield", 2, 5, 20, 10));
+        CharacterSheet harder = shielded(new Shield("Steel Shield", 2, 6, 20, 10));
+        assertNotEquals(ItemStamp.of(base), ItemStamp.of(steel));
+        assertNotEquals(ItemStamp.of(steel), ItemStamp.of(tower));
+        assertNotEquals(ItemStamp.of(steel), ItemStamp.of(harder));
+        assertEquals(ItemStamp.of(steel), ItemStamp.of(steel.withCurrentHp(3)));
     }
 }

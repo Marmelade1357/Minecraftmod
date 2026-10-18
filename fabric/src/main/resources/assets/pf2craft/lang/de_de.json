@@ -137,5 +137,6 @@
   "pf2craft.items.runes": "Runen: %s",
   "pf2craft.items.owner": "Besitzer: %s",
   "pf2craft.items.dropped": "Dein Inventar ist voll: %s liegt zu deinen Füßen.",
-  "pf2craft.items.shield": "RK +%s, Härte %s, TP %s"
+  "pf2craft.items.shield": "RK +%s, Härte %s, TP %s",
+  "pf2craft.items.reissued": "Die Charakter-Gegenstände von %s wurden neu ausgegeben."
 }
