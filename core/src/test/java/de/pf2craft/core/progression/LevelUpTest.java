@@ -10,6 +10,7 @@ import de.pf2craft.core.character.CharacterMath;
 import de.pf2craft.core.character.CharacterSheet;
 import de.pf2craft.core.character.PathbuilderImporter;
 import de.pf2craft.core.character.Rank;
+import de.pf2craft.core.item.ItemStamp;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -49,6 +50,14 @@ class LevelUpTest {
         assertEquals(0, o.abilityBoosts());
         assertEquals(List.of("Class Feat", "Skill Feat"), o.featSlots());
         assertEquals(13, o.hpGain());
+    }
+
+    @Test
+    void levelUpKeepsItemStamp() throws Exception {
+        CharacterSheet s5 = fighter5();
+        CharacterSheet s6 = LevelUp.apply(s5, registry(), feats("A", "B"));
+        assertEquals(6, s6.level());
+        assertEquals(ItemStamp.of(s5), ItemStamp.of(s6));
     }
 
     @Test

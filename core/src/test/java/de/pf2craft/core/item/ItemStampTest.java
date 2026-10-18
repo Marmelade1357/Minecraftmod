@@ -42,8 +42,8 @@ class ItemStampTest {
     }
 
     @Test
-    void changedLevelGivesDifferentStamp() {
-        assertNotEquals(ItemStamp.of(sheet(5, List.of(scythe(1)), 75)),
+    void levelChangeKeepsStamp() {
+        assertEquals(ItemStamp.of(sheet(5, List.of(scythe(1)), 75)),
                 ItemStamp.of(sheet(6, List.of(scythe(1)), 75)));
     }
 

@@ -6,7 +6,8 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Fingerprint of the parts of a sheet that items are made from. Items carry it so that weapons
- * from an older import or level can be recognised as stale; hit point changes do not alter it.
+ * from an older import can be recognised as stale. Hit point changes and level-ups do not alter it,
+ * so a GM-granted level-up keeps the weapons valid.
  */
 public final class ItemStamp {
     private static final long FNV_OFFSET = 0xcbf29ce484222325L;
@@ -17,8 +18,7 @@ public final class ItemStamp {
 
     public static long of(CharacterSheet sheet) {
         StringBuilder sb = new StringBuilder();
-        sb.append(sheet.name()).append('\u0000').append(sheet.className()).append('\u0000')
-                .append(sheet.level());
+        sb.append(sheet.name()).append('\u0000').append(sheet.className());
         for (Strike s : sheet.strikes()) {
             sb.append('\u0000').append(s);
         }
