@@ -1,7 +1,10 @@
 package de.pf2craft.client;
 
+import de.pf2craft.network.CombatSyncPayload;
+import de.pf2craft.network.EndTurnPayload;
 import de.pf2craft.network.NpcSearchResultPayload;
 import de.pf2craft.network.NpcSheetPayload;
+import de.pf2craft.network.OpenCombatScreenPayload;
 import de.pf2craft.network.OpenImportPayload;
 import de.pf2craft.network.OpenNpcScreenPayload;
 import de.pf2craft.network.RollResultPayload;
@@ -36,6 +39,7 @@ public class Pf2CraftClient implements ClientModInitializer {
 
     private static KeyBinding openDiceKey;
     private static KeyBinding openSheetKey;
+    private static KeyBinding endTurnKey;
     /** Ticks left to wait for the own sheet after a C press, or -1. */
     private static int waitingForOwnSheet = -1;
     /** A screen the server asked for while another (e.g. the terrain loading) screen was open. */
@@ -47,6 +51,9 @@ public class Pf2CraftClient implements ClientModInitializer {
                 "key.pf2craft.dice", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, KEY_CATEGORY));
         openSheetKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.pf2craft.sheet", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_C, KEY_CATEGORY));
+
+        endTurnKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.pf2craft.end_turn", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_ENTER, KEY_CATEGORY));
 
         ClientTickEvents.END_CLIENT_TICK.register(Pf2CraftClient::tick);
 
@@ -83,8 +90,13 @@ public class Pf2CraftClient implements ClientModInitializer {
                 show(context.client(), () -> new NpcSheetScreen(payload.entityId(), payload.json()));
             }
         });
+        ClientPlayNetworking.registerGlobalReceiver(CombatSyncPayload.ID,
+                (payload, context) -> ClientCombat.set(payload));
+        ClientPlayNetworking.registerGlobalReceiver(OpenCombatScreenPayload.ID,
+                (payload, context) -> show(context.client(), () -> new CombatSetupScreen(payload)));
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
             ClientSheets.clear();
+            ClientCombat.clear();
             waitingForOwnSheet = -1;
             pendingScreen = null;
         }));
@@ -105,6 +117,7 @@ public class Pf2CraftClient implements ClientModInitializer {
         });
 
         HudRenderCallback.EVENT.register(RollHud::render);
+        HudRenderCallback.EVENT.register(CombatHud::render);
         EntityRendererRegistry.register(Pf2Entities.NPC, VillagerEntityRenderer::new);
     }
 
@@ -117,6 +130,13 @@ public class Pf2CraftClient implements ClientModInitializer {
         while (openSheetKey.wasPressed()) {
             if (client.currentScreen == null && client.player != null) {
                 openOwnSheet(client);
+            }
+        }
+        while (endTurnKey.wasPressed()) {
+            if (client.currentScreen == null && client.player != null
+                    && ClientCombat.isTurnOf(client.player.getUuid())
+                    && ClientPlayNetworking.canSend(EndTurnPayload.ID)) {
+                ClientPlayNetworking.send(new EndTurnPayload());
             }
         }
         if (waitingForOwnSheet > 0 && --waitingForOwnSheet == 0) {
@@ -173,7 +193,7 @@ public class Pf2CraftClient implements ClientModInitializer {
         if (client.player != null && (current == null || current instanceof ChatScreen
                 || current instanceof ImportScreen || current instanceof CharacterScreen
                 || current instanceof DiceScreen || current instanceof NpcSpawnScreen
-                || current instanceof NpcSheetScreen)) {
+                || current instanceof NpcSheetScreen || current instanceof CombatSetupScreen)) {
             client.setScreen(screen.get());
         } else {
             pendingScreen = screen;

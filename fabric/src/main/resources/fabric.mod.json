@@ -11,6 +11,12 @@
     "main": ["de.pf2craft.Pf2Craft"],
     "client": ["de.pf2craft.client.Pf2CraftClient"]
   },
+  "mixins": [
+    {
+      "config": "pf2craft.client.mixins.json",
+      "environment": "client"
+    }
+  ],
   "depends": {
     "fabricloader": ">=0.16.0",
     "minecraft": "~1.21.1",
