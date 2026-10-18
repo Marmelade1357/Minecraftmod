@@ -37,6 +37,8 @@ core/                       Reines Java ohne Minecraft-Abhängigkeit. Regelkern 
   de.pf2craft.core.character   Charakterbogen-Modell, CharacterMath, PathbuilderImporter, CharacterJson, CheckId, GmEdit, PathbuilderId/-Response
   de.pf2craft.core.progression ClassProgression (+ Parser), ClassRegistry, LevelUp
   de.pf2craft.core.item        Gegenstandskatalog (Waffen/Rüstung/Schilde, Parser), ItemVisual (Optik nach Schadenswürfel), ItemStamp
+  de.pf2craft.core.combat   Kampfkern: Encounter (Initiative, Zugreihenfolge), TurnState, MovementBudget, AttackMath,
+                            DamageResolver/Defenses/RuneDamage, RangeRules, HealthLabel
   de.pf2craft.core.monster     Monster-Core-Daten (492 Kreaturen, Parser/Katalog), NpcStats, NpcEdit (GM-Änderungen)
   src/main/resources/pf2craft/monsters/  monster-core.json (nur Namen und Zahlen)
   src/main/resources/pf2craft/items/  Player-Core-Waffen, -Rüstungen, -Schilde (nur Namen und Zahlen)
@@ -55,10 +57,13 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
     npc/                          NpcEntity (Dorfbewohner-basiert), NpcService, NpcNetwork, GmSelection, CommandStaffItem
                                   (Befehlsstab), MonsterDataLoader (Jar + config/pf2craft/monsters/*.json; Vorlagen
                                   überschreiben nie Eingebautes, ID bekommt `-custom`, `-custom-2` …), Pf2Entities
+    combat/                       CombatService (Kampfzustand, Züge), AttackService, Enforcement (Einfrieren),
+                                  NpcWalk, CombatItem (Kampfglocke), CombatMessages
     command/                      Pf2Commands (/roll, /gmroll, /pf2 gm|hp|sheet|items|tools|npc|character …)
   src/client/java/de/pf2craft/client  nur Client: Pf2CraftClient, DiceScreen, RollHud, ImportScreen,
                                   CharacterScreen (Reiter, Verdeckt, GM-Knöpfe), LevelUpScreen, ClientSheets,
                                   NpcSpawnScreen, NpcSheetScreen (der NPC-Renderer wird in Pf2CraftClient registriert)
+  src/client/resources/pf2craft.client.mixins.json  Client-Mixin (InGameHudMixin: TP statt Herzen/Hunger)
   src/main/resources/assets/pf2craft/lang/  en_us.json, de_de.json
 ```
 
@@ -79,7 +84,8 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
 5. Nachrichten an Spieler mit `Text.translatableWithFallback(key, englishFallback, …)`,
    damit auch Clients ohne Mod sinnvollen Text sehen.
 6. Neue Texte: Schlüssel in **beiden** Sprachdateien eintragen.
-7. Code-Stil: an den bestehenden Code anpassen (4 Leerzeichen, wenige, aber
+7. Kampfzustand lebt nur serverseitig im Speicher und wird nicht gespeichert.
+8. Code-Stil: an den bestehenden Code anpassen (4 Leerzeichen, wenige, aber
    aussagekräftige Kommentare, `final`-Utility-Klassen mit privatem Konstruktor).
 
 ## Bauen und Testen
@@ -117,6 +123,12 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
   im Chat englisch; steigt der INT-Modifikator, muss der GM die zusätzliche trainierte Fertigkeit von Hand setzen.
 - Phase 3 Teil 1 (Gegenstände) vom Nutzer im Einzelspieler getestet. Teil 2 (NPCs, Befehlsstab) ist gebaut
   und per Unit-Tests in `core` abgedeckt; vom Nutzer im Einzelspieler getestet (spawnen, auswählen, Werte, hinlaufen, hinlegen): funktioniert.
+- Phase 3 Teil 3 (Kampfkern: Kampfglocke, Initiative, Aktionen/Bewegung, Einfrieren, Angriffe, NPC-Züge) ist gebaut und per
+  Unit-Tests in `core` abgedeckt; der Ingame-Test des Nutzers steht aus. Mehrspieler mit echten Spielern und das Einfrieren
+  auf echten Clients (Rubber-Banding möglich) sind ungetestet.
+- Bekannte Grenzen Teil 3: keine Reaktionen, kein Aktionsmenü, keine Zustände/Sterbend, keine Zauber, keine Sichtlinienprüfung,
+  Munition/Nachladen nicht erzwungen, Kampf endet beim Serverneustart, `/tp` eines Kämpfers wird zurückgesetzt (außer
+  `/pf2 combat anchor`).
 - Bekannte Grenzen Teil 2: NPCs handeln nicht von selbst und sind noch nicht im Kampf nutzbar; Platzhaltermodell
   (Dorfbewohner); Strike-Boni im Werte-Fenster nicht editierbar; Zusatzeffekte (Grab, anhaltender Schaden)
   nur als Namen/Hinweise; Spawn-Schutz kann Blockklicks von Nicht-OP-GMs verschlucken.
@@ -134,7 +146,8 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
      (Optik nach Schadenswürfel, Lore, Besitzer). *Vom Nutzer ingame getestet.*
    - ✅ **Teil 2 – NPCs:** Monster-Core-Daten, NPC-Entity, Befehlsstab (spawnen, auswählen, Werte, hinlaufen),
      `/pf2 npc …`, Vorlagen. *Vom Nutzer ingame getestet.*
-   - **Teil 3 – Kampfkern, Teil 4 – Aktionsmenü, Teil 5 – Zustände** (offen), umfassen:
+   - ✅ **Teil 3 – Kampfkern:** gebaut (Ingame-Test des Nutzers steht aus).
+   - **Teil 4 – Aktionsmenü, Teil 5 – Zustände** (offen), umfassen:
    - GM startet und beendet einen Kampf, Initiative mit Zugreihenfolge im HUD.
    - 3 Aktionen + 1 Reaktion pro Zug, Mehrfachangriffsmalus.
    - Angriff gegen RK mit Erfolgsgrad, Schaden, TP.

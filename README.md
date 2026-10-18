@@ -6,7 +6,7 @@ Ein Spieler ist Spielleiter (GM) und steuert NPCs, die anderen spielen ihre Char
 **Plattform:** Fabric · Minecraft 1.21.1 · Java 21. Server **und** alle Spieler brauchen die Mod
 (plus [Fabric API](https://modrinth.com/mod/fabric-api)).
 
-## Aktueller Stand (Phase 1 bis 3, Teil 2)
+## Aktueller Stand (Phase 1 bis 3, Teil 3)
 
 ### Würfelfenster
 - Taste **R** (änderbar unter Steuerung → PF2 Craft) öffnet das Würfelfenster.
@@ -36,8 +36,17 @@ groß oben auf dem Bildschirm (natürliche 20 golden, natürliche 1 rot) und im 
 | `/pf2 npc info` | Werte des ausgewählten (sonst angesehenen, max. 16 Blöcke) NPCs im Chat (Spielleiter oder OP) |
 | `/pf2 npc remove` | ausgewählten (sonst angesehenen) NPC entfernen (Spielleiter oder OP) |
 | `/pf2 npc hp <Wert>` | aktuelle TP des ausgewählten NPCs setzen (Spielleiter oder OP) |
-| `/pf2 combat start\|status\|next\|end` | Kampf starten (alle Charaktere und NPCs im Umkreis von 32 Blöcken), Stand anzeigen, Zug überspringen, Kampf beenden (Spielleiter oder OP). `/pf2 tools` gibt dem Spielleiter außerdem die Kampfglocke. |
-| `/pf2 combat endturn` | eigenen Zug beenden (Spieler, der gerade dran ist) |
+| `/pf2 combat start` | Kampf starten: alle Charaktere und NPCs im Umkreis von 32 Blöcken, Initiative wird gewürfelt (Spielleiter oder OP) |
+| `/pf2 combat status` | Runde, wer dran ist und die Reihenfolge anzeigen (Spielleiter oder OP) |
+| `/pf2 combat next` | Zug überspringen (Spielleiter oder OP) |
+| `/pf2 combat end` | Kampf beenden (Spielleiter oder OP) |
+| `/pf2 combat add` | alle Charaktere und NPCs im Umkreis von 32 Blöcken zum laufenden Kampf hinzufügen (Spielleiter oder OP) |
+| `/pf2 combat remove [<Ziel>]` | angesehenen NPC (oder das angegebene Ziel) aus dem Kampf nehmen (Spielleiter oder OP) |
+| `/pf2 combat anchor <Spieler> [<Position>]` | Kämpfer an der aktuellen bzw. angegebenen Position neu verankern, z. B. nach einem `/tp` (Spielleiter oder OP) |
+| `/pf2 combat endturn` | eigenen Zug beenden (jeder Kämpfer, der gerade dran ist) |
+| `/pf2 combat attack <1-3> [<Angriff 0-7>]` | Ersatz für den Linksklick: den angesehenen NPC (bis 16 Blöcke) mit dem 1., 2. oder 3. Angriff angreifen (jeder Kämpfer, der dran ist) |
+
+`/pf2 tools` gibt dem Spielleiter außerdem die **Kampfglocke**.
 
 „Spielleiter oder OP“ heißt: Spieler mit GM-Rolle oder Berechtigungsstufe 2.
 
@@ -91,9 +100,9 @@ Lizenz- und Urheberhinweise stehen in [NOTICE.md](NOTICE.md).
 Die NPCs stammen aus den Monsterdaten (Monster Core, 492 Kreaturen). `/pf2 tools` gibt dem Spielleiter den
 **Befehlsstab** (er wird auch bei `/pf2 gm add` ausgegeben). Rechtsklick:
 - **in die Luft:** Fenster „NPC hinzufügen“ (Monster suchen, anklicken, der NPC erscheint neben dir).
-- **auf einen NPC:** wählt ihn aus (Anzeige über der Hotbar). **Schleichen + Rechtsklick:** Werte-Fenster mit
+- **auf einen NPC:** wählt ihn aus, solange kein Angriff möglich ist (Anzeige über der Hotbar). **Linksklick** auf einen NPC wählt ihn immer aus. **Schleichen + Rechtsklick:** Werte-Fenster mit
   Bearbeitung der Werte, Umbenennen, „Als Vorlage speichern“ und „Entfernen“.
-- **auf einen Block** (NPC ausgewählt): der NPC läuft dorthin.
+- **auf einen Block** (NPC ausgewählt): der NPC läuft dorthin. Im Kampf nur, wenn der NPC dran ist; das Laufen kostet Aktionen (siehe Kampf).
 
 **Vorlagen:** Gespeicherte Vorlagen liegen in `config/pf2craft/monsters/` auf dem Server und erscheinen in der
 Monstersuche. Gespeicherte Vorlagen überschreiben nie ein eingebautes Monster: Ist die ID vergeben, wird `-custom`,
@@ -104,19 +113,61 @@ dagegen.) Alle `*.json`-Dateien in diesem Ordner werden geladen.
 `/pf2 npc info` und `/pf2 npc remove` wirken auf den NPC, den du ansiehst (bis 16 Blöcke), sonst auf den
 ausgewählten; `/pf2 npc hp <Wert>` setzt die TP des ausgewählten NPCs. Pro Welt sind höchstens 200 NPCs erlaubt.
 
-**Besiegte NPCs:** Bei 0 TP legt sich ein NPC auf den Boden.
+**Besiegte NPCs:** Bei 0 TP legt sich ein NPC auf den Boden und scheidet aus der Kampfreihenfolge aus.
 
 Hinweis: Blockklicks in der Spawn-Schutzzone des Servers (`spawn-protection`) erreichen die Mod bei Spielern ohne OP nicht.
+
+### Kampf
+
+**Starten (Spielleiter):** `/pf2 tools` gibt die **Kampfglocke**. Rechtsklick in die Luft öffnet das Kampf-Fenster
+mit allen Charakteren und NPCs im Umkreis von 32 Blöcken. Teilnehmer an- oder abhaken, bei Bedarf über
+„+ NPC hinzufügen…“ einen Gegner erzeugen (danach die Glocke erneut benutzen), dann **Initiative würfeln**.
+Die Initiative ist W20 + Wahrnehmung; bei Gleichstand kommt der NPC vor dem Spieler, danach entscheidet die Wahrnehmung.
+Im laufenden Kampf zeigt das Fenster die Teilnehmer: **Zug überspringen**, **Kampf beenden** (zweiter Klick bestätigt),
+✕ nimmt einen Teilnehmer heraus, nicht beteiligte lassen sich hinzufügen.
+
+**Anzeige:** Die Initiative-Leiste oben zeigt die Reihenfolge (wer dran ist, größer links) und die Runde. Spieler sehen bei
+NPCs nur „unverletzt“, „verletzt“ oder „schwer verletzt“, der Spielleiter die Zahlen. Eine Zeile zeigt Aktionen (◆),
+Reaktion und Bewegung (Blöcke); ist man dran, erscheint „Du bist dran“. Statt der Herzen und des Hungers zeigt die
+Mod bei Spielern mit Charakter „TP: x/y“. Vanilla-Schaden, -Tod und -Hunger sind für alle Spieler abgeschaltet
+(außer `/kill` und dem Void).
+
+**Dein Zug:** 3 Aktionen und 1 Reaktion pro Zug. Wer nicht dran ist, ist eingefroren: Bewegung wird zurückgesetzt, Blöcke
+abbauen, setzen, benutzen und Interaktionen mit Entities sind gesperrt. Bewegung wird in Blöcken gezählt (1 Block = 5 ft):
+der erste Schritt beginnt ein Schreiten (1 Aktion) von Geschwindigkeit/5 Blöcken, danach ein weiteres, solange Aktionen übrig sind.
+Mit **Enter** (änderbar unter Steuerung → PF2 Craft) beendest du den Zug.
+
+**Angriff:** Waffe deines Charakters in die Haupthand nehmen und auf deinem Zug einen NPC **links anklicken**. Im Fenster wählst du
+den **1., 2. oder 3. Angriff** (der Mehrfachangriffsmalus ist eingerechnet, der passende Vorschlag ist hervorgehoben, jeder
+kann gewählt werden). Das Ergebnis („Treffer“, „kritisch“, „verfehlt“ …) und der verursachte Schaden gehen an alle;
+RK, Wurf und TP des Ziels sieht nur der Spielleiter. Der Schaden wird nach Art berechnet (kritisch verdoppelt) mit Resistenzen,
+Schwächen und Immunitäten; Runen wie flaming, frost, shock, corrosive und thundering geben +1W6. Es gelten Reichweiten
+für Nah- und Fernkampf. Unbekannte Verteidigungsarten (z. B. Kaltes Eisen) werden dem Spielleiter gemeldet, aber nicht angewendet.
+
+**NPC-Züge (Spielleiter):** Ist ein NPC dran, wähle ihn mit dem Befehlsstab. Rechtsklick auf einen Block lässt ihn laufen
+(in Schreiten bezahlt), Rechtsklick auf ein Ziel öffnet das Angriffsfenster mit den Angriffen des Monsters.
+
+**0 TP:** Ein NPC gilt als besiegt (legt sich hin, scheidet aus). Ein Spieler wird inaktiv (eingefroren und übersprungen);
+Sterbend und Wiederherstellungswurf kommen mit Teil 5. Der Kampf endet nur automatisch, wenn niemand mehr aktiv ist;
+sonst erhalten Spielleiter den Hinweis „Der Kampf kann beendet werden“.
+
+**Ersatzbefehle:** siehe die `/pf2 combat …`-Zeilen in der Befehlstabelle. Der Kampf wird nicht gespeichert und endet beim Serverneustart.
+Einen Kämpfer an eine andere Stelle setzt der Spielleiter mit `/pf2 combat anchor`; ein `/tp` allein wird zurückgesetzt.
 
 ### Bekannte Grenzen
 - Taste **C** kollidiert mit der Vanilla-Belegung „Hotbar-Aktivator speichern“; eine der beiden Tasten unter Steuerung umbelegen.
 - Talente werden nur mit Namen geführt, ihre Effekte werden nicht berechnet.
 - Auswahlbasierte Klassenverbesserungen (z. B. Doktrinen, Waffenmeisterschaft, Wissensränge) muss der Spielleiter setzen.
 - Zauber und Inventar gibt es noch nicht.
+- Kampf: keine Reaktionen (Reaktiver Schlag, Schild blocken), kein Aktionsmenü (Schild heben, Umstoßen … kommt mit Teil 4),
+  keine Zustände, kein Sterbend/Wiederherstellungswurf (Teil 5), keine Zauber.
+- Es gibt keine Sichtlinienprüfung; Munition und Nachladen werden nicht erzwungen.
+- Der Kampf endet bei einem Serverneustart; ein `/tp` eines Kämpfers wird zurückgesetzt (außer mit `/pf2 combat anchor`).
+- Das Einfrieren wurde nur mit Test-Bots geprüft; auf echten Clients kann es ruckeln (Rubber-Banding).
 - Die Bezeichnungen der Würfe im Chat sind englisch.
 - Steigt der INT-Modifikator, muss der Spielleiter die zusätzliche trainierte Fertigkeit von Hand setzen.
 - Die geführte Charaktererschaffung im Spiel fehlt noch; Charaktere kommen aus Pathbuilder.
-- NPCs tun von selbst nichts und sind noch nicht im Kampf einsetzbar (kommt mit dem Kampfkern, Phase 3 Teil 3).
+- NPCs handeln nicht von selbst, der Spielleiter steuert sie mit dem Befehlsstab.
 - Das NPC-Modell ist ein Platzhalter (Dorfbewohner).
 - Angriffsboni (Strikes) lassen sich im Werte-Fenster noch nicht ändern.
 - Zusatzeffekte wie Ergreifen (Grab) oder anhaltender Schaden sind nur Namen bzw. Hinweise, ohne Regelwirkung.
@@ -124,7 +175,7 @@ Hinweis: Blockklicks in der Spawn-Schutzzone des Servers (`spawn-protection`) er
 ## Projektstruktur
 
 ```
-core/    Regelkern in reinem Java (Würfel, Erfolgsgrade, Charaktere, Klassen-Aufstieg, Gegenstandskatalog …), ohne Minecraft, mit Unit-Tests
+core/    Regelkern in reinem Java (Würfel, Erfolgsgrade, Charaktere, Klassen-Aufstieg, Gegenstandskatalog, Kampf …), ohne Minecraft, mit Unit-Tests
 fabric/  die eigentliche Mod: Netzwerk, Befehle, Würfelfenster, HUD, Charakterbogen
 ```
 
@@ -147,7 +198,7 @@ Der Regelkern wird direkt in die Mod-Jar kompiliert.
 3. Kampfmodus (in Teilen):
    - ✅ Teil 1: Waffen und Schilde als Gegenstände
    - ✅ Teil 2: NPCs mit Monster-Core-Werten und Befehlsstab (gebaut, Ingame-Test steht aus)
-   - Teil 3: Kampfkern (Initiative, 3 Aktionen + Reaktion, Angriffe, Mehrfachangriffsmalus)
+   - ✅ Teil 3: Kampfkern (Initiative, 3 Aktionen + Reaktion, Angriffe, Mehrfachangriffsmalus; gebaut, Ingame-Test steht aus)
    - Teil 4: Aktionsmenü
    - Teil 5: Zustände
 4. NPC-Steuerung im Kampf und „Übernehmen“ durch den GM
