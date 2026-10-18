@@ -5,7 +5,7 @@ package de.pf2craft.core.combat;
  * The service creates a budget (or calls {@link #reset()}) for every turn.
  */
 public final class MovementBudget {
-    private static final double EPSILON = 1e-6;
+    public static final double EPSILON = 1e-6;
 
     private final int blocksPerStride;
     private double remainingInStride;
@@ -24,6 +24,14 @@ public final class MovementBudget {
 
     /** Forgets the current Stride; the next move costs an action again. */
     public void reset() {
+        remainingInStride = 0;
+    }
+
+    /**
+     * Another action (an attack) interrupts the Stride: leftover distance is lost and the next move starts a new
+     * Stride, which costs an action.
+     */
+    public void interrupt() {
         remainingInStride = 0;
     }
 

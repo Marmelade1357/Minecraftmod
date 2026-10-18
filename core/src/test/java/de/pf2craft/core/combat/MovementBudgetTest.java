@@ -138,4 +138,28 @@ class MovementBudgetTest {
         assertFalse(new MovementBudget(0).payWalk(2, turn));
         assertEquals(3, turn.actionsLeft());
     }
+
+    @Test
+    void interruptLosesTheRestOfTheStride() {
+        TurnState turn = new TurnState();
+        MovementBudget budget = new MovementBudget(25);
+        assertTrue(budget.tryMove(2, turn));
+        assertEquals(3.0, budget.remainingInStride(), 1e-9);
+        budget.interrupt();
+        assertEquals(0.0, budget.remainingInStride(), 1e-9);
+        assertEquals(2, turn.actionsLeft());
+        assertTrue(budget.tryMove(1, turn)); // a new Stride: one more action
+        assertEquals(1, turn.actionsLeft());
+        assertEquals(4.0, budget.remainingInStride(), 1e-9);
+    }
+
+    @Test
+    void interruptWithoutActionsBlocksMovement() {
+        TurnState turn = new TurnState();
+        MovementBudget budget = new MovementBudget(25);
+        assertTrue(budget.tryMove(1, turn));
+        turn.spendActions(2);
+        budget.interrupt();
+        assertFalse(budget.tryMove(1, turn));
+    }
 }
