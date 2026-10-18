@@ -4,6 +4,7 @@ import de.pf2craft.Pf2Craft;
 import de.pf2craft.core.monster.NpcJson;
 import de.pf2craft.core.monster.NpcStats;
 import net.minecraft.entity.EntityPose;
+import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.passive.VillagerEntity;
@@ -12,7 +13,9 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
 /**
@@ -58,6 +61,18 @@ public class NpcEntity extends VillagerEntity {
             return;
         }
         updatePose();
+    }
+
+    @Override
+    protected Box calculateBoundingBox() {
+        // A defeated NPC lies down visually (SLEEPING pose, whose own hitbox is tiny) but keeps the standing
+        // hitbox so it stays targetable. LivingEntity.getDimensions is final, hence this hook.
+        return getDimensions(EntityPose.STANDING).getBoxAt(getPos());
+    }
+
+    @Override
+    public void onStruckByLightning(ServerWorld world, LightningEntity lightning) {
+        // Vanilla would turn a villager into a witch.
     }
 
     @Override

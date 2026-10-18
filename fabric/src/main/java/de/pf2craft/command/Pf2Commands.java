@@ -107,7 +107,7 @@ public final class Pf2Commands {
         }
         NpcEntity npc = NpcService.spawn(gm, data.get());
         ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.npc.spawned",
-                "Spawned %s.", npc.stats().displayName()), true);
+                "Spawned %s.", npc.stats().displayName()), false);
         return 1;
     }
 

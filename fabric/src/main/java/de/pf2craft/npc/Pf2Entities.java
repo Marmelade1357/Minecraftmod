@@ -13,6 +13,7 @@ public final class Pf2Entities {
     public static final EntityType<NpcEntity> NPC = Registry.register(Registries.ENTITY_TYPE, Pf2Craft.id("npc"),
             EntityType.Builder.create(NpcEntity::new, SpawnGroup.MISC)
                     .dimensions(0.6f, 1.95f)
+                    .eyeHeight(1.62f)
                     .maxTrackingRange(10)
                     .build("npc"));
 
