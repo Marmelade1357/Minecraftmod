@@ -76,4 +76,31 @@ class MovementBudgetTest {
         assertFalse(turn.spendActions(4));
         assertEquals(3, turn.actionsLeft());
     }
+
+    @Test
+    void tenthBlockStepsAreNotBrokenByRounding() {
+        TurnState turn = new TurnState();
+        MovementBudget budget = new MovementBudget(25);
+        for (int i = 0; i < 50; i++) {
+            assertTrue(budget.tryMove(0.1, turn));
+        }
+        assertEquals(2, turn.actionsLeft());
+        assertTrue(budget.tryMove(0.1, turn));
+        assertEquals(1, turn.actionsLeft());
+    }
+
+    @Test
+    void resetMakesNextMoveCostAnAction() {
+        TurnState turn = new TurnState();
+        MovementBudget budget = new MovementBudget(25);
+        assertTrue(budget.tryMove(1, turn));
+        budget.reset();
+        assertTrue(budget.tryMove(1, turn));
+        assertEquals(1, turn.actionsLeft());
+    }
+
+    @Test
+    void stridesNeededAtSpeedZero() {
+        assertEquals(Integer.MAX_VALUE, new MovementBudget(0).stridesNeededFor(3));
+    }
 }

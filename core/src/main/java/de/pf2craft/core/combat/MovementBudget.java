@@ -1,7 +1,12 @@
 package de.pf2craft.core.combat;
 
-/** Tracks movement within Strides: 1 block = 5 ft, each new Stride costs one action. */
+/**
+ * Tracks movement within Strides: 1 block = 5 ft, each new Stride costs one action.
+ * The service creates a budget (or calls {@link #reset()}) for every turn.
+ */
 public final class MovementBudget {
+    private static final double EPSILON = 1e-6;
+
     private final int blocksPerStride;
     private double remainingInStride;
 
@@ -17,6 +22,11 @@ public final class MovementBudget {
         return remainingInStride;
     }
 
+    /** Forgets the current Stride; the next move costs an action again. */
+    public void reset() {
+        remainingInStride = 0;
+    }
+
     /** Moves {@code blocks}; starts a new Stride (one action) when the current one is used up. */
     public boolean tryMove(double blocks, TurnState turn) {
         if (blocks <= 0) {
@@ -25,7 +35,7 @@ public final class MovementBudget {
         if (blocksPerStride == 0) {
             return false;
         }
-        if (remainingInStride <= 0) {
+        if (remainingInStride <= EPSILON) {
             if (!turn.spendActions(1)) {
                 return false;
             }

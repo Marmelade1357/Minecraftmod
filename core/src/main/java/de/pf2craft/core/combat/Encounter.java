@@ -42,7 +42,10 @@ public final class Encounter {
         }
     }
 
-    /** Fixes the pointer on the highest-initiative active entry; later adds do not move it. */
+    /**
+     * Fixes the pointer on the highest-initiative active entry; later adds do not move it.
+     * Idempotent: does nothing once started (or while no entry is active).
+     */
     public void start() {
         if (started) {
             return;
@@ -61,8 +64,8 @@ public final class Encounter {
         return List.copyOf(entries);
     }
 
+    /** The combatant whose turn it is; read-only, empty before {@link #start()}. */
     public Optional<Combatant> current() {
-        start();
         if (!started || currentGone || cursor >= entries.size()) {
             return Optional.empty();
         }
@@ -102,12 +105,21 @@ public final class Encounter {
         }
     }
 
-    /** Moves to the next active combatant (wrapping starts a new round) with a fresh turn state. */
+    /**
+     * Moves to the next active combatant (wrapping starts a new round) with a fresh turn state.
+     * On a not-yet-started encounter it acts as {@link #start()} and returns the first active one.
+     * When it returns empty nobody is active: the service must end the encounter (the cursor
+     * still points at the old entry and state is unchanged).
+     */
     public Optional<Combatant> advance() {
         if (!hasActiveAny()) {
             return Optional.empty();
         }
-        start();
+        if (!started) {
+            start();
+            turn = new TurnState();
+            return current();
+        }
         int n = entries.size();
         int from = currentGone ? cursor : cursor + 1;
         for (int i = 0; i < n; i++) {

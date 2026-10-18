@@ -126,4 +126,65 @@ class EncounterTest {
         assertFalse(e.hasActive(true));
         assertTrue(e.hasActive(false));
     }
+
+    @Test
+    void advanceBeforeStartReturnsFirst() {
+        Encounter e = new Encounter();
+        e.add(player("a", 0), 20);
+        e.add(player("b", 0), 10);
+        assertEquals("a", e.advance().orElseThrow().id());
+        assertEquals(1, e.round());
+        assertEquals(3, e.turn().actionsLeft());
+        assertEquals("b", e.advance().orElseThrow().id());
+    }
+
+    @Test
+    void currentIsEmptyBeforeStart() {
+        Encounter e = new Encounter();
+        e.add(player("a", 0), 20);
+        assertTrue(e.current().isEmpty());
+    }
+
+    @Test
+    void addsBeforeStartDoNotFreezePointer() {
+        Encounter e = new Encounter();
+        e.add(player("A", 0), 10);
+        assertTrue(e.current().isEmpty());
+        e.add(player("B", 0), 20);
+        e.start();
+        assertEquals("B", e.current().orElseThrow().id());
+        e.start();
+        assertEquals("B", e.current().orElseThrow().id());
+    }
+
+    @Test
+    void advanceOnEmptyEncounterIsEmpty() {
+        assertTrue(new Encounter().advance().isEmpty());
+    }
+
+    @Test
+    void duplicateIdThrows() {
+        Encounter e = new Encounter();
+        e.add(player("a", 0), 10);
+        assertThrows(IllegalArgumentException.class, () -> e.add(player("a", 0), 5));
+    }
+
+    @Test
+    void deactivatedCurrentIsSkippedAndReactivatedPickedUpNextPass() {
+        Encounter e = three();
+        e.setActive("a", false);
+        assertEquals("b", e.advance().orElseThrow().id());
+        assertEquals("c", e.advance().orElseThrow().id());
+        e.setActive("a", true);
+        assertEquals("a", e.advance().orElseThrow().id());
+        assertEquals(2, e.round());
+    }
+
+    @Test
+    void deactivateCurrentThenAdvance() {
+        Encounter e = three();
+        e.setActive("a", false);
+        assertEquals("b", e.advance().orElseThrow().id());
+        assertEquals(1, e.round());
+    }
 }
