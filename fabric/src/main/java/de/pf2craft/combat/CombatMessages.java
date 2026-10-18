@@ -97,6 +97,10 @@ final class CombatMessages {
         return Text.translatableWithFallback("pf2craft.combat.not_your_turn", "It is not your turn.");
     }
 
+    static MutableText noActions() {
+        return Text.translatableWithFallback("pf2craft.combat.no_actions", "You have no actions left to move.");
+    }
+
     static MutableText alreadyRunning() {
         return Text.translatableWithFallback("pf2craft.combat.already_running", "A combat is already running.");
     }

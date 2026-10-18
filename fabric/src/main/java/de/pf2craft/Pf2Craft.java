@@ -5,6 +5,7 @@ import de.pf2craft.character.CharacterStore;
 import de.pf2craft.character.ClassData;
 import de.pf2craft.character.SheetService;
 import de.pf2craft.combat.CombatService;
+import de.pf2craft.combat.Enforcement;
 import de.pf2craft.command.Pf2Commands;
 import de.pf2craft.item.ItemData;
 import de.pf2craft.item.Pf2Items;
@@ -55,6 +56,7 @@ public class Pf2Craft implements ModInitializer {
         // The staff is a tool, not a weapon: hitting anything with it does nothing.
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hit) ->
                 player.getStackInHand(hand).isOf(Pf2Items.COMMAND_STAFF) ? ActionResult.FAIL : ActionResult.PASS);
+        Enforcement.register();
         Pf2Networking.registerPayloads();
         Pf2Networking.registerServerReceivers();
         CommandRegistrationCallback.EVENT.register(Pf2Commands::register);

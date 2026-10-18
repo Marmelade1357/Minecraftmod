@@ -78,6 +78,7 @@ public final class CombatService {
         server = null;
         DEFEATED.clear();
         budget = new MovementBudget(FALLBACK_SPEED);
+        Enforcement.onCombatEnded();
     }
 
     // ---- candidates ------------------------------------------------------------------------------------------
@@ -172,6 +173,7 @@ public final class CombatService {
         ServerPlayerEntity removedPlayer = server.getPlayerManager().getPlayer(uuid);
         encounter.remove(id);
         DEFEATED.remove(id);
+        Enforcement.onLeft(uuid);
         for (ServerPlayerEntity r : audience) {
             r.sendMessage(CombatMessages.removed(name), false);
         }
@@ -427,6 +429,7 @@ public final class CombatService {
         List<ServerPlayerEntity> audience = recipients(exclude);
         encounter = null;
         DEFEATED.clear();
+        Enforcement.onCombatEnded();
         Pf2Craft.LOGGER.info("Combat ended");
         for (ServerPlayerEntity r : audience) {
             r.sendMessage(CombatMessages.ended(), false);

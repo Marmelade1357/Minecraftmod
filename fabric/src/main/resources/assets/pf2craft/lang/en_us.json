@@ -236,6 +236,7 @@
   "pf2craft.combat.no": "no",
   "pf2craft.combat.not_running": "No combat is running.",
   "pf2craft.combat.not_gm": "Only a game master can do that.",
+  "pf2craft.combat.no_actions": "You have no actions left to move.",
   "pf2craft.combat.not_your_turn": "It is not your turn.",
   "pf2craft.combat.already_running": "A combat is already running.",
   "pf2craft.combat.no_participants": "Nobody can fight: no characters or NPCs were found.",
