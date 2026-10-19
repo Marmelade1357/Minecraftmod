@@ -237,11 +237,12 @@ public final class Enforcement {
                 continue;
             }
             present.add(id);
-            if (e.active() && e.combatant().id().equals(current)) {
+            if (e.active() && e.combatant().id().equals(current)
+                    && ConditionService.canAct(e.combatant().id())) {
                 ANCHORS.remove(id);
                 moveCurrent(p);
             } else {
-                hold(p);
+                hold(p); // also the current player while unconscious or dying: no walking away
             }
         }
         ANCHORS.keySet().retainAll(present);
