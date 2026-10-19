@@ -13,6 +13,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Language;
@@ -35,6 +36,10 @@ public final class CombatHud {
     private static final int COLOR_GREY = 0xFF808080;
     private static final int COLOR_WHITE = 0xFFFFFFFF;
     private static final int COLOR_CONDITION = 0xFFFFC800;
+    /** Distance of the TP line from the bottom edge (just above the hotbar, where the hearts were). */
+    private static final int HEALTH_Y = 39;
+    private static final int LINE_STEP = 12;
+    private static final int EDGE_MARGIN = 8;
 
     private CombatHud() {
     }
@@ -62,10 +67,12 @@ public final class CombatHud {
         int height = context.getScaledWindowHeight();
 
         Optional<ClientSheets.Synced> own = ownSheet(client);
-        if (replacesVanillaHealth()) {
-            drawHealth(context, font, own.get().sheet(), width / 2 - 91, height - 39);
-        }
         Optional<CombatSyncPayload> combat = ClientCombat.get();
+        // Outside a combat the TP text sits where the hearts were; during one it follows the HUD anchor.
+        ClientActions.HudAnchor anchor = combat.isPresent() ? ClientActions.hudAnchor() : ClientActions.HudAnchor.CENTER;
+        if (replacesVanillaHealth()) {
+            drawHealth(context, font, own.get().sheet(), anchor, width, height - HEALTH_Y);
+        }
         if (combat.isEmpty()) {
             return;
         }
@@ -79,11 +86,33 @@ public final class CombatHud {
             context.getMatrices().scale(1.5f, 1.5f, 1);
             context.drawCenteredTextWithShadow(font, banner, 0, 0, COLOR_WHITE);
             context.getMatrices().pop();
-            drawActions(context, font, state, own.map(s -> s.sheet().speed()).orElse(0), width, height);
+            drawActions(context, font, state, own.map(s -> s.sheet().speed()).orElse(0), anchor, width, height);
         }
     }
 
-    private static void drawHealth(DrawContext context, TextRenderer font, CharacterSheet sheet, int x, int y) {
+    /**
+     * Draws one HUD line. CENTER keeps the classic layout (centered text, or left edge of the hotbar for the TP
+     * text); RIGHT and LEFT put the text 8 px from the screen edge, trimmed so it never leaves the screen.
+     */
+    private static void drawAnchored(DrawContext context, TextRenderer font, Text text, ClientActions.HudAnchor anchor,
+                                     int screenW, int y, int centerX, boolean centerAligned) {
+        if (anchor == ClientActions.HudAnchor.CENTER) {
+            if (centerAligned) {
+                context.drawCenteredTextWithShadow(font, text, centerX, y, COLOR_WHITE);
+            } else {
+                context.drawTextWithShadow(font, text, centerX, y, COLOR_WHITE);
+            }
+            return;
+        }
+        int room = screenW - 2 * EDGE_MARGIN;
+        OrderedText ordered = Language.getInstance().reorder(font.getWidth(text) > room ? font.trimToWidth(text, room) : text);
+        int w = font.getWidth(ordered);
+        int x = anchor == ClientActions.HudAnchor.RIGHT ? screenW - EDGE_MARGIN - w : EDGE_MARGIN;
+        context.drawTextWithShadow(font, ordered, x, y, COLOR_WHITE);
+    }
+
+    private static void drawHealth(DrawContext context, TextRenderer font, CharacterSheet sheet,
+                                   ClientActions.HudAnchor anchor, int screenW, int y) {
         int max = CharacterMath.maxHp(sheet);
         int hp = sheet.currentHp();
         Formatting color = hp * 4 <= max ? Formatting.RED : hp * 2 <= max ? Formatting.YELLOW : Formatting.GREEN;
@@ -96,7 +125,7 @@ public final class CombatHud {
                         .append(conditions.formatted(Formatting.GOLD));
             }
         }
-        context.drawTextWithShadow(font, text, x, y, COLOR_WHITE);
+        drawAnchored(context, font, text, anchor, screenW, y, screenW / 2 - 91, false);
     }
 
     /** @return the y below the bar */
@@ -190,7 +219,7 @@ public final class CombatHud {
     }
 
     private static void drawActions(DrawContext context, TextRenderer font, CombatSyncPayload state, int speedFeet,
-                                    int screenW, int screenH) {
+                                    ClientActions.HudAnchor anchor, int screenW, int screenH) {
         int total = Math.max(3, state.actionsLeft());
         StringBuilder diamonds = new StringBuilder();
         for (int i = 0; i < total; i++) {
@@ -204,12 +233,16 @@ public final class CombatHud {
                 .formatted(state.reactionAvailable() ? Formatting.GREEN : Formatting.DARK_GRAY);
         MutableText line = Text.translatable("hud.pf2craft.combat.actions",
                 Text.literal(diamonds.toString()).formatted(Formatting.GOLD), reaction, movement);
-        context.drawCenteredTextWithShadow(font, line, screenW / 2, screenH - 75, COLOR_WHITE);
+        // Centered: the classic place above the hotbar. Right/left: stacked above the TP line at the screen edge.
+        boolean centered = anchor == ClientActions.HudAnchor.CENTER;
+        drawAnchored(context, font, line, anchor, screenW, screenH - (centered ? 75 : HEALTH_Y + LINE_STEP),
+                screenW / 2, true);
         if (!ClientActions.pending().isEmpty()) {
             Text hint = Text.translatable("hud.pf2craft.action.pending",
                     Text.translatable("pf2craft.combat.action.name." + ClientActions.pending()))
                     .formatted(Formatting.YELLOW);
-            context.drawCenteredTextWithShadow(font, hint, screenW / 2, screenH - 87, COLOR_WHITE);
+            drawAnchored(context, font, hint, anchor, screenW, screenH - (centered ? 87 : HEALTH_Y + 2 * LINE_STEP),
+                    screenW / 2, true);
         }
     }
 }

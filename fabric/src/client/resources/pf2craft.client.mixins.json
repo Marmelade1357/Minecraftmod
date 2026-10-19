@@ -4,6 +4,7 @@
   "package": "de.pf2craft.client.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "ChatHudMixin",
     "InGameHudMixin"
   ],
   "injectors": {
