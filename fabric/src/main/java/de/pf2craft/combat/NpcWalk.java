@@ -65,6 +65,7 @@ public final class NpcWalk {
             return;
         }
         CombatService.effects().onMoved(npc.getUuid().toString());
+        ConditionService.onGrabberMoved(npc.getUuid().toString());
         WALKS.put(npc.getUuid(), new Walk(length, npc.getPos()));
         npc.getNavigation().startMovingAlong(path, WALK_SPEED);
         CombatService.sync(null);

@@ -12,7 +12,10 @@ public final class BasicActions {
             new BasicAction("seek", 1, ActionKind.SELF, "perception", "", false, false, 0),
             new BasicAction("demoralize", 1, ActionKind.TARGET_RANGE, "intimidation", "will", false, false, 6),
             new BasicAction("trip", 1, ActionKind.TARGET_MELEE, "athletics", "reflex", true, false, 0),
-            new BasicAction("grapple", 1, ActionKind.TARGET_MELEE, "athletics", "fortitude", true, false, 0));
+            new BasicAction("grapple", 1, ActionKind.TARGET_MELEE, "athletics", "fortitude", true, false, 0),
+            new BasicAction("stand_up", 1, ActionKind.SELF, "", "", false, false, 0),
+            // The server rolls the better of athletics and acrobatics against the grabber's Fortitude DC.
+            new BasicAction("escape", 1, ActionKind.SELF, "athletics", "", false, false, 0));
 
     private BasicActions() {
     }

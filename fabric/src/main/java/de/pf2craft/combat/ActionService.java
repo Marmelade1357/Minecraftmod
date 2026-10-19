@@ -298,6 +298,17 @@ public final class ActionService {
         if (CombatService.turn().actionsLeft() < action.cost()) {
             return actorFail(sender, CombatMessages.actionNotEnough(action.cost()), interactive);
         }
+        if (action.id().equals("stand_up") && !ConditionService.of(actor.id()).has(Condition.PRONE)) {
+            return actorFail(sender, CombatMessages.notProne(), interactive);
+        }
+        if (action.id().equals("escape")) {
+            if (!ConditionService.of(actor.id()).has(Condition.GRABBED)) {
+                return actorFail(sender, CombatMessages.notGrabbed(), interactive);
+            }
+            if (escapeDc(sender.getServer(), actor).isEmpty()) {
+                return actorFail(sender, CombatMessages.actionNoDc(), interactive);
+            }
+        }
         if (action.needsShield() && shieldBonus(actor).isEmpty()) {
             return actorFail(sender, CombatMessages.noShield(), interactive);
         }
@@ -337,6 +348,28 @@ public final class ActionService {
             if (ref != null && ref.owner().equals(p.getUuid()) && ref.sheetStamp() == stamp) {
                 return OptionalInt.of(actor.sheet().shield().get().acBonus());
             }
+        }
+        return OptionalInt.empty();
+    }
+
+    /** The grabber's Fortitude DC for Escape; empty if nobody (known) holds the actor. */
+    private static OptionalInt escapeDc(MinecraftServer server, Actor actor) {
+        Optional<String> grabber = ConditionService.grabberOf(actor.id());
+        if (grabber.isEmpty()) {
+            return OptionalInt.empty();
+        }
+        Entity entity;
+        try {
+            entity = findEntity(server, UUID.fromString(grabber.get()));
+        } catch (IllegalArgumentException e) {
+            return OptionalInt.empty();
+        }
+        if (entity instanceof NpcEntity npc && npc.stats() != null) {
+            return ActionDcs.defenseDc(npc.stats().base(), "fortitude");
+        }
+        if (entity instanceof ServerPlayerEntity player) {
+            return CharacterStore.get(player).map(sh -> ActionDcs.defenseDc(sh, "fortitude"))
+                    .orElse(OptionalInt.empty());
         }
         return OptionalInt.empty();
     }
@@ -392,8 +425,15 @@ public final class ActionService {
         int total = 0;
         int map = 0;
         DegreeOfSuccess degree = null;
+        int escapeDc = 0;
         try {
-            if (!action.skill().isEmpty()) {
+            if (action.id().equals("escape")) {
+                escapeDc = escapeDc(sender.getServer(), actor).orElseThrow();
+                natural = RollService.rollQuiet("1d20").naturalD20().orElseThrow();
+                total = natural + Math.max(actor.skillBonus("athletics"), actor.skillBonus("acrobatics"))
+                        + ConditionEffects.checkPenalty(ConditionService.of(actor.id()));
+                degree = DegreeOfSuccess.determine(total, escapeDc, OptionalInt.of(natural));
+            } else if (!action.skill().isEmpty()) {
                 natural = RollService.rollQuiet("1d20").naturalD20().orElseThrow();
                 if (action.countsAsAttack()) {
                     map = AttackMath.mapPenalty(CombatService.turn().nextAttackNumber(), false);
@@ -441,6 +481,27 @@ public final class ActionService {
                 publicLines.add(CombatMessages.actionSay("seek", actor.name()));
                 gmLines.add(CombatMessages.actionGmSeek(natural, total));
             }
+            case "stand_up" -> {
+                CombatService.budget().interrupt();
+                publicLines.add(CombatMessages.actionSay("stand_up", actor.name()));
+                applyAfter = () -> ConditionService.remove(actor.id(), Condition.PRONE);
+            }
+            case "escape" -> {
+                CombatService.budget().interrupt();
+                String grabberName = ConditionService.grabberOf(actor.id()).map(ConditionService::nameOf)
+                        .orElse("?");
+                publicLines.add(CombatMessages.actionLine(actor.name(), "escape", grabberName, degree));
+                gmLines.add(CombatMessages.actionGmRoll(natural, total, escapeDc, 0));
+                if (degree.isSuccess()) {
+                    boolean crit = degree == DegreeOfSuccess.CRITICAL_SUCCESS;
+                    applyAfter = () -> {
+                        ConditionService.remove(actor.id(), Condition.GRABBED);
+                        if (crit) {
+                            CombatService.budget().grantStep(); // a critical success also allows a free Step
+                        }
+                    };
+                }
+            }
             default -> {
                 if (action.countsAsAttack()) {
                     CombatService.turn().recordAttack();
@@ -456,6 +517,7 @@ public final class ActionService {
                         case "demoralize" -> applyAfter = () -> ConditionService.add(targetId, Condition.FRIGHTENED,
                                 crit ? 2 : 1, "demoralize");
                         case "trip" -> applyAfter = () -> ConditionService.add(targetId, Condition.PRONE, 1, "trip");
+                        case "grapple" -> applyAfter = () -> ConditionService.grab(targetId, actor.id(), "grapple");
                         default -> { }
                     }
                 }

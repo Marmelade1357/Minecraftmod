@@ -291,6 +291,7 @@ public final class Enforcement {
             lastAccepted = pos;
             if (delta > EDGE) {
                 CombatService.effects().onMoved(p.getUuid().toString()); // leaving cover and the like
+                ConditionService.onGrabberMoved(p.getUuid().toString());
             }
             // The HUD shows whole blocks left in the stride: sync when that number or the actions change.
             if (CombatService.turn().actionsLeft() != before

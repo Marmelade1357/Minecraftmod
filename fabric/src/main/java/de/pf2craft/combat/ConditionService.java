@@ -7,8 +7,10 @@ import de.pf2craft.core.combat.Condition;
 import de.pf2craft.core.combat.ConditionEffects;
 import de.pf2craft.core.combat.ConditionSet;
 import de.pf2craft.core.combat.Encounter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
@@ -18,6 +20,8 @@ import net.minecraft.text.Text;
  */
 public final class ConditionService {
     private static final Map<String, ConditionSet> SETS = new HashMap<>();
+    /** Grabbed combatant id -> the id of the creature holding them. */
+    private static final Map<String, String> GRABBED_BY = new HashMap<>();
 
     private ConditionService() {
     }
@@ -29,11 +33,13 @@ public final class ConditionService {
 
     public static void clear(String id) {
         SETS.remove(id);
+        GRABBED_BY.entrySet().removeIf(e -> e.getKey().equals(id) || e.getValue().equals(id));
         DyingService.forget(id);
     }
 
     public static void clearAll() {
         SETS.clear();
+        GRABBED_BY.clear();
         DyingService.forgetAll();
     }
 
@@ -60,7 +66,33 @@ public final class ConditionService {
             return;
         }
         set.remove(condition);
+        if (condition == Condition.GRABBED) {
+            GRABBED_BY.remove(id);
+        }
         announce(id, condition, CombatMessages.conditionLost(nameOf(id), condition), 0, "removed");
+    }
+
+    /** {@code targetId} is now grabbed by {@code grabberId}. */
+    public static void grab(String targetId, String grabberId, String source) {
+        GRABBED_BY.put(targetId, grabberId);
+        add(targetId, Condition.GRABBED, 1, source);
+    }
+
+    /** The id of the creature holding {@code targetId}, if known. */
+    public static Optional<String> grabberOf(String targetId) {
+        return Optional.ofNullable(GRABBED_BY.get(targetId));
+    }
+
+    /** The grabber moved: everyone it held is free. */
+    public static void onGrabberMoved(String grabberId) {
+        if (!GRABBED_BY.containsValue(grabberId)) {
+            return;
+        }
+        for (String held : new ArrayList<>(GRABBED_BY.keySet())) {
+            if (GRABBED_BY.get(held).equals(grabberId)) {
+                remove(held, Condition.GRABBED);
+            }
+        }
     }
 
     /**

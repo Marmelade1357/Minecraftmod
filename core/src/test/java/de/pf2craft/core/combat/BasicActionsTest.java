@@ -9,8 +9,9 @@ import org.junit.jupiter.api.Test;
 
 class BasicActionsTest {
     @Test
-    void allHasTheSevenActions() {
-        assertEquals(List.of("step", "raise_shield", "take_cover", "seek", "demoralize", "trip", "grapple"),
+    void allHasTheNineActions() {
+        assertEquals(List.of("step", "raise_shield", "take_cover", "seek", "demoralize", "trip", "grapple",
+                        "stand_up", "escape"),
                 BasicActions.ALL.stream().map(BasicAction::id).toList());
     }
 
@@ -37,6 +38,18 @@ class BasicActionsTest {
     void raiseShieldNeedsShield() {
         assertTrue(BasicActions.byId("raise_shield").orElseThrow().needsShield());
         assertFalse(BasicActions.byId("step").orElseThrow().needsShield());
+    }
+
+    @Test
+    void standUpAndEscapeAreOneActionSelfActions() {
+        BasicAction standUp = BasicActions.byId("stand_up").orElseThrow();
+        assertEquals(1, standUp.cost());
+        assertEquals(ActionKind.SELF, standUp.kind());
+        assertEquals("", standUp.skill());
+        BasicAction escape = BasicActions.byId("escape").orElseThrow();
+        assertEquals(1, escape.cost());
+        assertEquals(ActionKind.SELF, escape.kind());
+        assertEquals("athletics", escape.skill());
     }
 
     @Test

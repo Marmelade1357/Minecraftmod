@@ -324,12 +324,22 @@ final class CombatMessages {
             case "demoralize" -> "Demoralize";
             case "trip" -> "Trip";
             case "grapple" -> "Grapple";
+            case "stand_up" -> "Stand Up";
+            case "escape" -> "Escape";
             default -> id;
         };
     }
 
     static MutableText actionName(String id) {
         return Text.translatableWithFallback("pf2craft.combat.action.name." + id, actionEnglish(id));
+    }
+
+    static MutableText notProne() {
+        return Text.translatableWithFallback("pf2craft.combat.not_prone", "You are not prone.");
+    }
+
+    static MutableText notGrabbed() {
+        return Text.translatableWithFallback("pf2craft.combat.not_grabbed", "You are not grabbed.");
     }
 
     static MutableText actionUnknown() {
@@ -377,6 +387,7 @@ final class CombatMessages {
             case "step" -> "%s takes a Step.";
             case "raise_shield" -> "%s raises a shield.";
             case "take_cover" -> "%s takes cover.";
+            case "stand_up" -> "%s stands up.";
             default -> "%s seeks.";
         };
         return Text.translatableWithFallback("pf2craft.combat.action.say." + actionId, english, actor)
@@ -439,9 +450,6 @@ final class CombatMessages {
                 if (degree == DegreeOfSuccess.CRITICAL_SUCCESS) {
                     key = "restrained";
                     english = "[GM] The target may be restrained.";
-                } else if (degree == DegreeOfSuccess.SUCCESS) {
-                    key = "grabbed";
-                    english = "[GM] The target may be grabbed.";
                 }
             }
             default -> { }
