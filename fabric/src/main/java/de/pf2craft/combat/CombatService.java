@@ -78,9 +78,28 @@ public final class CombatService {
     }
 
     private static final int AUTO_END_DELAY = 20;
+    /**
+     * Delay when every active combatant is unconscious or dying: each turn change then triggers an automatic
+     * recovery roll, so without a longer pause the rolls (and chat lines) would fly by several per second.
+     */
+    private static final int DOWNED_ONLY_DELAY = 60;
 
     private static String autoEndId;
     private static int autoEndAt;
+
+    /** True if at least one combatant is active and none of the active ones can act. */
+    private static boolean onlyDownedActive() {
+        boolean any = false;
+        for (Encounter.Entry e : encounter.order()) {
+            if (e.active()) {
+                if (ConditionService.canAct(e.combatant().id())) {
+                    return false;
+                }
+                any = true;
+            }
+        }
+        return any;
+    }
 
     /** Whether the current combatant has used up everything the turn offers (see tickAutoEnd). */
     private static boolean turnSpent(Combatant c) {
@@ -110,7 +129,7 @@ public final class CombatService {
         }
         if (!c.id().equals(autoEndId)) {
             autoEndId = c.id();
-            autoEndAt = nowTicks + AUTO_END_DELAY;
+            autoEndAt = nowTicks + (onlyDownedActive() ? DOWNED_ONLY_DELAY : AUTO_END_DELAY);
             return;
         }
         if (nowTicks < autoEndAt) {
