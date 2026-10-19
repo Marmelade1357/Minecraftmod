@@ -357,6 +357,8 @@
   "screen.pf2craft.action_menu.no_actions": "Keine Aktion übrig",
   "screen.pf2craft.action_menu.no_shield": "Kein Schild",
   "screen.pf2craft.action_menu.not_your_turn": "Nicht dein Zug",
+  "screen.pf2craft.action_menu.not_prone": "Nicht liegend",
+  "screen.pf2craft.action_menu.not_grabbed": "Nicht gepackt",
   "pf2craft.combat.cannot_act": "Du kannst gerade nicht handeln.",
   "pf2craft.condition.gained": "%s ist jetzt %s",
   "pf2craft.condition.lost": "%s ist nicht mehr %s",

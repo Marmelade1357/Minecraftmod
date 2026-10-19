@@ -2,6 +2,7 @@ package de.pf2craft.client;
 
 import de.pf2craft.core.combat.BasicAction;
 import de.pf2craft.core.combat.BasicActions;
+import de.pf2craft.core.combat.Condition;
 import de.pf2craft.network.ActionRequestPayload;
 import de.pf2craft.network.CombatSyncPayload;
 import java.util.ArrayList;
@@ -134,6 +135,14 @@ public class ActionMenuScreen extends Screen {
         }
         if (combat.get().actionsLeft() < action.cost()) {
             return Optional.of(Text.translatable("screen.pf2craft.action_menu.no_actions"));
+        }
+        // The sync carries the actor's conditions (own ones for a player, all of them for a GM).
+        var conditions = ClientConditions.of(actor.get());
+        if ("stand_up".equals(action.id()) && !conditions.containsKey(Condition.PRONE)) {
+            return Optional.of(Text.translatable("screen.pf2craft.action_menu.not_prone"));
+        }
+        if ("escape".equals(action.id()) && !conditions.containsKey(Condition.GRABBED)) {
+            return Optional.of(Text.translatable("screen.pf2craft.action_menu.not_grabbed"));
         }
         if (action.needsShield()) {
             boolean ownShield = client.player != null && actor.get().equals(client.player.getUuid())

@@ -357,6 +357,8 @@
   "screen.pf2craft.action_menu.no_actions": "No actions left",
   "screen.pf2craft.action_menu.no_shield": "No shield",
   "screen.pf2craft.action_menu.not_your_turn": "Not your turn",
+  "screen.pf2craft.action_menu.not_prone": "Not prone",
+  "screen.pf2craft.action_menu.not_grabbed": "Not grabbed",
   "pf2craft.combat.cannot_act": "You cannot act right now.",
   "pf2craft.condition.gained": "%s is now %s",
   "pf2craft.condition.lost": "%s is no longer %s",
