@@ -253,7 +253,7 @@ public final class Pf2Commands {
         return 1;
     }
 
-    /** Command path of "remove":game masters and level-2 operators alike, with feedback. */
+    /** Command path of "remove": game masters and level-2 operators alike, with feedback. */
     private static int removeFromCombat(CommandContext<ServerCommandSource> ctx, java.util.UUID id) {
         if (!CombatService.active()) {
             ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.combat.not_running",

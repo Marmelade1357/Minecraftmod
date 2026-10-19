@@ -37,6 +37,12 @@ public final class ConditionService {
     }
 
     public static void clear(String id) {
+        // a grabber that leaves the combat lets go of everyone it held (one line per held creature)
+        for (String held : new ArrayList<>(GRABBED_BY.keySet())) {
+            if (GRABBED_BY.get(held).equals(id) && !held.equals(id)) {
+                remove(held, Condition.GRABBED);
+            }
+        }
         SETS.remove(id);
         GRABBED_BY.entrySet().removeIf(e -> e.getKey().equals(id) || e.getValue().equals(id));
         DyingService.forget(id);
