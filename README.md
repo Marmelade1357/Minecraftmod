@@ -110,7 +110,7 @@ Monstersuche. Gespeicherte Vorlagen überschreiben nie ein eingebautes Monster: 
 dagegen.) Alle `*.json`-Dateien in diesem Ordner werden geladen.
 
 **Ersatzbefehle:** `/pf2 npc spawn <id>` (ohne Tab-Vervollständigung der IDs; besser das Stab-Fenster benutzen),
-`/pf2 npc info` und `/pf2 npc remove` wirken auf den NPC, den du ansiehst (bis 16 Blöcke, mit Stab/Glocke in der Hand bis 96), sonst auf den
+`/pf2 npc info` und `/pf2 npc remove` wirken auf den NPC, den du ansiehst (bis 16 Blöcke, mit Stab/Glocke in der Hand bis 64), sonst auf den
 ausgewählten; `/pf2 npc hp <Wert>` setzt die TP des ausgewählten NPCs. Pro Welt sind höchstens 200 NPCs erlaubt.
 
 **Besiegte NPCs:** Bei 0 TP legt sich ein NPC auf den Boden und scheidet aus der Kampfreihenfolge aus.
@@ -118,7 +118,7 @@ ausgewählten; `/pf2 npc hp <Wert>` setzt die TP des ausgewählten NPCs. Pro Wel
 Hinweis: Blockklicks in der Spawn-Schutzzone des Servers (`spawn-protection`) erreichen die Mod bei Spielern ohne OP nicht.
 
 **Fernreichweite:** Solange ein Spielleiter den Befehlsstab oder die Kampfglocke in der Hand hält, reichen seine Klicks
-auf Blöcke und Kreaturen **96 Blöcke** weit (nur für Spielleiter; mit jedem anderen Item gilt die normale Reichweite,
+auf Blöcke und Kreaturen **64 Blöcke** weit (das ist das Maximum, das Minecraft für die Reichweite zulässt) (nur für Spielleiter; mit jedem anderen Item gilt die normale Reichweite,
 Bauen und Abbauen bleiben unverändert). Ansehen/Auswählen, Hinlaufen und Angriffe gehen so aus der Ferne. Die
 Befehle `/pf2 npc …` und der Ersatz-Angriff nutzen dieselbe Reichweite. Wie weit NPCs sichtbar sind, hängt auch von der
 Sichtweite (`view-distance`) des Servers ab. Tipp: im Kreativmodus über dem Kampf fliegen.
@@ -163,7 +163,7 @@ sonst erhalten Spielleiter den Hinweis „Der Kampf kann beendet werden“.
 **Ersatzbefehle:** siehe die `/pf2 combat …`-Zeilen in der Befehlstabelle. Der Kampf wird nicht gespeichert und endet beim Serverneustart.
 Einen Kämpfer an eine andere Stelle setzt der Spielleiter mit `/pf2 combat anchor`; ein `/tp` allein wird zurückgesetzt.
 
-**Fernreichweite:** Mit der Kampfglocke oder dem Befehlsstab in der Hand reichen GM-Klicks 96 Blöcke weit (siehe Befehlsstab). Das Kampf-Fenster und `/pf2 combat start|add` erfassen Kämpfer im Umkreis von 96 Blöcken.
+**Fernreichweite:** Mit der Kampfglocke oder dem Befehlsstab in der Hand reichen GM-Klicks 64 Blöcke weit (siehe Befehlsstab). Das Kampf-Fenster und `/pf2 combat start|add` erfassen Kämpfer im Umkreis von 96 Blöcken.
 
 ### Bekannte Grenzen
 - Taste **C** kollidiert mit der Vanilla-Belegung „Hotbar-Aktivator speichern“; eine der beiden Tasten unter Steuerung umbelegen.

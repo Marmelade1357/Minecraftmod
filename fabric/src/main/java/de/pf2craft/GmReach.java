@@ -14,7 +14,7 @@ import net.minecraft.util.Identifier;
 /**
  * Long interaction range for GMs while they hold the command staff or the combat bell, so they can fly
  * over a fight. Implemented with temporary (unsaved) attribute modifiers; vanilla's own server-side
- * reach check then accepts the far clicks. Independent of the combat reach in CombatService.
+ * reach check then accepts the far clicks. Vanilla clamps both attributes to 64, so the effective reach is 64. Independent of the combat reach in CombatService.
  */
 public final class GmReach {
     public static final double BONUS = 96.0;
