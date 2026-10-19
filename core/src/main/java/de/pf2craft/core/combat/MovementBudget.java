@@ -9,6 +9,7 @@ public final class MovementBudget {
 
     private final int blocksPerStride;
     private double remainingInStride;
+    private boolean inStep;
 
     public MovementBudget(int speedFeet) {
         this.blocksPerStride = speedFeet > 0 ? Math.max(1, speedFeet / 5) : 0;
@@ -25,6 +26,7 @@ public final class MovementBudget {
     /** Forgets the current Stride; the next move costs an action again. */
     public void reset() {
         remainingInStride = 0;
+        inStep = false;
     }
 
     /**
@@ -33,6 +35,19 @@ public final class MovementBudget {
      */
     public void interrupt() {
         remainingInStride = 0;
+        inStep = false;
+    }
+
+    /**
+     * A Step: exactly one block, no action spent here (the caller pays it). Moving those blocks does not charge a
+     * Stride. A larger running Stride remainder is never shrunk.
+     */
+    public void grantStep() {
+        if (remainingInStride > 1 + EPSILON) {
+            return;
+        }
+        remainingInStride = 1;
+        inStep = true;
     }
 
     /** Moves {@code blocks}; starts a new Stride (one action) when the current one is used up. */
@@ -44,6 +59,7 @@ public final class MovementBudget {
             return false;
         }
         if (remainingInStride <= EPSILON) {
+            inStep = false; // the step block is used up
             if (!turn.spendActions(1)) {
                 return false;
             }

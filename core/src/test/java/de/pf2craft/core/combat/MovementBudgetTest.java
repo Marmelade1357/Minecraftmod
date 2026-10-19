@@ -162,4 +162,49 @@ class MovementBudgetTest {
         budget.interrupt();
         assertFalse(budget.tryMove(1, turn));
     }
+
+    @Test
+    void stepGivesExactlyOneBlock() {
+        TurnState turn = new TurnState();
+        MovementBudget budget = new MovementBudget(25);
+        budget.grantStep();
+        assertTrue(budget.tryMove(0.5, turn));
+        assertTrue(budget.tryMove(0.5, turn));
+        assertEquals(3, turn.actionsLeft());
+        assertTrue(budget.tryMove(0.5, turn)); // a normal Stride starts and costs an action
+        assertEquals(2, turn.actionsLeft());
+        assertEquals(4.5, budget.remainingInStride(), 1e-9);
+    }
+
+    @Test
+    void stepDoesNotBreakRunningStride() {
+        TurnState turn = new TurnState();
+        MovementBudget budget = new MovementBudget(25);
+        assertTrue(budget.tryMove(2, turn));
+        assertEquals(3.0, budget.remainingInStride(), 1e-9);
+        budget.grantStep();
+        assertEquals(3.0, budget.remainingInStride(), 1e-9);
+    }
+
+    @Test
+    void stepAfterInterruptGivesOneBlock() {
+        TurnState turn = new TurnState();
+        MovementBudget budget = new MovementBudget(25);
+        assertTrue(budget.tryMove(2, turn));
+        budget.interrupt();
+        budget.grantStep();
+        assertEquals(1.0, budget.remainingInStride(), 1e-9);
+        assertTrue(budget.tryMove(1, turn));
+        assertEquals(2, turn.actionsLeft());
+    }
+
+    @Test
+    void interruptClearsTheStepMarker() {
+        TurnState turn = new TurnState();
+        MovementBudget budget = new MovementBudget(25);
+        budget.grantStep();
+        budget.interrupt();
+        assertTrue(budget.tryMove(1, turn));
+        assertEquals(2, turn.actionsLeft());
+    }
 }
