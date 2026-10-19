@@ -3,12 +3,14 @@ package de.pf2craft.character;
 import de.pf2craft.GmRoles;
 import de.pf2craft.combat.CombatService;
 import de.pf2craft.combat.DyingService;
+import de.pf2craft.combat.ConditionService;
 import de.pf2craft.core.character.Ability;
 import de.pf2craft.core.character.CharacterJson;
 import de.pf2craft.core.character.CharacterMath;
 import de.pf2craft.core.character.CharacterSheet;
 import de.pf2craft.core.character.CheckId;
 import de.pf2craft.core.character.GmEdit;
+import de.pf2craft.core.combat.ConditionEffects;
 import de.pf2craft.core.dice.DiceParseException;
 import de.pf2craft.core.progression.InvalidChoiceException;
 import de.pf2craft.core.progression.LevelUp;
@@ -138,7 +140,12 @@ public final class SheetService {
         if (bonus.isEmpty() || !RollService.checkCooldown(player)) {
             return;
         }
-        String expression = "1d20" + (bonus.getAsInt() >= 0 ? "+" : "") + bonus.getAsInt();
+        int total = bonus.getAsInt();
+        if (CombatService.active() && CombatService.contains(player.getUuid())) {
+            // frightened and other status penalties apply to the player's own checks during a combat
+            total += ConditionEffects.checkPenalty(ConditionService.of(player.getUuid().toString()));
+        }
+        String expression = "1d20" + (total >= 0 ? "+" : "") + total;
         try {
             RollService.roll(player.getServer(), player, player.getName().getString(), expression,
                     id.get().label(sheet.get()), secret);
