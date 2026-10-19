@@ -87,9 +87,10 @@ public final class CombatService {
         if (encounter.turn().actionsLeft() != 0) {
             return false;
         }
-        if (c.npc()) {
-            return !NpcWalk.walking(UUID.fromString(c.id())); // the walk is paid up front, but must finish first
+        if (c.npc() && NpcWalk.walking(UUID.fromString(c.id()))) {
+            return false; // the walk is paid up front, but must finish first
         }
+        // An unused rest of a Stride or a granted Step block keeps the turn open (same for players and NPCs).
         return budget.remainingInStride() <= MovementBudget.EPSILON;
     }
 

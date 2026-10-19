@@ -296,6 +296,9 @@ public final class ActionService {
         if (action.needsShield() && shieldBonus(actor).isEmpty()) {
             return actorFail(sender, CombatMessages.noShield(), interactive);
         }
+        if (action.needsShield() && CombatService.effects().sources(actor.id()).contains("raise_shield")) {
+            return actorFail(sender, CombatMessages.shieldAlreadyRaised(), interactive);
+        }
         return actor;
     }
 
@@ -408,9 +411,8 @@ public final class ActionService {
         List<Text> gmLines = new ArrayList<>();
         switch (action.id()) {
             case "step" -> {
-                if (actor.npc() == null) {
-                    CombatService.budget().grantStep(); // the block is free of Stride costs
-                } else {
+                CombatService.budget().grantStep(); // the block is free of Stride costs (NPCs walk it via NpcWalk)
+                if (actor.npc() != null) {
                     gmLines.add(CombatMessages.actionGmNpcStep(actor.name()));
                 }
                 publicLines.add(CombatMessages.actionSay("step", actor.name()));

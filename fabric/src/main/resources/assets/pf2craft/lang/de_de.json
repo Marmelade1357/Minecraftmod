@@ -318,6 +318,7 @@
   "pf2craft.combat.action.name.grapple": "Packen",
   "pf2craft.combat.action_unknown": "Unbekannte Aktion.",
   "pf2craft.combat.action_not_enough": "Nicht genug Aktionen übrig (%s nötig).",
+  "pf2craft.combat.shield_already_raised": "Dein Schild ist bereits erhoben.",
   "pf2craft.combat.no_shield": "Kein Schild zum Hochnehmen (halte den Schild deines Charakters in der Hand).",
   "pf2craft.combat.action_no_character": "Du hast keinen Charakter.",
   "pf2craft.combat.action_no_dc": "Für das Ziel gibt es keinen Vergleichswert.",

@@ -73,9 +73,19 @@ public final class ClientActions {
         try {
             JsonArray list = new JsonArray();
             favorites.forEach(list::add);
-            JsonObject root = new JsonObject();
-            root.add(FAVORITES, list);
             Path file = file();
+            JsonObject root = null;
+            try {
+                if (Files.isRegularFile(file)) {
+                    root = GSON.fromJson(Files.readString(file, StandardCharsets.UTF_8), JsonObject.class);
+                }
+            } catch (IOException | RuntimeException e) {
+                root = null; // unreadable or not an object: start fresh
+            }
+            if (root == null) {
+                root = new JsonObject();
+            }
+            root.add(FAVORITES, list);
             Files.createDirectories(file.getParent());
             Files.writeString(file, GSON.toJson(root), StandardCharsets.UTF_8);
         } catch (IOException | RuntimeException e) {

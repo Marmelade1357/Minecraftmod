@@ -289,6 +289,11 @@ final class CombatMessages {
                 "No shield to raise (hold your character's shield in hand).");
     }
 
+    static MutableText shieldAlreadyRaised() {
+        return Text.translatableWithFallback("pf2craft.combat.shield_already_raised",
+                "Your shield is already raised.");
+    }
+
     static MutableText actionNoCharacter() {
         return Text.translatableWithFallback("pf2craft.combat.action_no_character", "You have no character.");
     }
