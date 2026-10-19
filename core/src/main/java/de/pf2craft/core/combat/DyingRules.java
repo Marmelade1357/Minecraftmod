@@ -14,6 +14,19 @@ public final class DyingRules {
         s.set(Condition.DYING, (critical ? 2 : 1) + s.value(Condition.WOUNDED));
     }
 
+    /**
+     * Damage dealt to a creature that is already at 0 HP: dying rises by 1 (2 on a critical hit, capped at 4). A
+     * creature that is unconscious but stable (no dying) goes down again like a fresh knock-out, wounded included.
+     */
+    public static void damageWhileDying(ConditionSet s, boolean critical) {
+        if (!s.has(Condition.DYING)) {
+            knockOut(s, critical);
+            return;
+        }
+        s.set(Condition.UNCONSCIOUS, 1);
+        s.set(Condition.DYING, s.value(Condition.DYING) + (critical ? 2 : 1));
+    }
+
     public static int recoveryDc(ConditionSet s) {
         return 10 + s.value(Condition.DYING);
     }

@@ -40,6 +40,20 @@ public final class DyingService {
         CombatService.sync(null);
     }
 
+    /** A downed player (already at 0 HP) takes damage: dying rises instead of a second knock-out. */
+    public static void damageWhileDown(ServerPlayerEntity player, boolean critical) {
+        String id = player.getUuid().toString();
+        if (!CombatService.contains(player.getUuid())) {
+            return;
+        }
+        ConditionSet set = ConditionService.of(id);
+        int[] before = snapshot(set);
+        DyingRules.damageWhileDying(set, critical);
+        announceChanges(id, set, before, "damaged while down");
+        reportIfDead(id, set);
+        CombatService.sync(null);
+    }
+
     /** The dying combatant's turn begins: roll the recovery check against the DC (called by ConditionService). */
     static void recover(String id) {
         ConditionSet set = ConditionService.of(id);

@@ -346,7 +346,12 @@ public final class AttackService {
                     p.rangePenalty(), damage, hpLeft, hpMax);
             if (applied > 0) {
                 if (p.target() instanceof ServerPlayerEntity player) {
-                    SheetService.setCurrentHp(player, hpLeft, degree == DegreeOfSuccess.CRITICAL_SUCCESS); // 0 HP: dying
+                    boolean crit = degree == DegreeOfSuccess.CRITICAL_SUCCESS;
+                    if (hpBefore <= 0) {
+                        DyingService.damageWhileDown(player, crit); // already down: dying rises
+                    } else {
+                        SheetService.setCurrentHp(player, hpLeft, crit); // 0 HP: dying
+                    }
                 } else {
                     NpcService.damage((NpcEntity) p.target(), applied);
                 }

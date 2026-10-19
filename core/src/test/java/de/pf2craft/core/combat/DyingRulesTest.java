@@ -112,4 +112,38 @@ class DyingRulesTest {
     void recoveryDcIs10PlusDying() {
         assertEquals(13, DyingRules.recoveryDc(dying(3)));
     }
+
+    @Test
+    void damageWhileDyingRaisesByOne() {
+        ConditionSet s = dying(1);
+        DyingRules.damageWhileDying(s, false);
+        assertEquals(2, s.value(Condition.DYING));
+    }
+
+    @Test
+    void criticalDamageWhileDyingRaisesByTwo() {
+        ConditionSet s = dying(1);
+        DyingRules.damageWhileDying(s, true);
+        assertEquals(3, s.value(Condition.DYING));
+    }
+
+    @Test
+    void damageWhileDyingIsCappedAtFour() {
+        ConditionSet s = dying(3);
+        DyingRules.damageWhileDying(s, true);
+        assertEquals(4, s.value(Condition.DYING));
+        DyingRules.damageWhileDying(s, false);
+        assertEquals(4, s.value(Condition.DYING));
+        assertTrue(s.has(Condition.UNCONSCIOUS));
+    }
+
+    @Test
+    void damageToStableUnconsciousStartsDyingWithWounded() {
+        ConditionSet s = new ConditionSet();
+        s.set(Condition.UNCONSCIOUS, 1);
+        s.set(Condition.WOUNDED, 1);
+        DyingRules.damageWhileDying(s, false);
+        assertEquals(2, s.value(Condition.DYING));
+        assertEquals(1, s.value(Condition.WOUNDED));
+    }
 }
