@@ -142,9 +142,14 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
   Sterbend mit automatischem Wiederherstellungswurf, für alle sichtbar; „wäre tot“ nur an GMs; GM-Bearbeitung über `ConditionEditScreen` und
   `/pf2 combat condition <player|npc> <id> <value>`; HP-Text `HP: x/y · Zustände`) ist gebaut, per Unit-Tests in `core` und Bot-Tests abgedeckt;
   der Ingame-Test des Nutzers steht aus, die GUI wurde noch nicht visuell geprüft.
-- Bekannte Grenzen Teil 5: keine Zauber-/Monsterfähigkeits-Zustände; Zustände nicht persistiert (Disconnect verliert Sterbend/Verwundet eines
-  Bewusstlosen); nur Verängstigt hat einen numerischen Statusmalus (wirkt auf Angriffe, RK, Aktionsproben und Bogenwürfe im Kampf); Schaden bei 0 TP
-  erhöht Sterbend nicht; bleiben nur Bewusstlose übrig, kommen Wiederherstellungswürfe evtl. im Sekundentakt; `ActionMenuScreen` graut stand_up/escape nicht aus;
+- Polish-Runde (nach Teil 5): `ActionMenuScreen` graut Aufstehen/Befreien aus; Schaden bei 0 TP erhöht Sterbend (`DyingRules.damageWhileDying`,
+  Hook in `AttackService`); Disconnect eines Bewusstlosen behält seine Zustände bis Kampfende (`CombatService.onDisconnect/onJoin`);
+  reine Bewusstlosen-Reihenfolge wartet 3 s pro Zug (`DOWNED_ONLY_DELAY`); `Enforcement` hält Bewusstlose auch auf dem eigenen Zug fest;
+  Verwundet-Zeile beim Stabilisieren; Kampf-Chat kleiner (`ChatHudMixin`, Schlüssel `combatChatScale`/`combatChatHeight` in `config/pf2craft-client.json`)
+  und Kampf-HUD rechts unten (`hudAnchor`: right/center/left). Diese Punkte sind gebaut und kompiliert, aber nicht ingame vom Nutzer geprüft
+  (Chat-Mixin und HUD-Layout nur per Start und Koordinaten-Überlegung).
+- Bekannte Grenzen Teil 5: keine Zauber-/Monsterfähigkeits-Zustände; Zustände nur im Speicher (Serverneustart beendet den Kampf);
+  nur Verängstigt hat einen numerischen Statusmalus (wirkt auf Angriffe, RK, Aktionsproben und Bogenwürfe im Kampf);
   Verlangsamt/Benommen, Sterbend 4 und kritischer Niederschlag nicht per Bot getestet; Befreien scheitert, wenn die Packer-Entity fehlt, obwohl GRABBED bleibt.
 - GM-Fernreichweite (`GmReach`): temporäre Attribut-Modifier (+96, `pf2craft:gm_far_reach`; Minecraft begrenzt die Reichweite-Attribute auf 64, effektiv gelten also 64 Blöcke) auf Entity-/Block-Reichweite, solange ein GM Befehlsstab/Kampfglocke hält; `CombatService.RADIUS` = 96, `NpcNetwork.MAX_DISTANCE` = 128. Per Bot geprüft (siehe `.superpowers/sdd/gm-far-reach-report.md`); das Fadenkreuz-Zielen eines echten Clients auf Distanz ist ungetestet.
 - Bekannte Grenzen Teil 2: NPCs handeln nicht von selbst und sind noch nicht im Kampf nutzbar; Platzhaltermodell

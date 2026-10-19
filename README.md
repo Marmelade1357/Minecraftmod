@@ -161,6 +161,11 @@ eine vorübergehende Interaktionsreichweite von +12 Blöcken (wird nicht gespeic
 **0 TP:** Ein NPC gilt als besiegt (legt sich hin, scheidet aus). Ein Spieler wird bewusstlos und sterbend (siehe „Zustände“) und bleibt in der Reihenfolge. Der Kampf endet nur automatisch, wenn niemand mehr aktiv ist;
 sonst erhalten Spielleiter den Hinweis „Der Kampf kann beendet werden“.
 
+**Kampf-Chat und Anzeige:** Solange ein Kampf läuft, ist der Chat kleiner (Textgröße ×0,7, geöffnete Höhe ×0,6; die Breite bleibt), damit Anzeige und Welt sichtbar bleiben.
+Die Optionen im Spiel werden dabei nie verändert. Die Aktionszeile, der Hinweis auf die wartende Aktion und der eigene TP-Text stehen im Kampf **rechts unten** über der Hotbar.
+Einstellbar in `config/pf2craft-client.json` (andere Schlüssel bleiben erhalten): `combatChatScale` (Standard 0.7), `combatChatHeight` (Standard 0.6), beide 0.3 bis 1.0,
+und `hudAnchor` (`"right"` Standard, `"center"` oder `"left"`). Außerhalb des Kampfes bleibt der TP-Text, wo er war.
+
 **Ersatzbefehle:** siehe die `/pf2 combat …`-Zeilen in der Befehlstabelle. Der Kampf wird nicht gespeichert und endet beim Serverneustart.
 Einen Kämpfer an eine andere Stelle setzt der Spielleiter mit `/pf2 combat anchor`; ein `/tp` allein wird zurückgesetzt.
 
@@ -214,7 +219,9 @@ Zustände gelten im Kampf **sofort und automatisch**; der Spielleiter kann jeden
 
 **Sterbend:** Fällt ein Spieler auf 0 TP, wird er bewusstlos und sterbend 1 (bei kritischem Treffer 2; mit Verwundet kommt dessen Wert dazu).
 Zu Beginn seines eigenen Zuges würfelt der **Server automatisch** den Wiederherstellungswurf (einfache Probe gegen SG 10 + Sterbend-Wert, natürliche 20/1 verschieben den Erfolgsgrad).
-**Würfel, SG und Ergebnis sehen alle** im Chat. Stabilisiert er sich, bleibt er bewusstlos und würfelt nicht weiter. Heilung auf mehr als 0 TP beendet Bewusstlos/Sterbend und gibt Verwundet +1.
+**Würfel, SG und Ergebnis sehen alle** im Chat. Stabilisiert er sich, bleibt er bewusstlos und würfelt nicht weiter; die Verwundet-Stufe wird als eigene Zeile für alle gemeldet.
+Erleidet ein Bewusstloser erneut Schaden, steigt Sterbend um 1 (bei kritischem Treffer um 2, höchstens 4). Bewusstlose und Sterbende können sich nicht bewegen, auch nicht auf ihrem eigenen Zug.
+Trennt ein Bewusstloser die Verbindung, bleiben seine Zustände für den Rest des Kampfes erhalten; nach dem Wiedereinstieg würfelt er weiter. Sind nur noch Bewusstlose aktiv, vergehen etwa 3 Sekunden pro Wurf. Heilung auf mehr als 0 TP beendet Bewusstlos/Sterbend und gibt Verwundet +1.
 Erreicht Sterbend den Wert 4, meldet das Spiel **nur den Spielleitern** „X wäre jetzt tot“. Der Spielleiter entscheidet; nichts wird automatisch gelöscht oder beendet.
 **NPCs** auf 0 TP gelten sofort als besiegt (am Boden, aus der Reihenfolge), ohne Sterbend-Regeln; der Spielleiter kann sie wieder aufrichten.
 
@@ -232,10 +239,8 @@ Bearbeiten geht nur im laufenden Kampf und nur bei Kämpfern.
 - Zauber und Inventar gibt es noch nicht.
 - Kampf: keine Reaktionen (Reaktiver Schlag); der Schild-Block fehlt (der Schild wird gehoben, blockt aber noch nicht).
   Kein Zauber- und Gegenstandsmenü, keine Zauber.
-- Zustände: keine Zustände aus Zaubern oder Monsterfähigkeiten (der Spielleiter setzt sie von Hand); Zustände werden nicht gespeichert
-  (trennt ein bewusstloser Spieler die Verbindung, gehen Sterbend/Verwundet verloren; der Kampf endet ohnehin beim Neustart).
-  Nur Verängstigt hat einen numerischen Statusmalus. Schaden bei 0 TP erhöht Sterbend nicht. Bleiben nur bewusstlose Spieler übrig,
-  können Wiederherstellungswürfe im Sekundentakt aufeinanderfolgen. Aufstehen/Befreien werden im Menü nicht ausgegraut.
+- Zustände: keine Zustände aus Zaubern oder Monsterfähigkeiten (der Spielleiter setzt sie von Hand); Zustände werden nicht
+  über einen Serverneustart gespeichert (der Kampf endet dann ohnehin). Nur Verängstigt hat einen numerischen Statusmalus.
   Verlangsamt, Benommen, Sterbend 4 und kritischer Niederschlag sind nur per Unit-Test geprüft, nicht per Bot. Die Oberfläche (Zustandsliste, HUD) wurde noch nicht vom Nutzer angesehen.
 - Es gibt keine Sichtlinienprüfung; Munition und Nachladen werden nicht erzwungen.
 - Der Kampf endet bei einem Serverneustart; ein `/tp` eines Kämpfers wird zurückgesetzt (außer mit `/pf2 combat anchor`).
