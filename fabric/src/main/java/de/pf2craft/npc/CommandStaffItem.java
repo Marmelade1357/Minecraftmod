@@ -96,9 +96,8 @@ public class CommandStaffItem extends Item {
         if (!(entity instanceof NpcEntity npc) || npc.stats() == null || !requireGm(player)) {
             return;
         }
-        if (ActionService.hasPending(player)) {
-            ActionService.executePending(player, npc); // the pending action wants this click as its target
-            return;
+        if (ActionService.hasPending(player) && ActionService.executePending(player, npc)) {
+            return; // the pending action took this click as its target; otherwise select as usual
         }
         GmSelection.select(player, npc);
         player.sendMessage(Text.translatableWithFallback("pf2craft.npc.selected", "Selected: %s",
@@ -113,8 +112,7 @@ public class CommandStaffItem extends Item {
         if (!CombatService.active()) {
             return false;
         }
-        if (ActionService.hasPending(gm)) {
-            ActionService.executePending(gm, target);
+        if (ActionService.hasPending(gm) && ActionService.executePending(gm, target)) {
             return true;
         }
         NpcEntity selected = GmSelection.get(gm).orElse(null);

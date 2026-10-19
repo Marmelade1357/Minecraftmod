@@ -152,28 +152,36 @@ public final class ActionService {
     /**
      * The click on a creature while an action is pending. A failed target check keeps the pending action and
      * shows a hint; a failed actor check (turn over, no actions left) drops it.
+     *
+     * @return whether the click was consumed: true only if the action ran or the pending action was dropped
+     *         because it could no longer be performed; false for an invalid target or the cooldown
      */
-    public static void executePending(ServerPlayerEntity sender, Entity target) {
+    public static boolean executePending(ServerPlayerEntity sender, Entity target) {
         Pending pending = PENDING.get(sender.getUuid());
         if (pending == null) {
-            return;
+            return false;
         }
         Optional<BasicAction> found = BasicActions.byId(pending.actionId());
-        if (found.isEmpty() || cooldownActive(sender, true)) {
-            return;
+        if (found.isEmpty()) {
+            clearPending(sender.getUuid());
+            return true;
+        }
+        if (cooldownActive(sender, true)) {
+            return false;
         }
         BasicAction action = found.get();
         Actor actor = prepareActor(sender, pending.actorId(), action, true);
         if (actor == null) {
             clearPending(sender.getUuid());
-            return;
+            return true;
         }
         Checked checked = prepareTarget(actor, action, target);
         if (checked.error() != null) {
             AttackService.hint(sender, checked.error());
-            return;
+            return false;
         }
         execute(sender, actor, action, checked.target());
+        return true;
     }
 
     /**
