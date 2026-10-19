@@ -6,7 +6,7 @@ Ein Spieler ist Spielleiter (GM) und steuert NPCs, die anderen spielen ihre Char
 **Plattform:** Fabric · Minecraft 1.21.1 · Java 21. Server **und** alle Spieler brauchen die Mod
 (plus [Fabric API](https://modrinth.com/mod/fabric-api)).
 
-## Aktueller Stand (Phase 1 bis 3, Teil 3)
+## Aktueller Stand (Phase 1 bis 3, Teil 5)
 
 ### Würfelfenster
 - Taste **R** (änderbar unter Steuerung → PF2 Craft) öffnet das Würfelfenster.
@@ -43,6 +43,7 @@ groß oben auf dem Bildschirm (natürliche 20 golden, natürliche 1 rot) und im 
 | `/pf2 combat add` | alle Charaktere und NPCs im Umkreis von 32 Blöcken zum laufenden Kampf hinzufügen (Spielleiter oder OP) |
 | `/pf2 combat remove [<Ziel>]` | angesehenen NPC (oder das angegebene Ziel) aus dem Kampf nehmen (Spielleiter oder OP) |
 | `/pf2 combat anchor <Spieler> [<Position>]` | Kämpfer an der aktuellen bzw. angegebenen Position neu verankern, z. B. nach einem `/tp` (Spielleiter oder OP) |
+| `/pf2 combat condition player <Spieler> <id> <0-4>` / `npc <id> <0-4>` | Zustand eines Kämpfers setzen (0 entfernt; Zustände ohne Wert nur 0 oder 1). `npc` nutzt den angesehenen bzw. ausgewählten NPC. Ids: `frightened`, `off_guard`, `prone`, `grabbed`, `slowed`, `stunned`, `unconscious`, `dying`, `wounded` (Spielleiter oder OP) |
 | `/pf2 combat endturn` | Zug beenden (Kämpfer, der dran ist; der Spielleiter auch den Zug eines NPCs) |
 | `/pf2 combat action <id>` | Grundaktion ausführen (`step`, `raise_shield`, `take_cover`, `seek`, `demoralize`, `trip`, `grapple`) oder `cancel`. Spieler: für sich selbst. Spielleiter: für den **ausgewählten NPC, der gerade dran ist**. Zielaktionen nutzen das angesehene Wesen, sonst warten sie auf einen Klick |
 | `/pf2 combat attack <1-3> [<Angriff 0-7>]` | Ersatz für den Linksklick. Spieler: den angesehenen NPC (bis 16 Blöcke) mit der Waffe in der Hand angreifen. Spielleiter: der **ausgewählte NPC, der gerade dran ist,** greift das angesehene Wesen an (optional mit dem Monsterangriff 0-7) |
@@ -157,8 +158,7 @@ eine vorübergehende Interaktionsreichweite von +12 Blöcken (wird nicht gespeic
 **NPC-Züge (Spielleiter):** Ist ein NPC dran, wähle ihn mit dem Befehlsstab. Rechtsklick auf einen Block lässt ihn laufen
 (in Schreiten bezahlt), Rechtsklick auf ein Ziel öffnet das Angriffsfenster mit den Angriffen des Monsters.
 
-**0 TP:** Ein NPC gilt als besiegt (legt sich hin, scheidet aus). Ein Spieler wird inaktiv (bleibt auf seinem Block und wird übersprungen);
-Sterbend und Wiederherstellungswurf kommen mit Teil 5. Der Kampf endet nur automatisch, wenn niemand mehr aktiv ist;
+**0 TP:** Ein NPC gilt als besiegt (legt sich hin, scheidet aus). Ein Spieler wird bewusstlos und sterbend (siehe „Zustände“) und bleibt in der Reihenfolge. Der Kampf endet nur automatisch, wenn niemand mehr aktiv ist;
 sonst erhalten Spielleiter den Hinweis „Der Kampf kann beendet werden“.
 
 **Ersatzbefehle:** siehe die `/pf2 combat …`-Zeilen in der Befehlstabelle. Der Kampf wird nicht gespeichert und endet beim Serverneustart.
@@ -188,12 +188,42 @@ Ein Spielleiter-Linksklick mit dem Befehlsstab auf ein ungültiges Ziel wählt w
 - **Umstoßen:** Athletik gegen den Reflex-SG des Ziels, Nahkampf (1 Block); zählt für den Mehrfachangriffsmalus.
 - **Ergreifen:** Athletik gegen den Zähigkeits-SG des Ziels, Nahkampf; zählt für den Mehrfachangriffsmalus.
 
-Schild und Deckung sind **zeitweilige Effekte**: Sie erhöhen die RK in Angriffen, bis sie enden (siehe oben). Bis Teil 5 erzeugen die Proben
-nur **Hinweise**: das Ergebnis geht an alle, die passenden Zustände (z. B. Verängstigt, Liegend) trägt der Spielleiter von Hand ein.
+Schild und Deckung sind **zeitweilige Effekte**: Sie erhöhen die RK in Angriffen, bis sie enden (siehe oben).
+
+**Aufstehen** (1 Aktion, nur wenn liegend) und **Befreien** (1 Aktion, nur wenn gepackt) stehen ebenfalls bei den Grundaktionen.
+Befreien ist Athletik oder Akrobatik (die bessere) gegen den Zähigkeits-SG des Packers; Erfolg beendet „Gepackt“, ein kritischer Erfolg gibt zusätzlich einen freien Schritt.
+Greift die Aktion nicht (z. B. nicht liegend), lehnt der Server sie ab, ohne Aktionen zu verbrauchen. Das Menü graut diese beiden Aktionen nicht aus.
 
 **NPC-Aktionen (Spielleiter):** Ist ein NPC dran und ausgewählt, öffnet **V** dasselbe Menü für ihn; ebenso gilt `/pf2 combat action <id>`.
 NPCs können alle Grundaktionen außer **Schild hochnehmen** (keine Schilddaten, die Aktion wird abgelehnt). Beim Schreiten wird nur die Aktion
 bezahlt; der Spielleiter bekommt den Hinweis „darf 1 Block gehen“ und lässt den NPC selbst laufen.
+
+### Zustände
+
+Zustände gelten im Kampf **sofort und automatisch**; der Spielleiter kann jeden Zustand jederzeit überstimmen.
+
+**Liste:** Verängstigt (Wert), Off-guard, Liegend, Gepackt, Verlangsamt (Wert), Benommen (Wert), Bewusstlos, Sterbend (Wert), Verwundet (Wert).
+
+**Automatische Wirkung:**
+- **Verängstigt N:** −N auf Angriffe, RK, Aktionsproben und die Würfe des eigenen Charakterbogens während des Kampfes (nur dieser Statusmalus ist numerisch umgesetzt).
+  Sinkt am Ende des eigenen Zuges um 1. Erfolgreiches **Einschüchtern** gibt Verängstigt 1 (kritisch 2).
+- **Off-guard, Liegend, Gepackt, Bewusstlos:** −2 RK (zählt nur einmal). **Liegend:** zusätzlich −2 auf Angriffe. Erfolgreiches **Umstoßen** macht das Ziel liegend;
+  erfolgreiches **Ergreifen** macht es gepackt. Gepackt endet, wenn der Packer sich bewegt (oder das Ziel sich befreit).
+- **Verlangsamt / Benommen:** nehmen zu Beginn des Zuges Aktionen weg (zusammen höchstens 3).
+- **Bewusstlos / Sterbend:** keine Aktionen, keine Angriffe, kein Bewegen; der Zug endet von selbst.
+
+**Sterbend:** Fällt ein Spieler auf 0 TP, wird er bewusstlos und sterbend 1 (bei kritischem Treffer 2; mit Verwundet kommt dessen Wert dazu).
+Zu Beginn seines eigenen Zuges würfelt der **Server automatisch** den Wiederherstellungswurf (einfache Probe gegen SG 10 + Sterbend-Wert, natürliche 20/1 verschieben den Erfolgsgrad).
+**Würfel, SG und Ergebnis sehen alle** im Chat. Stabilisiert er sich, bleibt er bewusstlos und würfelt nicht weiter. Heilung auf mehr als 0 TP beendet Bewusstlos/Sterbend und gibt Verwundet +1.
+Erreicht Sterbend den Wert 4, meldet das Spiel **nur den Spielleitern** „X wäre jetzt tot“. Der Spielleiter entscheidet; nichts wird automatisch gelöscht oder beendet.
+**NPCs** auf 0 TP gelten sofort als besiegt (am Boden, aus der Reihenfolge), ohne Sterbend-Regeln; der Spielleiter kann sie wieder aufrichten.
+
+**Sichtbarkeit:** Liegend, Bewusstlos und Sterbend (und besiegt) sehen alle. Alle übrigen Zustände sieht nur der Betroffene und der Spielleiter; Zustände von NPCs (außer den öffentlichen) nur der Spielleiter.
+Chat-Meldungen beim Entstehen und Enden folgen derselben Regel. Der eigene TP-Text hängt die eigenen Zustände an: `TP: 42/50 · Verängstigt 1, Liegend`. Die Initiative-Leiste zeigt die sichtbaren Zustände je Teilnehmer.
+
+**Bearbeiten (Spielleiter):** Der Knopf **Zustände** im Charakterbogen (Spieler) bzw. im NPC-Fenster öffnet eine Liste mit + und − je Zustand. Spieler sehen ihre eigene Liste nur lesend.
+Dasselbe geht per Befehl, siehe `/pf2 combat condition …`. Bewusstlos entfernen beendet auch Sterbend; Sterbend setzen macht bewusstlos.
+Bearbeiten geht nur im laufenden Kampf und nur bei Kämpfern.
 
 ### Bekannte Grenzen
 - Taste **C** kollidiert mit der Vanilla-Belegung „Hotbar-Aktivator speichern“; eine der beiden Tasten unter Steuerung umbelegen.
@@ -201,8 +231,12 @@ bezahlt; der Spielleiter bekommt den Hinweis „darf 1 Block gehen“ und lässt
 - Auswahlbasierte Klassenverbesserungen (z. B. Doktrinen, Waffenmeisterschaft, Wissensränge) muss der Spielleiter setzen.
 - Zauber und Inventar gibt es noch nicht.
 - Kampf: keine Reaktionen (Reaktiver Schlag); der Schild-Block fehlt (der Schild wird gehoben, blockt aber noch nicht).
-  Aufstehen, Hinlegen und Befreien sowie alle Zustände und Sterbend/Wiederherstellungswurf kommen mit Teil 5.
   Kein Zauber- und Gegenstandsmenü, keine Zauber.
+- Zustände: keine Zustände aus Zaubern oder Monsterfähigkeiten (der Spielleiter setzt sie von Hand); Zustände werden nicht gespeichert
+  (trennt ein bewusstloser Spieler die Verbindung, gehen Sterbend/Verwundet verloren; der Kampf endet ohnehin beim Neustart).
+  Nur Verängstigt hat einen numerischen Statusmalus. Schaden bei 0 TP erhöht Sterbend nicht. Bleiben nur bewusstlose Spieler übrig,
+  können Wiederherstellungswürfe im Sekundentakt aufeinanderfolgen. Aufstehen/Befreien werden im Menü nicht ausgegraut.
+  Verlangsamt, Benommen, Sterbend 4 und kritischer Niederschlag sind nur per Unit-Test geprüft, nicht per Bot. Die Oberfläche (Zustandsliste, HUD) wurde noch nicht vom Nutzer angesehen.
 - Es gibt keine Sichtlinienprüfung; Munition und Nachladen werden nicht erzwungen.
 - Der Kampf endet bei einem Serverneustart; ein `/tp` eines Kämpfers wird zurückgesetzt (außer mit `/pf2 combat anchor`).
 - Das Einfrieren wurde nur mit Test-Bots geprüft; auf echten Clients kann es ruckeln (Rubber-Banding).
@@ -242,7 +276,7 @@ Der Regelkern wird direkt in die Mod-Jar kompiliert.
    - ✅ Teil 2: NPCs mit Monster-Core-Werten und Befehlsstab (gebaut, Ingame-Test steht aus)
    - ✅ Teil 3: Kampfkern (Initiative, 3 Aktionen + Reaktion, Angriffe, Mehrfachangriffsmalus; im Einzelspieler getestet, Mehrspieler ungetestet)
    - ✅ Teil 4: Aktionsmenü (Taste V, Grundaktionen, Schild und Deckung; gebaut, Ingame-Test steht aus)
-   - Teil 5: Zustände
+   - ✅ Teil 5: Zustände und Sterbend (gebaut, Ingame-Test steht aus)
 4. NPC-Steuerung im Kampf und „Übernehmen“ durch den GM
 5. Zauber, Gegenstände, mehr Inhalte, physische Würfel
 

@@ -39,6 +39,7 @@ core/                       Reines Java ohne Minecraft-Abhängigkeit. Regelkern 
   de.pf2craft.core.item        Gegenstandskatalog (Waffen/Rüstung/Schilde, Parser), ItemVisual (Optik nach Schadenswürfel), ItemStamp
   de.pf2craft.core.combat   Kampfkern: Encounter (Initiative, Zugreihenfolge), TurnState, MovementBudget, AttackMath,
                             DamageResolver/Defenses/RuneDamage, RangeRules, HealthLabel,
+                            Condition/ConditionSet/ConditionEffects (Zustände, Mali), DyingRules (Sterbend, Wiederherstellungswurf),
                             BasicActions/BasicAction/ActionKind/ActionDcs (Grundaktionen, SG), CombatEffects (zeitweilige RK-Boni)
   de.pf2craft.core.monster     Monster-Core-Daten (492 Kreaturen, Parser/Katalog), NpcStats, NpcEdit (GM-Änderungen)
   src/main/resources/pf2craft/monsters/  monster-core.json (nur Namen und Zahlen)
@@ -58,12 +59,13 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
     npc/                          NpcEntity (Dorfbewohner-basiert), NpcService, NpcNetwork, GmSelection, CommandStaffItem
                                   (Befehlsstab), MonsterDataLoader (Jar + config/pf2craft/monsters/*.json; Vorlagen
                                   überschreiben nie Eingebautes, ID bekommt `-custom`, `-custom-2` …), Pf2Entities
-    combat/                       CombatService (Kampfzustand, Züge), AttackService, Enforcement (Einfrieren),
+    combat/                       CombatService (Kampfzustand, Züge), ConditionService (Zustände je Kämpfer im Speicher, Chat, GM-Edit),
+                                  DyingService (Bewusstlos/Sterbend, automatischer Wiederherstellungswurf, „wäre tot“ nur an GMs), AttackService, Enforcement (Einfrieren),
                                   NpcWalk, CombatItem (Kampfglocke), CombatMessages,
                                   ActionService (Grundaktionen, wartende Zielaktionen, Schild per Rechtsklick)
     command/                      Pf2Commands (/roll, /gmroll, /pf2 gm|hp|sheet|items|tools|npc|character …)
   src/client/java/de/pf2craft/client  nur Client: Pf2CraftClient, DiceScreen, RollHud, ImportScreen,
-                                  CharacterScreen (Reiter, Verdeckt, GM-Knöpfe), LevelUpScreen, ClientSheets,
+                                  CharacterScreen (Reiter, Verdeckt, GM-Knöpfe), ConditionEditScreen/ClientConditions (Zustandsliste), LevelUpScreen, ClientSheets,
                                   ActionMenuScreen (Taste V), ClientActions, NpcSpawnScreen, NpcSheetScreen (der NPC-Renderer wird in Pf2CraftClient registriert)
   src/client/resources/pf2craft.client.mixins.json  Client-Mixin (InGameHudMixin: TP statt Herzen/Hunger)
   src/main/resources/assets/pf2craft/lang/  en_us.json, de_de.json
@@ -132,10 +134,18 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
 - Phase 3 Teil 4 (Aktionsmenü: Taste V, Grundaktionen Schreiten/Schild/Deckung/Suchen/Einschüchtern/Umstoßen/Ergreifen,
   wartende Zielaktionen, Schild per Rechtsklick, NPC-Aktionen, `/pf2 combat action`) ist gebaut und per Unit-Tests in `core`
   sowie Bot-Tests auf dem Dedicated Server abgedeckt; der Ingame-Test des Nutzers steht aus. Abbrechen nur mit V oder
-  `/pf2 combat action cancel` (nicht Esc). Ergebnisse sind bis Teil 5 nur Hinweise (keine Zustände).
-- Bekannte Grenzen Teil 3/4: keine Reaktionen, kein Schild-Block, kein Zauber-/Gegenstandsmenü, Aufstehen/Hinlegen/Befreien fehlen, keine Zustände/Sterbend, keine Zauber, keine Sichtlinienprüfung,
+  `/pf2 combat action cancel` (nicht Esc). Teil 4 ist in den Feature-Branch gemerged; Ingame-Test steht aus.
+- Bekannte Grenzen Teil 3/4: keine Reaktionen, kein Schild-Block, kein Zauber-/Gegenstandsmenü, keine Zauber, keine Sichtlinienprüfung,
   Munition/Nachladen nicht erzwungen, Kampf endet beim Serverneustart, `/tp` eines Kämpfers wird zurückgesetzt (außer
   `/pf2 combat anchor`).
+- Phase 3 Teil 5 (Zustände: frightened, off_guard, prone, grabbed, slowed, stunned, unconscious, dying, wounded; Aufstehen/Befreien im Menü;
+  Sterbend mit automatischem Wiederherstellungswurf, für alle sichtbar; „wäre tot“ nur an GMs; GM-Bearbeitung über `ConditionEditScreen` und
+  `/pf2 combat condition <player|npc> <id> <value>`; HP-Text `HP: x/y · Zustände`) ist gebaut, per Unit-Tests in `core` und Bot-Tests abgedeckt;
+  der Ingame-Test des Nutzers steht aus, die GUI wurde noch nicht visuell geprüft.
+- Bekannte Grenzen Teil 5: keine Zauber-/Monsterfähigkeits-Zustände; Zustände nicht persistiert (Disconnect verliert Sterbend/Verwundet eines
+  Bewusstlosen); nur Verängstigt hat einen numerischen Statusmalus (wirkt auf Angriffe, RK, Aktionsproben und Bogenwürfe im Kampf); Schaden bei 0 TP
+  erhöht Sterbend nicht; bleiben nur Bewusstlose übrig, kommen Wiederherstellungswürfe evtl. im Sekundentakt; `ActionMenuScreen` graut stand_up/escape nicht aus;
+  Verlangsamt/Benommen, Sterbend 4 und kritischer Niederschlag nicht per Bot getestet; Befreien scheitert, wenn die Packer-Entity fehlt, obwohl GRABBED bleibt.
 - GM-Fernreichweite (`GmReach`): temporäre Attribut-Modifier (+96, `pf2craft:gm_far_reach`; Minecraft begrenzt die Reichweite-Attribute auf 64, effektiv gelten also 64 Blöcke) auf Entity-/Block-Reichweite, solange ein GM Befehlsstab/Kampfglocke hält; `CombatService.RADIUS` = 96, `NpcNetwork.MAX_DISTANCE` = 128. Per Bot geprüft (siehe `.superpowers/sdd/gm-far-reach-report.md`); das Fadenkreuz-Zielen eines echten Clients auf Distanz ist ungetestet.
 - Bekannte Grenzen Teil 2: NPCs handeln nicht von selbst und sind noch nicht im Kampf nutzbar; Platzhaltermodell
   (Dorfbewohner); Strike-Boni im Werte-Fenster nicht editierbar; Zusatzeffekte (Grab, anhaltender Schaden)
@@ -155,12 +165,12 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
    - ✅ **Teil 2 – NPCs:** Monster-Core-Daten, NPC-Entity, Befehlsstab (spawnen, auswählen, Werte, hinlaufen),
      `/pf2 npc …`, Vorlagen. *Vom Nutzer ingame getestet.*
    - ✅ **Teil 3 – Kampfkern:** gebaut. *Vom Nutzer im Einzelspieler getestet; Mehrspieler offen.*
-   - ✅ **Teil 4 – Aktionsmenü:** gebaut (Ingame-Test des Nutzers steht aus).
-   - **Teil 5 – Zustände** (offen), umfasst:
+   - ✅ **Teil 4 – Aktionsmenü:** gebaut und gemerged (Ingame-Test des Nutzers steht aus).
+   - ✅ **Teil 5 – Zustände:** gebaut (Ingame-Test des Nutzers steht aus). Gesamtumfang Phase 3:
    - GM startet und beendet einen Kampf, Initiative mit Zugreihenfolge im HUD.
    - 3 Aktionen + 1 Reaktion pro Zug, Mehrfachangriffsmalus.
    - Angriff gegen RK mit Erfolgsgrad, Schaden, TP.
-   - Zustände (frightened, off-guard, …).
+   - Zustände (frightened, off-guard, …) – seit Teil 5.
    - Raster: 1 Block = 5 ft, Bewegung nach Speed. Wer nicht dran ist, kann nicht handeln.
 4. **Phase 4 – NPCs im Kampf:**
    - (Entity mit Werteblock und Spawn-Werkzeug sind seit Phase 3 Teil 2 gebaut.)
