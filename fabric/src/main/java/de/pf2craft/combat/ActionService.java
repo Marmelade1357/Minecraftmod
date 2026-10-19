@@ -222,6 +222,18 @@ public final class ActionService {
         return true;
     }
 
+    /** True if it is this player's turn in a running combat and the stack is a shield made for them. */
+    public static boolean isOwnShield(ServerPlayerEntity player, ItemStack stack) {
+        ShieldRef ref = stack.get(Pf2Components.SHIELD);
+        return ref != null && ref.owner().equals(player.getUuid()) && CombatService.active()
+                && CombatService.currentId().filter(player.getUuid().toString()::equals).isPresent();
+    }
+
+    /** Right-click with the own shield: the same request the menu sends for Raise a Shield. */
+    public static void raiseShieldByItem(ServerPlayerEntity player) {
+        request(player, new ActionRequestPayload(player.getUuid(), "raise_shield", -1));
+    }
+
     private static Entity lookedAtCreature(ServerPlayerEntity player, Entity actorEntity) {
         Vec3d start = player.getEyePos();
         Vec3d dir = player.getRotationVec(1.0f);

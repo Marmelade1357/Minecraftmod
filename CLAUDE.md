@@ -38,7 +38,8 @@ core/                       Reines Java ohne Minecraft-Abhängigkeit. Regelkern 
   de.pf2craft.core.progression ClassProgression (+ Parser), ClassRegistry, LevelUp
   de.pf2craft.core.item        Gegenstandskatalog (Waffen/Rüstung/Schilde, Parser), ItemVisual (Optik nach Schadenswürfel), ItemStamp
   de.pf2craft.core.combat   Kampfkern: Encounter (Initiative, Zugreihenfolge), TurnState, MovementBudget, AttackMath,
-                            DamageResolver/Defenses/RuneDamage, RangeRules, HealthLabel
+                            DamageResolver/Defenses/RuneDamage, RangeRules, HealthLabel,
+                            BasicActions/BasicAction/ActionKind/ActionDcs (Grundaktionen, SG), CombatEffects (zeitweilige RK-Boni)
   de.pf2craft.core.monster     Monster-Core-Daten (492 Kreaturen, Parser/Katalog), NpcStats, NpcEdit (GM-Änderungen)
   src/main/resources/pf2craft/monsters/  monster-core.json (nur Namen und Zahlen)
   src/main/resources/pf2craft/items/  Player-Core-Waffen, -Rüstungen, -Schilde (nur Namen und Zahlen)
@@ -58,11 +59,12 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
                                   (Befehlsstab), MonsterDataLoader (Jar + config/pf2craft/monsters/*.json; Vorlagen
                                   überschreiben nie Eingebautes, ID bekommt `-custom`, `-custom-2` …), Pf2Entities
     combat/                       CombatService (Kampfzustand, Züge), AttackService, Enforcement (Einfrieren),
-                                  NpcWalk, CombatItem (Kampfglocke), CombatMessages
+                                  NpcWalk, CombatItem (Kampfglocke), CombatMessages,
+                                  ActionService (Grundaktionen, wartende Zielaktionen, Schild per Rechtsklick)
     command/                      Pf2Commands (/roll, /gmroll, /pf2 gm|hp|sheet|items|tools|npc|character …)
   src/client/java/de/pf2craft/client  nur Client: Pf2CraftClient, DiceScreen, RollHud, ImportScreen,
                                   CharacterScreen (Reiter, Verdeckt, GM-Knöpfe), LevelUpScreen, ClientSheets,
-                                  NpcSpawnScreen, NpcSheetScreen (der NPC-Renderer wird in Pf2CraftClient registriert)
+                                  ActionMenuScreen (Taste V), ClientActions, NpcSpawnScreen, NpcSheetScreen (der NPC-Renderer wird in Pf2CraftClient registriert)
   src/client/resources/pf2craft.client.mixins.json  Client-Mixin (InGameHudMixin: TP statt Herzen/Hunger)
   src/main/resources/assets/pf2craft/lang/  en_us.json, de_de.json
 ```
@@ -124,9 +126,14 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
 - Phase 3 Teil 1 (Gegenstände) vom Nutzer im Einzelspieler getestet. Teil 2 (NPCs, Befehlsstab) ist gebaut
   und per Unit-Tests in `core` abgedeckt; vom Nutzer im Einzelspieler getestet (spawnen, auswählen, Werte, hinlaufen, hinlegen): funktioniert.
 - Phase 3 Teil 3 (Kampfkern: Kampfglocke, Initiative, Aktionen/Bewegung, Einfrieren, Angriffe, NPC-Züge) ist gebaut und per
-  Unit-Tests in `core` abgedeckt; der Ingame-Test des Nutzers steht aus. Mehrspieler mit echten Spielern und das Einfrieren
-  auf echten Clients (Rubber-Banding möglich) sind ungetestet.
-- Bekannte Grenzen Teil 3: keine Reaktionen, kein Aktionsmenü, keine Zustände/Sterbend, keine Zauber, keine Sichtlinienprüfung,
+  Unit-Tests in `core` abgedeckt; vom Nutzer im Einzelspieler getestet (Kampfstart, Züge, automatisches Zugende, Angriffe,
+  GM-Befehlsstab inkl. Fernreichweite). Mehrspieler mit echten Spielern und das Einfrieren auf echten Clients
+  (Rubber-Banding möglich) sind ungetestet.
+- Phase 3 Teil 4 (Aktionsmenü: Taste V, Grundaktionen Schreiten/Schild/Deckung/Suchen/Einschüchtern/Umstoßen/Ergreifen,
+  wartende Zielaktionen, Schild per Rechtsklick, NPC-Aktionen, `/pf2 combat action`) ist gebaut und per Unit-Tests in `core`
+  sowie Bot-Tests auf dem Dedicated Server abgedeckt; der Ingame-Test des Nutzers steht aus. Abbrechen nur mit V oder
+  `/pf2 combat action cancel` (nicht Esc). Ergebnisse sind bis Teil 5 nur Hinweise (keine Zustände).
+- Bekannte Grenzen Teil 3/4: keine Reaktionen, kein Schild-Block, kein Zauber-/Gegenstandsmenü, Aufstehen/Hinlegen/Befreien fehlen, keine Zustände/Sterbend, keine Zauber, keine Sichtlinienprüfung,
   Munition/Nachladen nicht erzwungen, Kampf endet beim Serverneustart, `/tp` eines Kämpfers wird zurückgesetzt (außer
   `/pf2 combat anchor`).
 - GM-Fernreichweite (`GmReach`): temporäre Attribut-Modifier (+96, `pf2craft:gm_far_reach`; Minecraft begrenzt die Reichweite-Attribute auf 64, effektiv gelten also 64 Blöcke) auf Entity-/Block-Reichweite, solange ein GM Befehlsstab/Kampfglocke hält; `CombatService.RADIUS` = 96, `NpcNetwork.MAX_DISTANCE` = 128. Per Bot geprüft (siehe `.superpowers/sdd/gm-far-reach-report.md`); das Fadenkreuz-Zielen eines echten Clients auf Distanz ist ungetestet.
@@ -147,8 +154,9 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
      (Optik nach Schadenswürfel, Lore, Besitzer). *Vom Nutzer ingame getestet.*
    - ✅ **Teil 2 – NPCs:** Monster-Core-Daten, NPC-Entity, Befehlsstab (spawnen, auswählen, Werte, hinlaufen),
      `/pf2 npc …`, Vorlagen. *Vom Nutzer ingame getestet.*
-   - ✅ **Teil 3 – Kampfkern:** gebaut (Ingame-Test des Nutzers steht aus).
-   - **Teil 4 – Aktionsmenü, Teil 5 – Zustände** (offen), umfassen:
+   - ✅ **Teil 3 – Kampfkern:** gebaut. *Vom Nutzer im Einzelspieler getestet; Mehrspieler offen.*
+   - ✅ **Teil 4 – Aktionsmenü:** gebaut (Ingame-Test des Nutzers steht aus).
+   - **Teil 5 – Zustände** (offen), umfasst:
    - GM startet und beendet einen Kampf, Initiative mit Zugreihenfolge im HUD.
    - 3 Aktionen + 1 Reaktion pro Zug, Mehrfachangriffsmalus.
    - Angriff gegen RK mit Erfolgsgrad, Schaden, TP.

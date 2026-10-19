@@ -69,7 +69,15 @@ public final class Enforcement {
                 blocked(player) ? ActionResult.FAIL : ActionResult.PASS);
         UseItemCallback.EVENT.register((player, world, hand) -> {
             ItemStack stack = player.getStackInHand(hand);
-            return blockedUse(player) ? TypedActionResult.fail(stack) : TypedActionResult.pass(stack);
+            if (blockedUse(player)) {
+                return TypedActionResult.fail(stack);
+            }
+            // Using the character's own shield during their turn is the Raise a Shield action; vanilla blocking is off.
+            if (player instanceof ServerPlayerEntity sp && ActionService.isOwnShield(sp, stack)) {
+                ActionService.raiseShieldByItem(sp);
+                return TypedActionResult.fail(stack);
+            }
+            return TypedActionResult.pass(stack);
         });
         // The vanilla attack is always cancelled for combatants; the current player's click opens the attack window.
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hit) -> {

@@ -44,6 +44,7 @@ groß oben auf dem Bildschirm (natürliche 20 golden, natürliche 1 rot) und im 
 | `/pf2 combat remove [<Ziel>]` | angesehenen NPC (oder das angegebene Ziel) aus dem Kampf nehmen (Spielleiter oder OP) |
 | `/pf2 combat anchor <Spieler> [<Position>]` | Kämpfer an der aktuellen bzw. angegebenen Position neu verankern, z. B. nach einem `/tp` (Spielleiter oder OP) |
 | `/pf2 combat endturn` | Zug beenden (Kämpfer, der dran ist; der Spielleiter auch den Zug eines NPCs) |
+| `/pf2 combat action <id>` | Grundaktion ausführen (`step`, `raise_shield`, `take_cover`, `seek`, `demoralize`, `trip`, `grapple`) oder `cancel`. Spieler: für sich selbst. Spielleiter: für den **ausgewählten NPC, der gerade dran ist**. Zielaktionen nutzen das angesehene Wesen, sonst warten sie auf einen Klick |
 | `/pf2 combat attack <1-3> [<Angriff 0-7>]` | Ersatz für den Linksklick. Spieler: den angesehenen NPC (bis 16 Blöcke) mit der Waffe in der Hand angreifen. Spielleiter: der **ausgewählte NPC, der gerade dran ist,** greift das angesehene Wesen an (optional mit dem Monsterangriff 0-7) |
 
 `/pf2 tools` gibt dem Spielleiter außerdem die **Kampfglocke**.
@@ -165,13 +166,43 @@ Einen Kämpfer an eine andere Stelle setzt der Spielleiter mit `/pf2 combat anch
 
 **Fernreichweite:** Mit der Kampfglocke oder dem Befehlsstab in der Hand reichen GM-Klicks 64 Blöcke weit (siehe Befehlsstab). Das Kampf-Fenster und `/pf2 combat start|add` erfassen Kämpfer im Umkreis von 96 Blöcken.
 
+### Aktionsmenü
+
+Auf deinem Zug öffnet Taste **V** (änderbar unter Steuerung → PF2 Craft) das Aktionsmenü. Links stehen die Kategorien
+(Grundaktionen, Klassenfähigkeiten, Zauber, Gegenstände; Zauber und Gegenstände sind noch gesperrt, Klassenfähigkeiten leer), rechts die Aktionen der Kategorie.
+Hinter jeder Aktion steht ihr Preis in Aktionen (◆). Der Stern vor dem Namen macht eine Aktion zum **Favoriten**; Favoriten stehen oben.
+Nicht verfügbare Aktionen sind grau, ein Tooltip nennt den Grund (nicht dran, zu wenig Aktionen, kein Schild).
+
+**Ziel anklicken:** Aktionen mit Ziel (Einschüchtern, Umstoßen, Ergreifen) warten nach dem Klick im Menü auf deinen **Linksklick** auf ein
+Wesen. Ein ungültiges Ziel (zu weit weg, kein Kämpfer) zeigt nur einen Hinweis, die Aktion bleibt wartend. **Abbrechen** geht mit
+**V** oder `/pf2 combat action cancel`; Esc bricht nicht ab. Endet der Zug oder reichen die Aktionen nicht mehr, verfällt die wartende Aktion.
+Ein Spielleiter-Linksklick mit dem Befehlsstab auf ein ungültiges Ziel wählt wie gewohnt aus.
+
+**Grundaktionen** (je 1 Aktion):
+- **Schreiten:** 1 Block gehen, ohne dass ein Schreiten beginnt.
+- **Schild hochnehmen:** +RK-Bonus deines Schilds bis zum Beginn deines nächsten Zugs. Du musst den Schild deines Charakters in der Hand halten;
+  ein **Rechtsklick mit dem Schild** auf deinem Zug ist dasselbe wie die Menüaktion (der Vanilla-Block ist abgeschaltet).
+- **Deckung nehmen:** +2 RK, bis du dich bewegst oder dein nächster Zug beginnt.
+- **Suchen:** Wahrnehmungsprobe; das Ergebnis sieht der Spielleiter.
+- **Einschüchtern:** Einschüchtern gegen den Willens-SG des Ziels, bis 6 Blöcke.
+- **Umstoßen:** Athletik gegen den Reflex-SG des Ziels, Nahkampf (1 Block); zählt für den Mehrfachangriffsmalus.
+- **Ergreifen:** Athletik gegen den Zähigkeits-SG des Ziels, Nahkampf; zählt für den Mehrfachangriffsmalus.
+
+Schild und Deckung sind **zeitweilige Effekte**: Sie erhöhen die RK in Angriffen, bis sie enden (siehe oben). Bis Teil 5 erzeugen die Proben
+nur **Hinweise**: das Ergebnis geht an alle, die passenden Zustände (z. B. Verängstigt, Liegend) trägt der Spielleiter von Hand ein.
+
+**NPC-Aktionen (Spielleiter):** Ist ein NPC dran und ausgewählt, öffnet **V** dasselbe Menü für ihn; ebenso gilt `/pf2 combat action <id>`.
+NPCs können alle Grundaktionen außer **Schild hochnehmen** (keine Schilddaten, die Aktion wird abgelehnt). Beim Schreiten wird nur die Aktion
+bezahlt; der Spielleiter bekommt den Hinweis „darf 1 Block gehen“ und lässt den NPC selbst laufen.
+
 ### Bekannte Grenzen
 - Taste **C** kollidiert mit der Vanilla-Belegung „Hotbar-Aktivator speichern“; eine der beiden Tasten unter Steuerung umbelegen.
 - Talente werden nur mit Namen geführt, ihre Effekte werden nicht berechnet.
 - Auswahlbasierte Klassenverbesserungen (z. B. Doktrinen, Waffenmeisterschaft, Wissensränge) muss der Spielleiter setzen.
 - Zauber und Inventar gibt es noch nicht.
-- Kampf: keine Reaktionen (Reaktiver Schlag, Schild blocken), kein Aktionsmenü (Schild heben, Umstoßen … kommt mit Teil 4),
-  keine Zustände, kein Sterbend/Wiederherstellungswurf (Teil 5), keine Zauber.
+- Kampf: keine Reaktionen (Reaktiver Schlag); der Schild-Block fehlt (der Schild wird gehoben, blockt aber noch nicht).
+  Aufstehen, Hinlegen und Befreien sowie alle Zustände und Sterbend/Wiederherstellungswurf kommen mit Teil 5.
+  Kein Zauber- und Gegenstandsmenü, keine Zauber.
 - Es gibt keine Sichtlinienprüfung; Munition und Nachladen werden nicht erzwungen.
 - Der Kampf endet bei einem Serverneustart; ein `/tp` eines Kämpfers wird zurückgesetzt (außer mit `/pf2 combat anchor`).
 - Das Einfrieren wurde nur mit Test-Bots geprüft; auf echten Clients kann es ruckeln (Rubber-Banding).
@@ -209,8 +240,8 @@ Der Regelkern wird direkt in die Mod-Jar kompiliert.
 3. Kampfmodus (in Teilen):
    - ✅ Teil 1: Waffen und Schilde als Gegenstände
    - ✅ Teil 2: NPCs mit Monster-Core-Werten und Befehlsstab (gebaut, Ingame-Test steht aus)
-   - ✅ Teil 3: Kampfkern (Initiative, 3 Aktionen + Reaktion, Angriffe, Mehrfachangriffsmalus; gebaut, Ingame-Test steht aus)
-   - Teil 4: Aktionsmenü
+   - ✅ Teil 3: Kampfkern (Initiative, 3 Aktionen + Reaktion, Angriffe, Mehrfachangriffsmalus; im Einzelspieler getestet, Mehrspieler ungetestet)
+   - ✅ Teil 4: Aktionsmenü (Taste V, Grundaktionen, Schild und Deckung; gebaut, Ingame-Test steht aus)
    - Teil 5: Zustände
 4. NPC-Steuerung im Kampf und „Übernehmen“ durch den GM
 5. Zauber, Gegenstände, mehr Inhalte, physische Würfel
