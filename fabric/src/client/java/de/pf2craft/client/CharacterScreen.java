@@ -179,6 +179,14 @@ public class CharacterScreen extends Screen {
         addDrawableChild(CyclingButtonWidget.onOffBuilder(secret)
                 .build(left, footerY, 100, FOOTER_H, Text.translatable("screen.pf2craft.sheet.secret"),
                         (button, value) -> secret = value));
+        Optional<de.pf2craft.network.CombatSyncPayload.Entry> inCombat = ClientConditions.entry(owner);
+        if (inCombat.isPresent()) {
+            // GMs edit, the owner only reads (the server filters what each side may see)
+            addDrawableChild(ButtonWidget.builder(Text.translatable("screen.pf2craft.sheet.conditions"),
+                            b -> client.setScreen(new ConditionEditScreen(this, owner, inCombat.get().name(),
+                                    synced.gmView())))
+                    .dimensions(left + 104, footerY, 70, FOOTER_H).build());
+        }
         if (!isOwnSheet()) {
             return;
         }

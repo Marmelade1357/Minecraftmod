@@ -11,14 +11,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 /**
  * Conditions of the running combat, per combatant id. In memory only, like {@link CombatService}; cleared when the
  * combatant leaves or the combat ends. Static, server thread only.
  */
 public final class ConditionService {
+    /** Longest condition text of one combatant in the sync payload. */
+    public static final int MAX_ENCODED = 96;
     private static final Map<String, ConditionSet> SETS = new HashMap<>();
     /** Grabbed combatant id -> the id of the creature holding them. */
     private static final Map<String, String> GRABBED_BY = new HashMap<>();
@@ -70,6 +75,115 @@ public final class ConditionService {
             GRABBED_BY.remove(id);
         }
         announce(id, condition, CombatMessages.conditionLost(nameOf(id), condition), 0, "removed");
+    }
+
+    /**
+     * A GM sets a condition to an exact value (0 removes it). Everything is validated here: the sender must be a GM,
+     * the target a combatant and the value within 0..4 (valued) or 0..1 (unvalued). Errors go to the GM's chat.
+     */
+    public static void edit(ServerPlayerEntity gm, UUID target, Condition condition, int value) {
+        if (!GmRoles.isGm(gm)) {
+            CombatMessages.error(gm, CombatMessages.notGm());
+            return;
+        }
+        Optional<Text> error = setValue(target, condition, value);
+        error.ifPresent(e -> gm.sendMessage(e.copy().formatted(Formatting.RED), false));
+    }
+
+    /** Payload entry: the condition id comes from the client and may be anything. */
+    public static void editFromClient(ServerPlayerEntity gm, UUID target, String conditionId, int value) {
+        Optional<Condition> condition = Condition.byId(conditionId);
+        if (condition.isEmpty()) {
+            if (GmRoles.isGm(gm)) {
+                gm.sendMessage(unknownCondition(), false);
+            } else {
+                CombatMessages.error(gm, CombatMessages.notGm());
+            }
+            return;
+        }
+        edit(gm, target, condition.get(), value);
+    }
+
+    /** Command path: permission is checked by the command. Returns the error, if any. */
+    public static Optional<Text> editFromCommand(UUID target, Condition condition, int value) {
+        return setValue(target, condition, value);
+    }
+
+    /** Translated name with value, e.g. "Frightened 2". */
+    public static MutableText describe(Condition condition, int value) {
+        return CombatMessages.conditionLabel(condition, value);
+    }
+
+    public static MutableText unknownCondition() {
+        return Text.translatableWithFallback("pf2craft.condition.unknown", "Unknown condition.")
+                .formatted(Formatting.RED);
+    }
+
+    private static Optional<Text> setValue(UUID target, Condition condition, int value) {
+        if (!CombatService.active()) {
+            return Optional.of(CombatMessages.notRunning());
+        }
+        if (!CombatService.contains(target)) {
+            return Optional.of(Text.translatableWithFallback("pf2craft.combat.not_participant",
+                    "That creature does not take part in the combat."));
+        }
+        int max = condition.valued() ? 4 : 1;
+        if (value < 0 || value > max) {
+            return Optional.of(Text.translatableWithFallback("pf2craft.condition.bad_value",
+                    "The value must be between 0 and %s.", max));
+        }
+        String id = target.toString();
+        ConditionSet set = of(id);
+        ConditionSet before = set.copy();
+        if (value == 0) {
+            set.remove(condition);
+            if (condition == Condition.GRABBED) {
+                GRABBED_BY.remove(id);
+            }
+            if (condition == Condition.UNCONSCIOUS) {
+                set.remove(Condition.DYING); // waking up ends dying
+            }
+        } else {
+            set.set(condition, value);
+            if (condition == Condition.DYING) {
+                set.set(Condition.UNCONSCIOUS, 1); // a dying creature is always unconscious
+            }
+        }
+        for (Condition c : Condition.values()) {
+            int now = set.value(c);
+            if (now != before.value(c)) {
+                announceValue(id, c, now, "gm edit");
+            }
+        }
+        DyingService.afterEdit(id);
+        CombatService.sync(null);
+        return Optional.empty();
+    }
+
+    /**
+     * The conditions of {@code id} as {@code id:value} pairs separated by commas, for the sync payload. Only the
+     * public ones unless {@code all}; whole pairs are dropped rather than cut when the text would get too long.
+     */
+    public static String encode(String id, boolean all) {
+        ConditionSet set = SETS.get(id);
+        if (set == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<Condition, Integer> e : set.all().entrySet()) {
+            if (!all && !e.getKey().publicToAll()) {
+                continue;
+            }
+            String pair = e.getKey().id() + ":" + e.getValue();
+            if (sb.length() + pair.length() + 1 > MAX_ENCODED) {
+                break;
+            }
+            if (sb.length() > 0) {
+                sb.append(',');
+            }
+            sb.append(pair);
+        }
+        return sb.toString();
     }
 
     /** {@code targetId} is now grabbed by {@code grabberId}. */

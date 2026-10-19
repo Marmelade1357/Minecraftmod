@@ -24,9 +24,9 @@ import net.minecraft.util.Language;
 public final class CombatHud {
     private static final int BAR_TOP = 4;
     private static final int CURRENT_W = 104;
-    private static final int CURRENT_H = 36;
+    private static final int CURRENT_H = 48;
     private static final int OTHER_W = 76;
-    private static final int OTHER_H = 30;
+    private static final int OTHER_H = 44;
     private static final int GAP = 3;
     private static final int COLOR_PANEL = 0xA0000000;
     private static final int COLOR_PANEL_CURRENT = 0xC0302800;
@@ -34,6 +34,7 @@ public final class CombatHud {
     private static final int COLOR_BORDER = 0xFF606060;
     private static final int COLOR_GREY = 0xFF808080;
     private static final int COLOR_WHITE = 0xFFFFFFFF;
+    private static final int COLOR_CONDITION = 0xFFFFC800;
 
     private CombatHud() {
     }
@@ -86,7 +87,15 @@ public final class CombatHud {
         int max = CharacterMath.maxHp(sheet);
         int hp = sheet.currentHp();
         Formatting color = hp * 4 <= max ? Formatting.RED : hp * 2 <= max ? Formatting.YELLOW : Formatting.GREEN;
-        Text text = Text.translatable("hud.pf2craft.hp", hp, max).formatted(color, Formatting.BOLD);
+        MutableText text = Text.translatable("hud.pf2craft.hp", hp, max).formatted(color, Formatting.BOLD);
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        if (player != null) {
+            MutableText conditions = ClientConditions.line(ClientConditions.of(player.getUuid()));
+            if (!conditions.getString().isEmpty()) {
+                text.append(Text.literal(" · ").formatted(Formatting.GRAY))
+                        .append(conditions.formatted(Formatting.GOLD));
+            }
+        }
         context.drawTextWithShadow(font, text, x, y, COLOR_WHITE);
     }
 
@@ -152,6 +161,13 @@ public final class CombatHud {
             Text health = healthText(e);
             context.drawTextWithShadow(font, Language.getInstance().reorder(font.trimToWidth(health, textW)), x + 3, line,
                     grey ? COLOR_GREY : COLOR_WHITE);
+            line += font.fontHeight + 1;
+        }
+        // The server already filtered: public conditions for everyone, all of them for GMs.
+        Text conditions = ClientConditions.line(e.conditionMap());
+        if (!conditions.getString().isEmpty()) {
+            context.drawTextWithShadow(font, Language.getInstance().reorder(font.trimToWidth(conditions, textW)),
+                    x + 3, line, grey ? COLOR_GREY : COLOR_CONDITION);
         }
     }
 

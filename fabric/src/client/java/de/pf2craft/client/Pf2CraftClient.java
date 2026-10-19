@@ -99,7 +99,12 @@ public class Pf2CraftClient implements ClientModInitializer {
             }
         });
         ClientPlayNetworking.registerGlobalReceiver(CombatSyncPayload.ID,
-                (payload, context) -> ClientCombat.set(payload));
+                (payload, context) -> {
+                    ClientCombat.set(payload);
+                    if (context.client().currentScreen instanceof ConditionEditScreen screen) {
+                        screen.refresh();
+                    }
+                });
         ClientPlayNetworking.registerGlobalReceiver(PendingActionPayload.ID,
                 (payload, context) -> ClientActions.setPending(payload.actionId()));
         ClientPlayNetworking.registerGlobalReceiver(OpenCombatScreenPayload.ID,

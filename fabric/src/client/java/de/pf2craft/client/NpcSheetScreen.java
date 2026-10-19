@@ -195,14 +195,30 @@ public class NpcSheetScreen extends Screen {
     }
 
     private void addFooter(int footerY) {
-        int third = (panelW - 8) / 3;
+        int quarter = (panelW - 9) / 4;
         addDrawableChild(ButtonWidget.builder(Text.translatable("screen.pf2craft.npc.sheet.template"),
                         b -> send(new NpcActionPayload(entityId, "save_template")))
-                .dimensions(left, footerY, third + 20, FOOTER_H).build());
+                .dimensions(left, footerY, quarter + 20, FOOTER_H).build());
+        ButtonWidget conditions = addDrawableChild(ButtonWidget.builder(
+                        Text.translatable("screen.pf2craft.sheet.conditions"), b -> openConditions())
+                .dimensions(left + quarter + 23, footerY, quarter - 10, FOOTER_H).build());
+        conditions.active = npcUuid().flatMap(ClientConditions::entry).isPresent();
         removeButton = addDrawableChild(ButtonWidget.builder(removeLabel(), b -> remove())
-                .dimensions(left + third + 24, footerY, third - 20, FOOTER_H).build());
+                .dimensions(left + 2 * quarter + 15, footerY, quarter - 10, FOOTER_H).build());
         addDrawableChild(ButtonWidget.builder(Text.translatable("gui.done"), b -> close())
-                .dimensions(left + 2 * third + 8, footerY, panelW - 2 * third - 8, FOOTER_H).build());
+                .dimensions(left + 3 * quarter + 8, footerY, panelW - 3 * quarter - 8, FOOTER_H).build());
+    }
+
+    /** The NPC's UUID, if its entity is loaded on the client. */
+    private java.util.Optional<java.util.UUID> npcUuid() {
+        if (client == null || client.world == null) {
+            return java.util.Optional.empty();
+        }
+        return java.util.Optional.ofNullable(client.world.getEntityById(entityId)).map(e -> e.getUuid());
+    }
+
+    private void openConditions() {
+        npcUuid().ifPresent(id -> client.setScreen(new ConditionEditScreen(this, id, stats.displayName(), true)));
     }
 
     private Text removeLabel() {

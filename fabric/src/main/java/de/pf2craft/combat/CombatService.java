@@ -643,6 +643,7 @@ public final class CombatService {
             for (Encounter.Entry e : encounter.order()) {
                 Combatant c = e.combatant();
                 UUID uuid = UUID.fromString(c.id());
+                boolean seeAll = gm || uuid.equals(r.getUuid()); // GMs and the owner see private conditions too
                 if (c.npc()) {
                     NpcEntity npc = findNpc(server, uuid);
                     NpcStats stats = npc == null ? null : npc.stats();
@@ -652,10 +653,11 @@ public final class CombatService {
                             gm ? e.initiative() : -1, label,
                             gm && stats != null ? stats.currentHp() : -1,
                             gm && stats != null ? stats.base().hp() : -1,
-                            e.active(), c.id().equals(currentId)));
+                            e.active(), c.id().equals(currentId), ConditionService.encode(c.id(), seeAll)));
                 } else {
                     entries.add(new CombatSyncPayload.Entry(uuid, clip(c.name()), false, e.initiative(),
-                            CombatSyncPayload.Entry.PLAYER_LABEL, -1, -1, e.active(), c.id().equals(currentId)));
+                            CombatSyncPayload.Entry.PLAYER_LABEL, -1, -1, e.active(), c.id().equals(currentId),
+                            ConditionService.encode(c.id(), seeAll)));
                 }
             }
             TurnState t = encounter.turn();

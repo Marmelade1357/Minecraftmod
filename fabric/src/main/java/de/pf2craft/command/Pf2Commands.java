@@ -15,9 +15,11 @@ import de.pf2craft.character.SheetService;
 import de.pf2craft.combat.ActionService;
 import de.pf2craft.combat.AttackService;
 import de.pf2craft.combat.CombatService;
+import de.pf2craft.combat.ConditionService;
 import de.pf2craft.combat.Enforcement;
 import de.pf2craft.core.character.CharacterSheet;
 import de.pf2craft.core.combat.BasicActions;
+import de.pf2craft.core.combat.Condition;
 import de.pf2craft.core.dice.DiceParseException;
 import de.pf2craft.core.monster.MonsterData;
 import de.pf2craft.core.monster.NpcEdit;
@@ -186,6 +188,25 @@ public final class Pf2Commands {
                                         })
                                         .executes(ctx -> ActionService.fallback(ctx.getSource().getPlayerOrThrow(),
                                                 StringArgumentType.getString(ctx, "id")) ? 1 : 0)))
+                        .then(literal("condition")
+                                .requires(Pf2Commands::isGmOrOp)
+                                .then(literal("player")
+                                        .then(argument("player", EntityArgumentType.player())
+                                                .then(argument("id", StringArgumentType.word())
+                                                        .suggests(Pf2Commands::suggestConditions)
+                                                        .then(argument("value", IntegerArgumentType.integer(0, 4))
+                                                                .executes(ctx -> setCondition(ctx,
+                                                                        EntityArgumentType.getPlayer(ctx, "player")
+                                                                                .getUuid()))))))
+                                .then(literal("npc")
+                                        .then(argument("id", StringArgumentType.word())
+                                                .suggests(Pf2Commands::suggestConditions)
+                                                .then(argument("value", IntegerArgumentType.integer(0, 4))
+                                                        .executes(ctx -> {
+                                                            Optional<NpcEntity> npc = lookedAtNpc(ctx);
+                                                            return npc.isEmpty() ? 0
+                                                                    : setCondition(ctx, npc.get().getUuid());
+                                                        })))))
                         .then(literal("endturn")
                                 .executes(ctx -> {
                                     CombatService.endTurn(ctx.getSource().getPlayerOrThrow());
@@ -205,7 +226,34 @@ public final class Pf2Commands {
                                         .executes(Pf2Commands::resetCharacter)))));
     }
 
-    /** Command path of "remove": game masters and level-2 operators alike, with feedback. */
+    private static java.util.concurrent.CompletableFuture<com.mojang.brigadier.suggestion.Suggestions>
+            suggestConditions(CommandContext<ServerCommandSource> ctx,
+                              com.mojang.brigadier.suggestion.SuggestionsBuilder builder) {
+        for (Condition c : Condition.values()) {
+            builder.suggest(c.id());
+        }
+        return builder.buildFuture();
+    }
+
+    /** {@code /pf2 combat condition ...}: sets one condition of a combatant (value 0 removes it). */
+    private static int setCondition(CommandContext<ServerCommandSource> ctx, java.util.UUID target) {
+        Optional<Condition> condition = Condition.byId(StringArgumentType.getString(ctx, "id"));
+        if (condition.isEmpty()) {
+            ctx.getSource().sendError(ConditionService.unknownCondition());
+            return 0;
+        }
+        int value = IntegerArgumentType.getInteger(ctx, "value");
+        Optional<Text> error = ConditionService.editFromCommand(target, condition.get(), value);
+        if (error.isPresent()) {
+            ctx.getSource().sendError(error.get());
+            return 0;
+        }
+        ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.condition.set",
+                "Condition set: %s", ConditionService.describe(condition.get(), value)), false);
+        return 1;
+    }
+
+    /** Command path of "remove":game masters and level-2 operators alike, with feedback. */
     private static int removeFromCombat(CommandContext<ServerCommandSource> ctx, java.util.UUID id) {
         if (!CombatService.active()) {
             ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.combat.not_running",

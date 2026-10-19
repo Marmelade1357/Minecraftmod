@@ -88,6 +88,15 @@ public final class DyingService {
         CombatService.sync(null);
     }
 
+    /** A GM set conditions by hand: report a dying-4 combatant to the GMs, or allow recovery again if it dropped. */
+    static void afterEdit(String id) {
+        ConditionSet set = ConditionService.of(id);
+        if (set.value(Condition.DYING) < ConditionSet.DYING_CAP) {
+            REPORTED_DEAD.remove(id);
+        }
+        reportIfDead(id, set);
+    }
+
     static void forget(String id) {
         REPORTED_DEAD.remove(id);
     }

@@ -376,5 +376,11 @@
   "pf2craft.dying.degree.crit_success": "critical success",
   "pf2craft.dying.degree.success": "success",
   "pf2craft.dying.degree.failure": "failure",
-  "pf2craft.dying.degree.crit_failure": "critical failure"
+  "pf2craft.dying.degree.crit_failure": "critical failure",
+  "screen.pf2craft.sheet.conditions": "Conditions",
+  "screen.pf2craft.conditions.title": "Conditions",
+  "screen.pf2craft.conditions.heading": "Conditions: %s",
+  "pf2craft.condition.unknown": "Unknown condition.",
+  "pf2craft.condition.bad_value": "The value must be between 0 and %s.",
+  "pf2craft.condition.set": "Condition set: %s"
 }
