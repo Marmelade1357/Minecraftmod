@@ -82,7 +82,9 @@ public final class Enforcement {
             if (player instanceof ServerPlayerEntity sp && CombatService.active()
                     && CombatService.currentId().filter(sp.getUuid().toString()::equals).isPresent()) {
                 if (hand == Hand.MAIN_HAND) {
-                    if (entity instanceof NpcEntity) {
+                    if (ActionService.hasPending(sp)) {
+                        ActionService.executePending(sp, entity);
+                    } else if (entity instanceof NpcEntity) {
                         AttackService.openFor(sp, entity);
                     } else {
                         AttackService.hint(sp, CombatMessages.badTarget());
@@ -275,6 +277,9 @@ public final class Enforcement {
         int strideBefore = (int) Math.ceil(CombatService.budget().remainingInStride());
         if (CombatService.budget().tryMove(delta, CombatService.turn())) {
             lastAccepted = pos;
+            if (delta > EDGE) {
+                CombatService.effects().onMoved(p.getUuid().toString()); // leaving cover and the like
+            }
             // The HUD shows whole blocks left in the stride: sync when that number or the actions change.
             if (CombatService.turn().actionsLeft() != before
                     || (int) Math.ceil(CombatService.budget().remainingInStride()) != strideBefore) {

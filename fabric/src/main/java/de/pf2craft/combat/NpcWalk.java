@@ -64,6 +64,7 @@ public final class NpcWalk {
             CombatMessages.error(gm, CombatMessages.notEnoughActions());
             return;
         }
+        CombatService.effects().onMoved(npc.getUuid().toString());
         WALKS.put(npc.getUuid(), new Walk(length, npc.getPos()));
         npc.getNavigation().startMovingAlong(path, WALK_SPEED);
         CombatService.sync(null);

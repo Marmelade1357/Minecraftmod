@@ -2,6 +2,7 @@ package de.pf2craft.network;
 
 import de.pf2craft.character.CharacterService;
 import de.pf2craft.character.SheetService;
+import de.pf2craft.combat.ActionService;
 import de.pf2craft.combat.AttackService;
 import de.pf2craft.combat.CombatService;
 import de.pf2craft.core.dice.DiceParseException;
@@ -44,6 +45,8 @@ public final class Pf2Networking {
         PayloadTypeRegistry.playS2C().register(OpenCombatScreenPayload.ID, OpenCombatScreenPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(OpenAttackScreenPayload.ID, OpenAttackScreenPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(AttackConfirmPayload.ID, AttackConfirmPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(ActionRequestPayload.ID, ActionRequestPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(PendingActionPayload.ID, PendingActionPayload.CODEC);
     }
 
     public static void registerServerReceivers() {
@@ -79,6 +82,8 @@ public final class Pf2Networking {
                 (payload, context) -> CombatService.endTurn(context.player()));
         ServerPlayNetworking.registerGlobalReceiver(AttackConfirmPayload.ID,
                 (payload, context) -> AttackService.confirm(context.player(), payload));
+        ServerPlayNetworking.registerGlobalReceiver(ActionRequestPayload.ID,
+                (payload, context) -> ActionService.request(context.player(), payload));
         ServerPlayNetworking.registerGlobalReceiver(RollRequestPayload.ID, (payload, context) -> {
             ServerPlayerEntity player = context.player();
             if (!RollService.checkCooldown(player)) {

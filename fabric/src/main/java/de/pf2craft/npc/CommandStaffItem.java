@@ -1,6 +1,7 @@
 package de.pf2craft.npc;
 
 import de.pf2craft.GmRoles;
+import de.pf2craft.combat.ActionService;
 import de.pf2craft.combat.AttackService;
 import de.pf2craft.combat.CombatService;
 import de.pf2craft.combat.NpcWalk;
@@ -95,6 +96,10 @@ public class CommandStaffItem extends Item {
         if (!(entity instanceof NpcEntity npc) || npc.stats() == null || !requireGm(player)) {
             return;
         }
+        if (ActionService.hasPending(player)) {
+            ActionService.executePending(player, npc); // the pending action wants this click as its target
+            return;
+        }
         GmSelection.select(player, npc);
         player.sendMessage(Text.translatableWithFallback("pf2craft.npc.selected", "Selected: %s",
                 npc.stats().displayName()), true);
@@ -107,6 +112,10 @@ public class CommandStaffItem extends Item {
     private static boolean attackWithSelected(ServerPlayerEntity gm, LivingEntity target) {
         if (!CombatService.active()) {
             return false;
+        }
+        if (ActionService.hasPending(gm)) {
+            ActionService.executePending(gm, target);
+            return true;
         }
         NpcEntity selected = GmSelection.get(gm).orElse(null);
         if (selected == null || selected == target

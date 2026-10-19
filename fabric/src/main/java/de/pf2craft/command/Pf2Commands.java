@@ -12,10 +12,12 @@ import de.pf2craft.GmRoles;
 import de.pf2craft.character.CharacterService;
 import de.pf2craft.character.CharacterStore;
 import de.pf2craft.character.SheetService;
+import de.pf2craft.combat.ActionService;
 import de.pf2craft.combat.AttackService;
 import de.pf2craft.combat.CombatService;
 import de.pf2craft.combat.Enforcement;
 import de.pf2craft.core.character.CharacterSheet;
+import de.pf2craft.core.combat.BasicActions;
 import de.pf2craft.core.dice.DiceParseException;
 import de.pf2craft.core.monster.MonsterData;
 import de.pf2craft.core.monster.NpcEdit;
@@ -175,6 +177,15 @@ public final class Pf2Commands {
                                                         ctx.getSource().getPlayerOrThrow(),
                                                         IntegerArgumentType.getInteger(ctx, "number"),
                                                         IntegerArgumentType.getInteger(ctx, "strike")) ? 1 : 0))))
+                        .then(literal("action")
+                                .then(argument("id", StringArgumentType.word())
+                                        .suggests((ctx, builder) -> {
+                                            BasicActions.ALL.forEach(a -> builder.suggest(a.id()));
+                                            builder.suggest("cancel");
+                                            return builder.buildFuture();
+                                        })
+                                        .executes(ctx -> ActionService.fallback(ctx.getSource().getPlayerOrThrow(),
+                                                StringArgumentType.getString(ctx, "id")) ? 1 : 0)))
                         .then(literal("endturn")
                                 .executes(ctx -> {
                                     CombatService.endTurn(ctx.getSource().getPlayerOrThrow());

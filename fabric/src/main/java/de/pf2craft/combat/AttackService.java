@@ -168,13 +168,14 @@ public final class AttackService {
         NpcEntity npc = p.npc();
         MonsterData base = npc.stats().base();
         boolean agile = AttackMath.isAgile(p.strike().traits());
+        int ac = base.ac() + CombatService.effects().acBonus(npc.getUuid().toString());
         // Everything that can throw is rolled before the action is spent.
         AttackOutcome outcome;
         DegreeOfSuccess degree;
         DamageOutcome damage = null;
         try {
             outcome = AttackMath.resolve(rollNatural(), CharacterMath.strikeAttack(p.sheet(), p.strikeIndex()),
-                    AttackMath.mapPenalty(number, agile), p.rangePenalty(), base.ac());
+                    AttackMath.mapPenalty(number, agile), p.rangePenalty(), ac);
             degree = outcome.degree();
             if (degree.isSuccess()) {
                 List<DamageInstance> rolled = DamageRoller.roll(StrikeDamage.forStrike(p.sheet(), p.strikeIndex()),
@@ -194,7 +195,7 @@ public final class AttackService {
             int applied = damage == null ? -1 : Math.max(0, damage.total());
             int hpLeft = Math.max(0, npc.stats().currentHp() - Math.max(0, applied));
             announce(attacker, nameOf(attacker, p.sheet()), npc.stats().displayName(), number, outcome, degree,
-                    applied, base.ac(), p.rangePenalty(), damage, hpLeft, base.hp());
+                    applied, ac, p.rangePenalty(), damage, hpLeft, base.hp());
             if (applied > 0) {
                 NpcService.damage(npc, applied); // may defeat the NPC and move the combat on
             }
@@ -408,12 +409,13 @@ public final class AttackService {
             if (sheet.isEmpty() || sheet.get().currentHp() <= 0) {
                 return npcFail(gm, CombatMessages.badNpcTarget());
             }
-            ac = CharacterMath.armorClass(sheet.get());
+            ac = CharacterMath.armorClass(sheet.get())
+                    + CombatService.effects().acBonus(player.getUuid().toString());
             defenses = Defenses.NONE;
         } else if (target instanceof NpcEntity victim && victim != npc && !victim.isRemoved()
                 && victim.stats() != null && !victim.stats().defeated() && victim.getWorld() == npc.getWorld()) {
             MonsterData base = victim.stats().base();
-            ac = base.ac();
+            ac = base.ac() + CombatService.effects().acBonus(victim.getUuid().toString());
             defenses = new Defenses(base.resistances(), base.weaknesses(), base.immunities());
         } else {
             return npcFail(gm, CombatMessages.badNpcTarget());
@@ -509,14 +511,14 @@ public final class AttackService {
         return RangeRules.rangePenalty(Math.max(0, distance - EPSILON), incrementFeet);
     }
 
-    private static double edgeDistance(Box a, Box b) {
+    static double edgeDistance(Box a, Box b) {
         double dx = Math.max(0, Math.max(a.minX - b.maxX, b.minX - a.maxX));
         double dy = Math.max(0, Math.max(a.minY - b.maxY, b.minY - a.maxY));
         double dz = Math.max(0, Math.max(a.minZ - b.maxZ, b.minZ - a.maxZ));
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
-    private static String nameOf(ServerPlayerEntity player, CharacterSheet sheet) {
+    static String nameOf(ServerPlayerEntity player, CharacterSheet sheet) {
         return sheet.name() == null || sheet.name().isBlank() ? player.getName().getString() : sheet.name();
     }
 

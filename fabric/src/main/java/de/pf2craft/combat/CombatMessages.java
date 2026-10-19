@@ -255,4 +255,148 @@ final class CombatMessages {
         return Text.translatableWithFallback("pf2craft.combat.attack_error",
                 "The attack could not be resolved: %s", detail);
     }
+
+    // ---- basic actions ---------------------------------------------------------------------------------------
+
+    private static String actionEnglish(String id) {
+        return switch (id) {
+            case "step" -> "Step";
+            case "raise_shield" -> "Raise a Shield";
+            case "take_cover" -> "Take Cover";
+            case "seek" -> "Seek";
+            case "demoralize" -> "Demoralize";
+            case "trip" -> "Trip";
+            case "grapple" -> "Grapple";
+            default -> id;
+        };
+    }
+
+    static MutableText actionName(String id) {
+        return Text.translatableWithFallback("pf2craft.combat.action.name." + id, actionEnglish(id));
+    }
+
+    static MutableText actionUnknown() {
+        return Text.translatableWithFallback("pf2craft.combat.action_unknown", "Unknown action.");
+    }
+
+    static MutableText actionNotEnough(int cost) {
+        return Text.translatableWithFallback("pf2craft.combat.action_not_enough",
+                "Not enough actions left (%s needed).", cost);
+    }
+
+    static MutableText noShield() {
+        return Text.translatableWithFallback("pf2craft.combat.no_shield",
+                "No shield to raise (hold your character's shield in hand).");
+    }
+
+    static MutableText actionNoCharacter() {
+        return Text.translatableWithFallback("pf2craft.combat.action_no_character", "You have no character.");
+    }
+
+    static MutableText actionNoDc() {
+        return Text.translatableWithFallback("pf2craft.combat.action_no_dc",
+                "The target has no value to test against.");
+    }
+
+    static MutableText actionNoSelection() {
+        return Text.translatableWithFallback("pf2craft.combat.action_no_selection",
+                "Select the NPC that is up (staff) or be up yourself.");
+    }
+
+    /** Action-bar hint while an action waits for its target. */
+    static MutableText actionPending(String actionId) {
+        return Text.translatableWithFallback("pf2craft.combat.action_pending",
+                "%s: click the target (or look at it and repeat the command).", actionName(actionId))
+                .formatted(Formatting.YELLOW);
+    }
+
+    static MutableText actionSay(String actionId, String actor) {
+        String english = switch (actionId) {
+            case "step" -> "%s takes a Step.";
+            case "raise_shield" -> "%s raises a shield.";
+            case "take_cover" -> "%s takes cover.";
+            default -> "%s seeks.";
+        };
+        return Text.translatableWithFallback("pf2craft.combat.action.say." + actionId, english, actor)
+                .formatted(Formatting.GRAY);
+    }
+
+    /** The line everyone sees: no DC, no total, no natural roll. */
+    static MutableText actionLine(String actor, String actionId, String target, DegreeOfSuccess degree) {
+        MutableText result = switch (degree) {
+            case CRITICAL_SUCCESS -> Text.translatableWithFallback("pf2craft.combat.action.crit_success",
+                    "critical success");
+            case SUCCESS -> Text.translatableWithFallback("pf2craft.combat.action.success", "success");
+            case FAILURE -> Text.translatableWithFallback("pf2craft.combat.action.failure", "failure");
+            case CRITICAL_FAILURE -> Text.translatableWithFallback("pf2craft.combat.action.crit_failure",
+                    "critical failure");
+        };
+        Formatting color = switch (degree) {
+            case CRITICAL_SUCCESS -> Formatting.GOLD;
+            case SUCCESS -> Formatting.GREEN;
+            case FAILURE -> Formatting.GRAY;
+            case CRITICAL_FAILURE -> Formatting.RED;
+        };
+        return Text.translatableWithFallback("pf2craft.combat.action.line", "%s: %s against %s - %s",
+                actor, actionName(actionId), target, result).formatted(color);
+    }
+
+    static MutableText actionGmRoll(int natural, int total, int dc, int map) {
+        return Text.translatableWithFallback("pf2craft.combat.action.gm_roll",
+                "[GM] d20 %s, total %s against DC %s (multiple attack penalty %s)", natural, total, dc, map)
+                .formatted(Formatting.DARK_AQUA);
+    }
+
+    static MutableText actionGmSeek(int natural, int total) {
+        return Text.translatableWithFallback("pf2craft.combat.action.gm_seek", "[GM] Seek: d20 %s, total %s",
+                natural, total).formatted(Formatting.DARK_AQUA);
+    }
+
+    static MutableText actionGmShield(int bonus) {
+        return Text.translatableWithFallback("pf2craft.combat.action.gm_shield",
+                "[GM] Shield: +%s AC until the start of the next turn", bonus).formatted(Formatting.DARK_AQUA);
+    }
+
+    static MutableText actionGmNpcStep(String name) {
+        return Text.translatableWithFallback("pf2craft.combat.action.gm_npc_step", "[GM] %s may move 1 block.",
+                name).formatted(Formatting.DARK_AQUA);
+    }
+
+    /** Condition hint for the GM by action and degree; the condition is never applied automatically. */
+    static java.util.Optional<MutableText> actionConditionHint(String actionId, DegreeOfSuccess degree) {
+        String key = null;
+        String english = null;
+        switch (actionId) {
+            case "demoralize" -> {
+                if (degree.isSuccess()) {
+                    key = "frightened";
+                    english = "[GM] The target may be frightened 1/2.";
+                }
+            }
+            case "trip" -> {
+                if (degree.isSuccess()) {
+                    key = "prone_target";
+                    english = "[GM] The target may be prone.";
+                } else if (degree == DegreeOfSuccess.CRITICAL_FAILURE) {
+                    key = "prone_actor";
+                    english = "[GM] The actor may be prone.";
+                }
+            }
+            case "grapple" -> {
+                if (degree == DegreeOfSuccess.CRITICAL_SUCCESS) {
+                    key = "restrained";
+                    english = "[GM] The target may be restrained.";
+                } else if (degree == DegreeOfSuccess.SUCCESS) {
+                    key = "grabbed";
+                    english = "[GM] The target may be grabbed.";
+                }
+            }
+            default -> { }
+        }
+        if (key == null) {
+            return java.util.Optional.empty();
+        }
+        return java.util.Optional.of(Text.translatableWithFallback("pf2craft.combat.action_hint_" + key, english)
+                .formatted(Formatting.DARK_AQUA));
+    }
 }

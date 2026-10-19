@@ -4,6 +4,7 @@ import de.pf2craft.character.CharacterService;
 import de.pf2craft.character.CharacterStore;
 import de.pf2craft.character.ClassData;
 import de.pf2craft.character.SheetService;
+import de.pf2craft.combat.ActionService;
 import de.pf2craft.combat.AttackService;
 import de.pf2craft.combat.CombatService;
 import de.pf2craft.combat.Enforcement;
@@ -58,6 +59,7 @@ public class Pf2Craft implements ModInitializer {
                     SheetService.onDisconnect(handler.player);
                     NpcNetwork.onDisconnect(handler.player);
                     AttackService.forget(handler.player.getUuid());
+                    ActionService.forget(handler.player.getUuid());
                 });
         // The staff is a tool, not a weapon: hitting anything with it does nothing.
         // Exception: a left-click on an NPC selects it.

@@ -5,6 +5,7 @@ import de.pf2craft.Pf2Craft;
 import de.pf2craft.character.CharacterStore;
 import de.pf2craft.core.character.CharacterMath;
 import de.pf2craft.core.character.CharacterSheet;
+import de.pf2craft.core.combat.CombatEffects;
 import de.pf2craft.core.combat.Combatant;
 import de.pf2craft.core.combat.Encounter;
 import de.pf2craft.core.combat.HealthLabel;
@@ -52,6 +53,7 @@ public final class CombatService {
     private static int announcedRound;
     private static MinecraftServer server;
     private static final Set<String> DEFEATED = new HashSet<>();
+    private static final CombatEffects EFFECTS = new CombatEffects();
 
     /** Temporary attribute bonus that lets the click reach far targets; the server's reach rules still decide. */
     private static final Identifier REACH_ID = Pf2Craft.id("combat_reach");
@@ -142,8 +144,20 @@ public final class CombatService {
         return budget;
     }
 
+    /** Temporary effects (AC bonuses) of the running combat; cleared when it ends. */
+    public static CombatEffects effects() {
+        return EFFECTS;
+    }
+
+    /** The server of the running combat, or null. */
+    static MinecraftServer server() {
+        return server;
+    }
+
     /** Clears all state without messages, e.g. when the server stops. */
     public static void reset() {
+        ActionService.clearAllPending();
+        EFFECTS.clearAll();
         encounter = null;
         server = null;
         DEFEATED.clear();
@@ -270,6 +284,8 @@ public final class CombatService {
         ServerPlayerEntity removedPlayer = server.getPlayerManager().getPlayer(uuid);
         encounter.remove(id);
         DEFEATED.remove(id);
+        EFFECTS.clear(id);
+        ActionService.clearPending(uuid);
         Enforcement.onLeft(uuid);
         for (ServerPlayerEntity r : audience) {
             r.sendMessage(CombatMessages.removed(name), false);
@@ -332,6 +348,9 @@ public final class CombatService {
         encounter = fresh;
         server = srv;
         DEFEATED.clear();
+        EFFECTS.clearAll();
+        EFFECTS.onTurnStart(first.get().id());
+        ActionService.clearAllPending();
         budget = new MovementBudget(speedOf(first.get().id()));
         announcedRound = 1;
         Pf2Craft.LOGGER.info("Combat started with {} participants", fresh.order().size());
@@ -475,6 +494,7 @@ public final class CombatService {
     private static void deactivate(String id, @Nullable ServerPlayerEntity leaving) {
         boolean wasCurrent = currentId().filter(id::equals).isPresent();
         encounter.setActive(id, false);
+        EFFECTS.clear(id);
         if (wasCurrent) {
             nextTurn(leaving);
             if (encounter == null) {
@@ -531,6 +551,8 @@ public final class CombatService {
             return;
         }
         budget = new MovementBudget(speedOf(next.get().id()));
+        EFFECTS.onTurnStart(next.get().id());
+        ActionService.clearAllPending(); // a pending action belongs to the turn it was chosen in
         if (encounter.round() != announcedRound) {
             announcedRound = encounter.round();
             for (ServerPlayerEntity r : recipients(exclude)) {
@@ -552,6 +574,8 @@ public final class CombatService {
 
     private static void finish(@Nullable ServerPlayerEntity exclude) {
         List<ServerPlayerEntity> audience = recipients(exclude);
+        ActionService.clearAllPending();
+        EFFECTS.clearAll();
         encounter = null;
         autoEndId = null;
         DEFEATED.clear();
