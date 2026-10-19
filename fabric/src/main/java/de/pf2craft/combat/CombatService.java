@@ -452,7 +452,9 @@ public final class CombatService {
         if (encounter == null || !containsId(player.getUuid().toString())) {
             return;
         }
-        deactivate(player.getUuid().toString(), player);
+        String id = player.getUuid().toString();
+        // A downed player keeps dying/unconscious/wounded for the rest of the combat, so logging out is no escape.
+        deactivate(id, player, ConditionService.isDowned(id));
     }
 
     public static void onJoin(ServerPlayerEntity player) {
@@ -462,7 +464,8 @@ public final class CombatService {
         String id = player.getUuid().toString();
         if (containsId(id) && !DEFEATED.contains(id)) {
             Optional<CharacterSheet> sheet = CharacterStore.get(player);
-            if (sheet.isPresent() && sheet.get().currentHp() > 0) {
+            if (sheet.isPresent() && (sheet.get().currentHp() > 0 || ConditionService.isDowned(id))) {
+                // A downed player comes back still downed and keeps getting recovery rolls.
                 encounter.setActive(id, true);
             }
         }
@@ -478,7 +481,7 @@ public final class CombatService {
             return;
         }
         DEFEATED.add(id);
-        deactivate(id, null);
+        deactivate(id, null, false);
     }
 
     /**
@@ -499,11 +502,13 @@ public final class CombatService {
         }
     }
 
-    private static void deactivate(String id, @Nullable ServerPlayerEntity leaving) {
+    private static void deactivate(String id, @Nullable ServerPlayerEntity leaving, boolean keepConditions) {
         boolean wasCurrent = currentId().filter(id::equals).isPresent();
         encounter.setActive(id, false);
         EFFECTS.clear(id);
-        ConditionService.clear(id);
+        if (!keepConditions) {
+            ConditionService.clear(id);
+        }
         if (wasCurrent) {
             nextTurn(leaving);
             if (encounter == null) {

@@ -54,6 +54,12 @@ public final class ConditionService {
         DyingService.forgetAll();
     }
 
+    /** Whether the combatant is knocked out (unconscious or dying); such conditions survive a disconnect. */
+    public static boolean isDowned(String id) {
+        ConditionSet set = SETS.get(id);
+        return set != null && (set.has(Condition.UNCONSCIOUS) || set.has(Condition.DYING));
+    }
+
     public static boolean canAct(String id) {
         ConditionSet set = SETS.get(id);
         return set == null || ConditionEffects.canAct(set);
