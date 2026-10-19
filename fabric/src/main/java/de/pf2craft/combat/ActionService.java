@@ -12,6 +12,8 @@ import de.pf2craft.core.combat.AttackMath;
 import de.pf2craft.core.combat.BasicAction;
 import de.pf2craft.core.combat.BasicActions;
 import de.pf2craft.core.combat.CombatEffects;
+import de.pf2craft.core.combat.Condition;
+import de.pf2craft.core.combat.ConditionEffects;
 import de.pf2craft.core.dice.DiceParseException;
 import de.pf2craft.core.item.ItemStamp;
 import de.pf2craft.item.Pf2Components;
@@ -290,6 +292,9 @@ public final class ActionService {
             }
             actor = new Actor(actorId.toString(), npc.stats().displayName(), npc, null, npc);
         }
+        if (!ConditionService.canAct(actor.id())) {
+            return actorFail(sender, CombatMessages.cannotAct(), interactive);
+        }
         if (CombatService.turn().actionsLeft() < action.cost()) {
             return actorFail(sender, CombatMessages.actionNotEnough(action.cost()), interactive);
         }
@@ -393,7 +398,8 @@ public final class ActionService {
                 if (action.countsAsAttack()) {
                     map = AttackMath.mapPenalty(CombatService.turn().nextAttackNumber(), false);
                 }
-                total = natural + actor.skillBonus(action.skill()) + map;
+                total = natural + actor.skillBonus(action.skill()) + map
+                        + ConditionEffects.checkPenalty(ConditionService.of(actor.id()));
                 if (target != null) {
                     degree = DegreeOfSuccess.determine(total, target.dc(), OptionalInt.of(natural));
                 }
@@ -409,6 +415,7 @@ public final class ActionService {
         CombatEffects effects = CombatService.effects();
         List<Text> publicLines = new ArrayList<>();
         List<Text> gmLines = new ArrayList<>();
+        Runnable applyAfter = null; // conditions are announced after the action's own line
         switch (action.id()) {
             case "step" -> {
                 CombatService.budget().grantStep(); // the block is free of Stride costs (NPCs walk it via NpcWalk)
@@ -442,6 +449,16 @@ public final class ActionService {
                 publicLines.add(CombatMessages.actionLine(actor.name(), action.id(), target.name(), degree));
                 gmLines.add(CombatMessages.actionGmRoll(natural, total, target.dc(), map));
                 CombatMessages.actionConditionHint(action.id(), degree).ifPresent(gmLines::add);
+                if (degree != null && degree.isSuccess()) {
+                    String targetId = target.entity().getUuid().toString();
+                    boolean crit = degree == DegreeOfSuccess.CRITICAL_SUCCESS;
+                    switch (action.id()) {
+                        case "demoralize" -> applyAfter = () -> ConditionService.add(targetId, Condition.FRIGHTENED,
+                                crit ? 2 : 1, "demoralize");
+                        case "trip" -> applyAfter = () -> ConditionService.add(targetId, Condition.PRONE, 1, "trip");
+                        default -> { }
+                    }
+                }
             }
         }
         for (ServerPlayerEntity r : sender.getServer().getPlayerManager().getPlayerList()) {
@@ -451,6 +468,9 @@ public final class ActionService {
             }
         }
         Pf2Craft.LOGGER.info("{} uses {} (cost {})", actor.name(), action.id(), action.cost());
+        if (applyAfter != null) {
+            applyAfter.run();
+        }
         CombatService.sync(null);
         // The turn ends by itself shortly after the last action: CombatService.tickAutoEnd looks at it every tick.
     }

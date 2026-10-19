@@ -2,6 +2,7 @@ package de.pf2craft.combat;
 
 import de.pf2craft.core.check.DegreeOfSuccess;
 import de.pf2craft.core.combat.AppliedPart;
+import de.pf2craft.core.combat.Condition;
 import java.util.List;
 import java.util.stream.Collectors;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -113,6 +114,39 @@ final class CombatMessages {
 
     static MutableText notYourTurn() {
         return Text.translatableWithFallback("pf2craft.combat.not_your_turn", "It is not your turn.");
+    }
+
+    static MutableText cannotAct() {
+        return Text.translatableWithFallback("pf2craft.combat.cannot_act", "You cannot act right now.");
+    }
+
+    /** Condition name, with its value if it has one, e.g. "Frightened 2". */
+    static MutableText conditionLabel(Condition c, int value) {
+        MutableText name = Text.translatableWithFallback("pf2craft.condition." + c.id(), conditionEnglish(c));
+        return c.valued() ? name.append(" " + value) : name;
+    }
+
+    private static String conditionEnglish(Condition c) {
+        return switch (c) {
+            case OFF_GUARD -> "Off-guard";
+            default -> c.id().substring(0, 1).toUpperCase(java.util.Locale.ROOT) + c.id().substring(1);
+        };
+    }
+
+    static MutableText conditionGained(String name, Condition c, int value) {
+        return Text.translatableWithFallback("pf2craft.condition.gained", "%s is now %s", name,
+                conditionLabel(c, value)).formatted(Formatting.YELLOW);
+    }
+
+    static MutableText conditionLost(String name, Condition c) {
+        return Text.translatableWithFallback("pf2craft.condition.lost", "%s is no longer %s", name,
+                Text.translatableWithFallback("pf2craft.condition." + c.id(), conditionEnglish(c)))
+                .formatted(Formatting.YELLOW);
+    }
+
+    static MutableText actionsLost(String name, int actions) {
+        return Text.translatableWithFallback("pf2craft.condition.actions_lost", "%s loses %s actions this turn.",
+                name, actions).formatted(Formatting.YELLOW);
     }
 
     static MutableText noActions() {
@@ -367,22 +401,13 @@ final class CombatMessages {
                 name).formatted(Formatting.DARK_AQUA);
     }
 
-    /** Condition hint for the GM by action and degree; the condition is never applied automatically. */
+    /** Condition hint for the GM by action and degree, for the conditions that are not applied automatically. */
     static java.util.Optional<MutableText> actionConditionHint(String actionId, DegreeOfSuccess degree) {
         String key = null;
         String english = null;
         switch (actionId) {
-            case "demoralize" -> {
-                if (degree.isSuccess()) {
-                    key = "frightened";
-                    english = "[GM] The target may be frightened 1/2.";
-                }
-            }
             case "trip" -> {
-                if (degree.isSuccess()) {
-                    key = "prone_target";
-                    english = "[GM] The target may be prone.";
-                } else if (degree == DegreeOfSuccess.CRITICAL_FAILURE) {
+                if (degree == DegreeOfSuccess.CRITICAL_FAILURE) {
                     key = "prone_actor";
                     english = "[GM] The actor may be prone.";
                 }

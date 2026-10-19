@@ -11,6 +11,7 @@ import de.pf2craft.core.character.Strike;
 import de.pf2craft.core.check.DegreeOfSuccess;
 import de.pf2craft.core.combat.AttackMath;
 import de.pf2craft.core.combat.AttackOutcome;
+import de.pf2craft.core.combat.ConditionEffects;
 import de.pf2craft.core.combat.DamageInstance;
 import de.pf2craft.core.combat.DamageOutcome;
 import de.pf2craft.core.combat.DamageResolver;
@@ -80,7 +81,8 @@ public final class AttackService {
             return;
         }
         boolean agile = AttackMath.isAgile(p.strike().traits());
-        int bonus = CharacterMath.strikeAttack(p.sheet(), p.strikeIndex());
+        int bonus = CharacterMath.strikeAttack(p.sheet(), p.strikeIndex())
+                + ConditionEffects.attackPenalty(ConditionService.of(attacker.getUuid().toString()));
         List<Integer> bonuses = List.of(bonus + AttackMath.mapPenalty(1, agile),
                 bonus + AttackMath.mapPenalty(2, agile), bonus + AttackMath.mapPenalty(3, agile));
         int suggested = Math.min(3, CombatService.turn().nextAttackNumber());
@@ -168,13 +170,16 @@ public final class AttackService {
         NpcEntity npc = p.npc();
         MonsterData base = npc.stats().base();
         boolean agile = AttackMath.isAgile(p.strike().traits());
-        int ac = base.ac() + CombatService.effects().acBonus(npc.getUuid().toString());
+        String npcId = npc.getUuid().toString();
+        int ac = base.ac() + CombatService.effects().acBonus(npcId)
+                + ConditionEffects.acPenalty(ConditionService.of(npcId));
+        int conditionAttack = ConditionEffects.attackPenalty(ConditionService.of(attacker.getUuid().toString()));
         // Everything that can throw is rolled before the action is spent.
         AttackOutcome outcome;
         DegreeOfSuccess degree;
         DamageOutcome damage = null;
         try {
-            outcome = AttackMath.resolve(rollNatural(), CharacterMath.strikeAttack(p.sheet(), p.strikeIndex()),
+            outcome = AttackMath.resolve(rollNatural(), CharacterMath.strikeAttack(p.sheet(), p.strikeIndex()) + conditionAttack,
                     AttackMath.mapPenalty(number, agile), p.rangePenalty(), ac);
             degree = outcome.degree();
             if (degree.isSuccess()) {
@@ -246,15 +251,16 @@ public final class AttackService {
             return;
         }
         List<OpenAttackScreenPayload.StrikeOption> options = new java.util.ArrayList<>();
+        int conditionAttack = ConditionEffects.attackPenalty(ConditionService.of(npc.getUuid().toString()));
         for (MonsterStrike strike : npc.stats().base().strikes()) {
             if (options.size() >= OpenAttackScreenPayload.MAX_OPTIONS) {
                 break;
             }
             boolean agile = AttackMath.isAgile(strike.traits());
             options.add(new OpenAttackScreenPayload.StrikeOption(clip(strike.name()), List.of(
-                    strike.attackBonus() + AttackMath.mapPenalty(1, agile),
-                    strike.attackBonus() + AttackMath.mapPenalty(2, agile),
-                    strike.attackBonus() + AttackMath.mapPenalty(3, agile)), agile));
+                    strike.attackBonus() + conditionAttack + AttackMath.mapPenalty(1, agile),
+                    strike.attackBonus() + conditionAttack + AttackMath.mapPenalty(2, agile),
+                    strike.attackBonus() + conditionAttack + AttackMath.mapPenalty(3, agile)), agile));
         }
         int suggested = Math.min(3, CombatService.turn().nextAttackNumber());
         if (ServerPlayNetworking.canSend(gm, OpenAttackScreenPayload.ID)) {
@@ -298,11 +304,12 @@ public final class AttackService {
             return false;
         }
         boolean agile = AttackMath.isAgile(p.strike().traits());
+        int conditionAttack = ConditionEffects.attackPenalty(ConditionService.of(npc.getUuid().toString()));
         AttackOutcome outcome;
         DegreeOfSuccess degree;
         DamageOutcome damage = null;
         try {
-            outcome = AttackMath.resolve(rollNatural(), p.strike().attackBonus(),
+            outcome = AttackMath.resolve(rollNatural(), p.strike().attackBonus() + conditionAttack,
                     AttackMath.mapPenalty(number, agile), p.rangePenalty(), p.ac());
             degree = outcome.degree();
             if (degree.isSuccess()) {
@@ -390,6 +397,9 @@ public final class AttackService {
                 || CombatService.currentId().filter(npc.getUuid().toString()::equals).isEmpty()) {
             return npcFail(gm, CombatMessages.npcNotCurrent());
         }
+        if (!ConditionService.canAct(npc.getUuid().toString())) {
+            return npcFail(gm, CombatMessages.cannotAct());
+        }
         if (CombatService.turn().actionsLeft() < 1) {
             return npcFail(gm, CombatMessages.npcNoActions());
         }
@@ -409,13 +419,16 @@ public final class AttackService {
             if (sheet.isEmpty() || sheet.get().currentHp() <= 0) {
                 return npcFail(gm, CombatMessages.badNpcTarget());
             }
-            ac = CharacterMath.armorClass(sheet.get())
-                    + CombatService.effects().acBonus(player.getUuid().toString());
+            String targetId = player.getUuid().toString();
+            ac = CharacterMath.armorClass(sheet.get()) + CombatService.effects().acBonus(targetId)
+                    + ConditionEffects.acPenalty(ConditionService.of(targetId));
             defenses = Defenses.NONE;
         } else if (target instanceof NpcEntity victim && victim != npc && !victim.isRemoved()
                 && victim.stats() != null && !victim.stats().defeated() && victim.getWorld() == npc.getWorld()) {
             MonsterData base = victim.stats().base();
-            ac = base.ac() + CombatService.effects().acBonus(victim.getUuid().toString());
+            String victimId = victim.getUuid().toString();
+            ac = base.ac() + CombatService.effects().acBonus(victimId)
+                    + ConditionEffects.acPenalty(ConditionService.of(victimId));
             defenses = new Defenses(base.resistances(), base.weaknesses(), base.immunities());
         } else {
             return npcFail(gm, CombatMessages.badNpcTarget());
@@ -463,6 +476,9 @@ public final class AttackService {
         }
         if (CombatService.currentId().filter(attacker.getUuid().toString()::equals).isEmpty()) {
             return fail(attacker, CombatMessages.notYourTurn(), interactive);
+        }
+        if (!ConditionService.canAct(attacker.getUuid().toString())) {
+            return fail(attacker, CombatMessages.cannotAct(), interactive);
         }
         if (CombatService.turn().actionsLeft() < 1) {
             return fail(attacker, CombatMessages.noAttackActions(), interactive);

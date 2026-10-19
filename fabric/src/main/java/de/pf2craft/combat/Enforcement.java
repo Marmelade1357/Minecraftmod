@@ -172,6 +172,10 @@ public final class Enforcement {
         for (Encounter.Entry e : CombatService.encounter().get().order()) {
             if (e.combatant().id().equals(id)) {
                 if (e.active() && id.equals(current)) {
+                    if (!ConditionService.canAct(id)) {
+                        sendLimited(sp, LAST_TURN_MSG, CombatMessages.cannotAct());
+                        return true;
+                    }
                     return false;
                 }
                 sendLimited(sp, LAST_TURN_MSG, CombatMessages.notYourTurn());

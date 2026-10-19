@@ -337,8 +337,6 @@
   "pf2craft.combat.action.gm_seek": "[GM] Seek: d20 %s, total %s",
   "pf2craft.combat.action.gm_shield": "[GM] Shield: +%s AC until the start of the next turn",
   "pf2craft.combat.action.gm_npc_step": "[GM] %s may move 1 block.",
-  "pf2craft.combat.action_hint_frightened": "[GM] The target may be frightened 1/2.",
-  "pf2craft.combat.action_hint_prone_target": "[GM] The target may be prone.",
   "pf2craft.combat.action_hint_prone_actor": "[GM] The actor may be prone.",
   "pf2craft.combat.action_hint_grabbed": "[GM] The target may be grabbed.",
   "pf2craft.combat.action_hint_restrained": "[GM] The target may be restrained.",
@@ -354,5 +352,18 @@
   "screen.pf2craft.action_menu.soon": "Coming soon",
   "screen.pf2craft.action_menu.no_actions": "No actions left",
   "screen.pf2craft.action_menu.no_shield": "No shield",
-  "screen.pf2craft.action_menu.not_your_turn": "Not your turn"
+  "screen.pf2craft.action_menu.not_your_turn": "Not your turn",
+  "pf2craft.combat.cannot_act": "You cannot act right now.",
+  "pf2craft.condition.gained": "%s is now %s",
+  "pf2craft.condition.lost": "%s is no longer %s",
+  "pf2craft.condition.actions_lost": "%s loses %s actions this turn.",
+  "pf2craft.condition.frightened": "Frightened",
+  "pf2craft.condition.off_guard": "Off-guard",
+  "pf2craft.condition.prone": "Prone",
+  "pf2craft.condition.grabbed": "Grabbed",
+  "pf2craft.condition.slowed": "Slowed",
+  "pf2craft.condition.stunned": "Stunned",
+  "pf2craft.condition.unconscious": "Unconscious",
+  "pf2craft.condition.dying": "Dying",
+  "pf2craft.condition.wounded": "Wounded"
 }

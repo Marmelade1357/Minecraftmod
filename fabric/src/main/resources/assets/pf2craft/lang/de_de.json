@@ -337,8 +337,6 @@
   "pf2craft.combat.action.gm_seek": "[SL] Suchen: W20 %s, Summe %s",
   "pf2craft.combat.action.gm_shield": "[SL] Schild: +%s RK bis zum Beginn der nächsten Runde",
   "pf2craft.combat.action.gm_npc_step": "[SL] %s darf 1 Block gehen.",
-  "pf2craft.combat.action_hint_frightened": "[SL] Ziel kann verängstigt 1/2 sein.",
-  "pf2craft.combat.action_hint_prone_target": "[SL] Ziel kann liegend sein.",
   "pf2craft.combat.action_hint_prone_actor": "[SL] Akteur kann liegend sein.",
   "pf2craft.combat.action_hint_grabbed": "[SL] Ziel kann gepackt sein.",
   "pf2craft.combat.action_hint_restrained": "[SL] Ziel kann festgehalten sein.",
@@ -354,5 +352,18 @@
   "screen.pf2craft.action_menu.soon": "Folgt",
   "screen.pf2craft.action_menu.no_actions": "Keine Aktion übrig",
   "screen.pf2craft.action_menu.no_shield": "Kein Schild",
-  "screen.pf2craft.action_menu.not_your_turn": "Nicht dein Zug"
+  "screen.pf2craft.action_menu.not_your_turn": "Nicht dein Zug",
+  "pf2craft.combat.cannot_act": "Du kannst gerade nicht handeln.",
+  "pf2craft.condition.gained": "%s ist jetzt %s",
+  "pf2craft.condition.lost": "%s ist nicht mehr %s",
+  "pf2craft.condition.actions_lost": "%s verliert in diesem Zug %s Aktionen.",
+  "pf2craft.condition.frightened": "Verängstigt",
+  "pf2craft.condition.off_guard": "Unvorbereitet",
+  "pf2craft.condition.prone": "Liegend",
+  "pf2craft.condition.grabbed": "Gepackt",
+  "pf2craft.condition.slowed": "Verlangsamt",
+  "pf2craft.condition.stunned": "Betäubt",
+  "pf2craft.condition.unconscious": "Bewusstlos",
+  "pf2craft.condition.dying": "Sterbend",
+  "pf2craft.condition.wounded": "Verwundet"
 }

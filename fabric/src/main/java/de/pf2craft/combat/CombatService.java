@@ -159,6 +159,7 @@ public final class CombatService {
     public static void reset() {
         ActionService.clearAllPending();
         EFFECTS.clearAll();
+        ConditionService.clearAll();
         encounter = null;
         server = null;
         DEFEATED.clear();
@@ -286,6 +287,7 @@ public final class CombatService {
         encounter.remove(id);
         DEFEATED.remove(id);
         EFFECTS.clear(id);
+        ConditionService.clear(id);
         ActionService.clearPending(uuid);
         Enforcement.onLeft(uuid);
         for (ServerPlayerEntity r : audience) {
@@ -350,9 +352,11 @@ public final class CombatService {
         server = srv;
         DEFEATED.clear();
         EFFECTS.clearAll();
+        ConditionService.clearAll();
         EFFECTS.onTurnStart(first.get().id());
         ActionService.clearAllPending();
         budget = new MovementBudget(speedOf(first.get().id()));
+        ConditionService.onTurnStart(first.get().id());
         announcedRound = 1;
         Pf2Craft.LOGGER.info("Combat started with {} participants", fresh.order().size());
 
@@ -496,6 +500,7 @@ public final class CombatService {
         boolean wasCurrent = currentId().filter(id::equals).isPresent();
         encounter.setActive(id, false);
         EFFECTS.clear(id);
+        ConditionService.clear(id);
         if (wasCurrent) {
             nextTurn(leaving);
             if (encounter == null) {
@@ -546,6 +551,7 @@ public final class CombatService {
         if (encounter == null || !currentId().equals(before)) {
             return; // the purge already moved on (or ended the combat)
         }
+        before.ifPresent(ConditionService::onTurnEnd);
         Optional<Combatant> next = encounter.advance();
         if (next.isEmpty()) {
             finish(exclude);
@@ -553,6 +559,7 @@ public final class CombatService {
         }
         budget = new MovementBudget(speedOf(next.get().id()));
         EFFECTS.onTurnStart(next.get().id());
+        ConditionService.onTurnStart(next.get().id());
         ActionService.clearAllPending(); // a pending action belongs to the turn it was chosen in
         if (encounter.round() != announcedRound) {
             announcedRound = encounter.round();
@@ -577,6 +584,7 @@ public final class CombatService {
         List<ServerPlayerEntity> audience = recipients(exclude);
         ActionService.clearAllPending();
         EFFECTS.clearAll();
+        ConditionService.clearAll();
         encounter = null;
         autoEndId = null;
         DEFEATED.clear();
@@ -655,7 +663,7 @@ public final class CombatService {
     }
 
     /** Online players that are combatants plus all GMs. */
-    private static List<ServerPlayerEntity> recipients(@Nullable ServerPlayerEntity exclude) {
+    static List<ServerPlayerEntity> recipients(@Nullable ServerPlayerEntity exclude) {
         List<ServerPlayerEntity> result = new ArrayList<>();
         if (server == null || encounter == null) {
             return result;
