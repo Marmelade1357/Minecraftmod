@@ -1,5 +1,6 @@
 package de.pf2craft.client;
 
+import de.pf2craft.network.ActionRequestPayload;
 import de.pf2craft.network.CombatSyncPayload;
 import de.pf2craft.network.EndTurnPayload;
 import de.pf2craft.network.NpcSearchResultPayload;
@@ -8,11 +9,13 @@ import de.pf2craft.network.OpenAttackScreenPayload;
 import de.pf2craft.network.OpenCombatScreenPayload;
 import de.pf2craft.network.OpenImportPayload;
 import de.pf2craft.network.OpenNpcScreenPayload;
+import de.pf2craft.network.PendingActionPayload;
 import de.pf2craft.network.RollResultPayload;
 import de.pf2craft.network.SheetRequestPayload;
 import de.pf2craft.network.SheetSyncPayload;
 import de.pf2craft.npc.Pf2Entities;
 import de.pf2craft.roll.RollMessages;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 import net.fabricmc.api.ClientModInitializer;
@@ -41,6 +44,7 @@ public class Pf2CraftClient implements ClientModInitializer {
     private static KeyBinding openDiceKey;
     private static KeyBinding openSheetKey;
     private static KeyBinding endTurnKey;
+    private static KeyBinding actionMenuKey;
     /** Ticks left to wait for the own sheet after a C press, or -1. */
     private static int waitingForOwnSheet = -1;
     /** A screen the server asked for while another (e.g. the terrain loading) screen was open. */
@@ -55,6 +59,9 @@ public class Pf2CraftClient implements ClientModInitializer {
 
         endTurnKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.pf2craft.end_turn", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_ENTER, KEY_CATEGORY));
+
+        actionMenuKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.pf2craft.action_menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, KEY_CATEGORY));
 
         ClientTickEvents.END_CLIENT_TICK.register(Pf2CraftClient::tick);
 
@@ -93,6 +100,8 @@ public class Pf2CraftClient implements ClientModInitializer {
         });
         ClientPlayNetworking.registerGlobalReceiver(CombatSyncPayload.ID,
                 (payload, context) -> ClientCombat.set(payload));
+        ClientPlayNetworking.registerGlobalReceiver(PendingActionPayload.ID,
+                (payload, context) -> ClientActions.setPending(payload.actionId()));
         ClientPlayNetworking.registerGlobalReceiver(OpenCombatScreenPayload.ID,
                 (payload, context) -> show(context.client(), () -> new CombatSetupScreen(payload)));
         ClientPlayNetworking.registerGlobalReceiver(OpenAttackScreenPayload.ID,
@@ -100,6 +109,7 @@ public class Pf2CraftClient implements ClientModInitializer {
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
             ClientSheets.clear();
             ClientCombat.clear();
+            ClientActions.setPending("");
             waitingForOwnSheet = -1;
             pendingScreen = null;
         }));
@@ -144,6 +154,11 @@ public class Pf2CraftClient implements ClientModInitializer {
                 ClientPlayNetworking.send(new EndTurnPayload());
             }
         }
+        while (actionMenuKey.wasPressed()) {
+            if (client.currentScreen == null && client.player != null) {
+                onActionKey(client);
+            }
+        }
         if (waitingForOwnSheet > 0 && --waitingForOwnSheet == 0) {
             waitingForOwnSheet = -1;
             if (client.currentScreen == null && client.player != null) {
@@ -155,6 +170,26 @@ public class Pf2CraftClient implements ClientModInitializer {
             pendingScreen = null;
             client.setScreen(screen.get());
         }
+    }
+
+    /** V: cancels a pending action, otherwise opens the action menu when someone the player controls is up. */
+    private static void onActionKey(MinecraftClient client) {
+        if (!ClientActions.pending().isEmpty()) {
+            Optional<UUID> actor = ActionMenuScreen.actor(client);
+            ClientActions.setPending("");
+            if (ClientPlayNetworking.canSend(ActionRequestPayload.ID)) {
+                // The server ignores the actor for a cancel; the own id is always valid.
+                ClientPlayNetworking.send(new ActionRequestPayload(actor.orElse(client.player.getUuid()),
+                        ActionRequestPayload.CANCEL, -1));
+            }
+            return;
+        }
+        if (ActionMenuScreen.actor(client).isEmpty()) {
+            client.player.sendMessage(Text.translatable("hud.pf2craft.action.not_your_turn")
+                    .formatted(Formatting.RED), true);
+            return;
+        }
+        client.setScreen(new ActionMenuScreen());
     }
 
     private static void openOwnSheet(MinecraftClient client) {

@@ -189,5 +189,11 @@ public final class CombatHud {
         MutableText line = Text.translatable("hud.pf2craft.combat.actions",
                 Text.literal(diamonds.toString()).formatted(Formatting.GOLD), reaction, movement);
         context.drawCenteredTextWithShadow(font, line, screenW / 2, screenH - 75, COLOR_WHITE);
+        if (!ClientActions.pending().isEmpty()) {
+            Text hint = Text.translatable("hud.pf2craft.action.pending",
+                    Text.translatable("pf2craft.combat.action.name." + ClientActions.pending()))
+                    .formatted(Formatting.YELLOW);
+            context.drawCenteredTextWithShadow(font, hint, screenW / 2, screenH - 87, COLOR_WHITE);
+        }
     }
 }

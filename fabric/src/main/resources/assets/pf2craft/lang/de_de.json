@@ -340,5 +340,18 @@
   "pf2craft.combat.action_hint_prone_target": "[SL] Ziel kann liegend sein.",
   "pf2craft.combat.action_hint_prone_actor": "[SL] Akteur kann liegend sein.",
   "pf2craft.combat.action_hint_grabbed": "[SL] Ziel kann gepackt sein.",
-  "pf2craft.combat.action_hint_restrained": "[SL] Ziel kann festgehalten sein."
+  "pf2craft.combat.action_hint_restrained": "[SL] Ziel kann festgehalten sein.",
+  "key.pf2craft.action_menu": "Aktionsmenü öffnen",
+  "hud.pf2craft.action.pending": "Aktion: %s – Ziel anklicken (Esc/V: abbrechen)",
+  "hud.pf2craft.action.not_your_turn": "Du bist nicht dran.",
+  "screen.pf2craft.action_menu.title": "Aktionen",
+  "screen.pf2craft.action_menu.category.basic": "Grundaktionen",
+  "screen.pf2craft.action_menu.category.class": "Klassenfähigkeiten",
+  "screen.pf2craft.action_menu.category.spells": "Zauber",
+  "screen.pf2craft.action_menu.category.items": "Gegenstände",
+  "screen.pf2craft.action_menu.none_yet": "Noch keine",
+  "screen.pf2craft.action_menu.soon": "Folgt",
+  "screen.pf2craft.action_menu.no_actions": "Keine Aktion übrig",
+  "screen.pf2craft.action_menu.no_shield": "Kein Schild",
+  "screen.pf2craft.action_menu.not_your_turn": "Nicht dein Zug"
 }
