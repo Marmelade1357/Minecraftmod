@@ -342,7 +342,7 @@
   "pf2craft.combat.action_hint_grabbed": "[SL] Ziel kann gepackt sein.",
   "pf2craft.combat.action_hint_restrained": "[SL] Ziel kann festgehalten sein.",
   "key.pf2craft.action_menu": "Aktionsmenü öffnen",
-  "hud.pf2craft.action.pending": "Aktion: %s – Ziel anklicken (Esc/V: abbrechen)",
+  "hud.pf2craft.action.pending": "Aktion: %s – Ziel anklicken (V: abbrechen)",
   "hud.pf2craft.action.not_your_turn": "Du bist nicht dran.",
   "screen.pf2craft.action_menu.title": "Aktionen",
   "screen.pf2craft.action_menu.category.basic": "Grundaktionen",

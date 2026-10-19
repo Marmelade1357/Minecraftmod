@@ -342,7 +342,7 @@
   "pf2craft.combat.action_hint_grabbed": "[GM] The target may be grabbed.",
   "pf2craft.combat.action_hint_restrained": "[GM] The target may be restrained.",
   "key.pf2craft.action_menu": "Open action menu",
-  "hud.pf2craft.action.pending": "Action: %s - click the target (Esc/V: cancel)",
+  "hud.pf2craft.action.pending": "Action: %s - click the target (V: cancel)",
   "hud.pf2craft.action.not_your_turn": "It is not your turn.",
   "screen.pf2craft.action_menu.title": "Actions",
   "screen.pf2craft.action_menu.category.basic": "Basic actions",
