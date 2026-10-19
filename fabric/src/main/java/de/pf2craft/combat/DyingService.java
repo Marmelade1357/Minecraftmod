@@ -80,6 +80,12 @@ public final class DyingService {
         for (ServerPlayerEntity r : CombatService.recipients(null)) {
             r.sendMessage(line, false);
         }
+        if (!set.has(Condition.DYING) && set.value(Condition.WOUNDED) > before[2]) {
+            var wounded = CombatMessages.woundedGained(name, set.value(Condition.WOUNDED)); // own public line
+            for (ServerPlayerEntity r : CombatService.recipients(null)) {
+                r.sendMessage(wounded, false);
+            }
+        }
         Pf2Craft.LOGGER.info("Recovery check of {}: d20 {} vs DC {} -> {}, dying {} (was {})", id, natural, dc, degree,
                 set.value(Condition.DYING), before[1]);
         reportIfDead(id, set);

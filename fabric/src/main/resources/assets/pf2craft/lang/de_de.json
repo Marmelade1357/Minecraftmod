@@ -374,6 +374,7 @@
   "pf2craft.condition.wounded": "Verwundet",
   "pf2craft.dying.recovery": "%s: Erholungsprobe W20 %s gegen SG %s - %s, sterbend %s",
   "pf2craft.dying.recovery_stable": "%s: Erholungsprobe W20 %s gegen SG %s - %s, stabilisiert sich (bewusstlos, verwundet)",
+  "pf2craft.dying.wounded_gained": "%s ist jetzt verwundet %s.",
   "pf2craft.dying.would_be_dead": "[GM] %s wäre jetzt tot.",
   "pf2craft.dying.degree.crit_success": "kritischer Erfolg",
   "pf2craft.dying.degree.success": "Erfolg",

@@ -167,6 +167,12 @@ final class CombatMessages {
                 result).formatted(Formatting.GREEN);
     }
 
+    /** Public line when a stabilizing creature gains (or raises) its wounded value. */
+    static MutableText woundedGained(String name, int wounded) {
+        return Text.translatableWithFallback("pf2craft.dying.wounded_gained", "%s is now wounded %s.", name, wounded)
+                .formatted(Formatting.RED);
+    }
+
     static MutableText wouldBeDead(String name) {
         return Text.translatableWithFallback("pf2craft.dying.would_be_dead", "[GM] %s would now be dead.", name)
                 .formatted(Formatting.DARK_RED);
