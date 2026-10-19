@@ -346,7 +346,7 @@ public final class AttackService {
                     p.rangePenalty(), damage, hpLeft, hpMax);
             if (applied > 0) {
                 if (p.target() instanceof ServerPlayerEntity player) {
-                    SheetService.setCurrentHp(player, hpLeft); // 0 HP takes the player out of the combat
+                    SheetService.setCurrentHp(player, hpLeft, degree == DegreeOfSuccess.CRITICAL_SUCCESS); // 0 HP: dying
                 } else {
                     NpcService.damage((NpcEntity) p.target(), applied);
                 }

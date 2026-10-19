@@ -84,6 +84,9 @@ public final class CombatService {
 
     /** Whether the current combatant has used up everything the turn offers (see tickAutoEnd). */
     private static boolean turnSpent(Combatant c) {
+        if (!ConditionService.canAct(c.id())) {
+            return true; // unconscious or dying: nothing to do, the recovery roll already happened at turn start
+        }
         if (encounter.turn().actionsLeft() != 0) {
             return false;
         }

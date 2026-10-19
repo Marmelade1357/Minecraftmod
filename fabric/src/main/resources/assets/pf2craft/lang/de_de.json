@@ -365,5 +365,12 @@
   "pf2craft.condition.stunned": "Betäubt",
   "pf2craft.condition.unconscious": "Bewusstlos",
   "pf2craft.condition.dying": "Sterbend",
-  "pf2craft.condition.wounded": "Verwundet"
+  "pf2craft.condition.wounded": "Verwundet",
+  "pf2craft.dying.recovery": "%s: Erholungsprobe W20 %s gegen SG %s - %s, sterbend %s",
+  "pf2craft.dying.recovery_stable": "%s: Erholungsprobe W20 %s gegen SG %s - %s, stabilisiert sich (bewusstlos, verwundet)",
+  "pf2craft.dying.would_be_dead": "[GM] %s wäre jetzt tot.",
+  "pf2craft.dying.degree.crit_success": "kritischer Erfolg",
+  "pf2craft.dying.degree.success": "Erfolg",
+  "pf2craft.dying.degree.failure": "Fehlschlag",
+  "pf2craft.dying.degree.crit_failure": "kritischer Fehlschlag"
 }

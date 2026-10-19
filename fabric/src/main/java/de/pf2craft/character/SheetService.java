@@ -2,6 +2,7 @@ package de.pf2craft.character;
 
 import de.pf2craft.GmRoles;
 import de.pf2craft.combat.CombatService;
+import de.pf2craft.combat.DyingService;
 import de.pf2craft.core.character.Ability;
 import de.pf2craft.core.character.CharacterJson;
 import de.pf2craft.core.character.CharacterMath;
@@ -166,7 +167,7 @@ public final class SheetService {
             CharacterSheet edited = GmEdit.apply(sheet.get(), field, value);
             CharacterStore.set(owner, edited);
             broadcast(gm.getServer(), owner, edited);
-            onHpChanged(owner, sheet.get().currentHp(), edited.currentHp());
+            onHpChanged(owner, sheet.get().currentHp(), edited.currentHp(), false);
         } catch (InvalidChoiceException e) {
             error(gm, Text.literal(e.getMessage()));
         }
@@ -212,6 +213,11 @@ public final class SheetService {
 
     /** Sets the current HP (clamped 0..max), stores and syncs it; 0 defeats the combatant, above 0 revives. */
     public static void setCurrentHp(ServerPlayerEntity player, int hp) {
+        setCurrentHp(player, hp, false);
+    }
+
+    /** As above; {@code critical} marks 0 HP caused by a critical hit (dying 2 instead of 1). */
+    public static void setCurrentHp(ServerPlayerEntity player, int hp, boolean critical) {
         Optional<CharacterSheet> sheet = CharacterStore.get(player);
         if (sheet.isEmpty()) {
             return;
@@ -221,13 +227,15 @@ public final class SheetService {
         CharacterSheet updated = sheet.get().withCurrentHp(clamped);
         CharacterStore.set(player, updated);
         broadcast(player.getServer(), player, updated);
-        onHpChanged(player, before, clamped);
+        onHpChanged(player, before, clamped, critical);
     }
 
-    private static void onHpChanged(ServerPlayerEntity player, int before, int after) {
+    private static void onHpChanged(ServerPlayerEntity player, int before, int after, boolean critical) {
         if (after <= 0 && before > 0) {
-            CombatService.markDefeated(player.getUuid().toString());
+            // A player stays in the combat order: unconscious and dying, with recovery rolls on its turns.
+            DyingService.knockOut(player, critical);
         } else if (after > 0 && before <= 0) {
+            DyingService.onHealed(player.getUuid().toString());
             CombatService.reviveIfNeeded(player.getUuid().toString());
         }
     }

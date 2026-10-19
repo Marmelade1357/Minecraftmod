@@ -29,10 +29,12 @@ public final class ConditionService {
 
     public static void clear(String id) {
         SETS.remove(id);
+        DyingService.forget(id);
     }
 
     public static void clearAll() {
         SETS.clear();
+        DyingService.forgetAll();
     }
 
     public static boolean canAct(String id) {
@@ -80,7 +82,7 @@ public final class ConditionService {
             }
             sendTo(id, false, CombatMessages.actionsLost(nameOf(id), spent));
         }
-        // Task 4 hooks the dying recovery roll in here (it runs at the start of the turn of a dying combatant).
+        DyingService.recover(id); // a dying combatant rolls its recovery check at the start of its turn
     }
 
     /** A combatant's turn ends: frightened fades by one. */
@@ -94,6 +96,13 @@ public final class ConditionService {
             announce(id, Condition.FRIGHTENED, CombatMessages.conditionLost(nameOf(id), Condition.FRIGHTENED), 0,
                     "turn end");
         }
+    }
+
+    /** Tells the audience that the condition now has {@code value} (0 = gone); used by {@link DyingService}. */
+    static void announceValue(String id, Condition condition, int value, String source) {
+        Text line = value > 0 ? CombatMessages.conditionGained(nameOf(id), condition, value)
+                : CombatMessages.conditionLost(nameOf(id), condition);
+        announce(id, condition, line, value, source);
     }
 
     // ---- helpers ---------------------------------------------------------------------------------------------
@@ -113,7 +122,7 @@ public final class ConditionService {
         }
     }
 
-    private static String nameOf(String id) {
+    static String nameOf(String id) {
         if (CombatService.encounter().isPresent()) {
             for (Encounter.Entry e : CombatService.encounter().get().order()) {
                 Combatant c = e.combatant();

@@ -149,6 +149,29 @@ final class CombatMessages {
                 name, actions).formatted(Formatting.YELLOW);
     }
 
+    static MutableText recoveryCheck(String name, int natural, int dc, DegreeOfSuccess degree, int dying) {
+        MutableText result = switch (degree) {
+            case CRITICAL_SUCCESS -> Text.translatableWithFallback("pf2craft.dying.degree.crit_success",
+                    "critical success");
+            case SUCCESS -> Text.translatableWithFallback("pf2craft.dying.degree.success", "success");
+            case FAILURE -> Text.translatableWithFallback("pf2craft.dying.degree.failure", "failure");
+            case CRITICAL_FAILURE -> Text.translatableWithFallback("pf2craft.dying.degree.crit_failure",
+                    "critical failure");
+        };
+        if (dying > 0) {
+            return Text.translatableWithFallback("pf2craft.dying.recovery", "%s: recovery check d20 %s vs DC %s - %s, dying %s",
+                    name, natural, dc, result, dying).formatted(Formatting.RED);
+        }
+        return Text.translatableWithFallback("pf2craft.dying.recovery_stable",
+                "%s: recovery check d20 %s vs DC %s - %s, stabilizes (unconscious, wounded)", name, natural, dc,
+                result).formatted(Formatting.GREEN);
+    }
+
+    static MutableText wouldBeDead(String name) {
+        return Text.translatableWithFallback("pf2craft.dying.would_be_dead", "[GM] %s would now be dead.", name)
+                .formatted(Formatting.DARK_RED);
+    }
+
     static MutableText noActions() {
         return Text.translatableWithFallback("pf2craft.combat.no_actions", "You have no actions left to move.");
     }
