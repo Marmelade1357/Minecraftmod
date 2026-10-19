@@ -20,7 +20,9 @@ public final class GmRoles {
     /** @return {@code true} if the role changed */
     public static boolean setGm(ServerPlayerEntity player, boolean gm) {
         if (!gm) {
-            return player.removeCommandTag(TAG);
+            boolean changed = player.removeCommandTag(TAG);
+            GmReach.clear(player);
+            return changed;
         }
         boolean changed = player.addCommandTag(TAG);
         Pf2Items.giveStaff(player);

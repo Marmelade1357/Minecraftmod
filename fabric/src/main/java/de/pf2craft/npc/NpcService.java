@@ -1,5 +1,6 @@
 package de.pf2craft.npc;
 
+import de.pf2craft.GmReach;
 import de.pf2craft.combat.CombatService;
 import de.pf2craft.combat.NpcWalk;
 import de.pf2craft.core.monster.DamagePart;
@@ -98,14 +99,15 @@ public final class NpcService {
         CombatService.purgeGone();
     }
 
-    /** The NPC the player is looking at within {@link #LOOK_RANGE} blocks, if any. */
+    /** The NPC the player is looking at within {@link GmReach#lookRange} blocks, if any. */
     public static Optional<NpcEntity> lookedAt(ServerPlayerEntity player) {
         Vec3d start = player.getEyePos();
         Vec3d dir = player.getRotationVec(1.0f);
-        Vec3d end = start.add(dir.multiply(LOOK_RANGE));
-        Box box = player.getBoundingBox().stretch(dir.multiply(LOOK_RANGE)).expand(1.0);
+        double range = GmReach.lookRange(player);
+        Vec3d end = start.add(dir.multiply(range));
+        Box box = player.getBoundingBox().stretch(dir.multiply(range)).expand(1.0);
         EntityHitResult hit = ProjectileUtil.raycast(player, start, end, box,
-                e -> e instanceof NpcEntity && !e.isSpectator(), LOOK_RANGE * LOOK_RANGE);
+                e -> e instanceof NpcEntity && !e.isSpectator(), range * range);
         if (hit != null && hit.getEntity() instanceof NpcEntity npc && npc.stats() != null) {
             return Optional.of(npc);
         }

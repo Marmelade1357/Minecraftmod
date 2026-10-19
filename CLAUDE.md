@@ -129,6 +129,7 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
 - Bekannte Grenzen Teil 3: keine Reaktionen, kein Aktionsmenü, keine Zustände/Sterbend, keine Zauber, keine Sichtlinienprüfung,
   Munition/Nachladen nicht erzwungen, Kampf endet beim Serverneustart, `/tp` eines Kämpfers wird zurückgesetzt (außer
   `/pf2 combat anchor`).
+- GM-Fernreichweite (`GmReach`): temporäre Attribut-Modifier (+96, `pf2craft:gm_far_reach`) auf Entity-/Block-Reichweite, solange ein GM Befehlsstab/Kampfglocke hält; `CombatService.RADIUS` = 96, `NpcNetwork.MAX_DISTANCE` = 128. Per Bot geprüft (siehe `.superpowers/sdd/gm-far-reach-report.md`); das Fadenkreuz-Zielen eines echten Clients auf Distanz ist ungetestet.
 - Bekannte Grenzen Teil 2: NPCs handeln nicht von selbst und sind noch nicht im Kampf nutzbar; Platzhaltermodell
   (Dorfbewohner); Strike-Boni im Werte-Fenster nicht editierbar; Zusatzeffekte (Grab, anhaltender Schaden)
   nur als Namen/Hinweise; Spawn-Schutz kann Blockklicks von Nicht-OP-GMs verschlucken.

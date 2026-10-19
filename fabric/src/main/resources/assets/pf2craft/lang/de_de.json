@@ -149,7 +149,7 @@
   "pf2craft.npc.info.strike": "%s %s: %s",
   "item.pf2craft.command_staff": "Befehlsstab",
   "pf2craft.npc.not_gm": "Das darf nur ein Spielleiter.",
-  "pf2craft.npc.not_found": "Dieser NSC ist nicht geladen oder zu weit weg (maximal 64 Blöcke).",
+  "pf2craft.npc.not_found": "Dieser NSC ist nicht geladen oder zu weit weg (maximal 128 Blöcke).",
   "pf2craft.npc.selected": "Ausgewählt: %s",
   "pf2craft.npc.none_selected": "Kein NSC ausgewählt. Klicke zuerst mit dem Stab mit Rechtsklick auf einen NSC.",
   "pf2craft.npc.edit_failed": "Ungültiger Wert: %s",

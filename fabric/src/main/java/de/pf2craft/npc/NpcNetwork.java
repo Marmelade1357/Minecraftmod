@@ -1,5 +1,6 @@
 package de.pf2craft.npc;
 
+import de.pf2craft.GmReach;
 import de.pf2craft.GmRoles;
 import de.pf2craft.Pf2Craft;
 import de.pf2craft.core.monster.MonsterData;
@@ -32,7 +33,7 @@ import net.minecraft.util.Formatting;
 /** Server side of the NPC screens: every request is checked for the GM role and for a loaded NPC nearby. */
 public final class NpcNetwork {
     /** An NPC further away than this cannot be edited from a screen. */
-    public static final double MAX_DISTANCE = 64.0;
+    public static final double MAX_DISTANCE = GmReach.GM_SCAN;
     private static final long SEARCH_COOLDOWN_MS = 200;
     private static final Map<UUID, Long> LAST_SEARCH = new ConcurrentHashMap<>();
 
@@ -165,7 +166,7 @@ public final class NpcNetwork {
             return npc;
         }
         gm.sendMessage(Text.translatableWithFallback("pf2craft.npc.not_found",
-                "That NPC is not loaded or too far away (within 64 blocks).").formatted(Formatting.RED), false);
+                "That NPC is not loaded or too far away (within 128 blocks).").formatted(Formatting.RED), false);
         return null;
     }
 

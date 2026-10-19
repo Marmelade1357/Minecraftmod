@@ -1,5 +1,6 @@
 package de.pf2craft.combat;
 
+import de.pf2craft.GmReach;
 import de.pf2craft.GmRoles;
 import de.pf2craft.Pf2Craft;
 import de.pf2craft.character.CharacterStore;
@@ -271,7 +272,7 @@ public final class AttackService {
         }
         Vec3d start = gm.getEyePos();
         Vec3d dir = gm.getRotationVec(1.0f);
-        double range = NpcService.LOOK_RANGE;
+        double range = GmReach.lookRange(gm);
         EntityHitResult hit = ProjectileUtil.raycast(gm, start, start.add(dir.multiply(range)),
                 gm.getBoundingBox().stretch(dir.multiply(range)).expand(1.0),
                 e -> e != npc.get() && !e.isSpectator() && (e instanceof NpcEntity || e instanceof ServerPlayerEntity),

@@ -44,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class CombatService {
     /** Candidates and fallback-command participants must be this close to the GM. */
-    public static final double RADIUS = 32.0;
+    public static final double RADIUS = 96.0;
     private static final int FALLBACK_SPEED = 25;
 
     private static Encounter encounter;

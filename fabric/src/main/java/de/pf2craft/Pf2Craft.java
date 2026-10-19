@@ -70,6 +70,7 @@ public class Pf2Craft implements ModInitializer {
             }
             return ActionResult.FAIL;
         });
+        GmReach.register();
         Enforcement.register();
         NpcWalk.register();
         Pf2Networking.registerPayloads();
