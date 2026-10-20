@@ -45,6 +45,8 @@ public class Pf2CraftClient implements ClientModInitializer {
     private static KeyBinding openSheetKey;
     private static KeyBinding endTurnKey;
     private static KeyBinding actionMenuKey;
+    private static KeyBinding strideKey;
+    private static KeyBinding rangeToggleKey;
     /** Ticks left to wait for the own sheet after a C press, or -1. */
     private static int waitingForOwnSheet = -1;
     /** A screen the server asked for while another (e.g. the terrain loading) screen was open. */
@@ -63,7 +65,13 @@ public class Pf2CraftClient implements ClientModInitializer {
         actionMenuKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.pf2craft.action_menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, KEY_CATEGORY));
 
+        strideKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.pf2craft.stride", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, KEY_CATEGORY));
+        rangeToggleKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.pf2craft.range_toggle", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_H, KEY_CATEGORY));
+
         ClientTickEvents.END_CLIENT_TICK.register(Pf2CraftClient::tick);
+        RangeOverlay.register();
 
         ClientPlayNetworking.registerGlobalReceiver(RollResultPayload.ID, (payload, context) -> {
             context.client().inGameHud.getChatHud().addMessage(RollMessages.chatLine(payload));
@@ -164,6 +172,19 @@ public class Pf2CraftClient implements ClientModInitializer {
                 onActionKey(client);
             }
         }
+        while (strideKey.wasPressed()) {
+            if (client.currentScreen == null && client.player != null) {
+                onStrideKey(client);
+            }
+        }
+        while (rangeToggleKey.wasPressed()) {
+            if (client.currentScreen == null && client.player != null) {
+                boolean on = !ClientActions.rangeDisplay();
+                ClientActions.setRangeDisplay(on);
+                client.player.sendMessage(Text.translatable(on ? "hud.pf2craft.range.on" : "hud.pf2craft.range.off")
+                        .formatted(Formatting.YELLOW), true);
+            }
+        }
         if (waitingForOwnSheet > 0 && --waitingForOwnSheet == 0) {
             waitingForOwnSheet = -1;
             if (client.currentScreen == null && client.player != null) {
@@ -174,6 +195,19 @@ public class Pf2CraftClient implements ClientModInitializer {
             Supplier<Screen> screen = pendingScreen;
             pendingScreen = null;
             client.setScreen(screen.get());
+        }
+    }
+
+    /** G: asks the server for a Stride; the server checks turn, actions and speed. */
+    private static void onStrideKey(MinecraftClient client) {
+        Optional<UUID> actor = ActionMenuScreen.actor(client);
+        if (actor.isEmpty()) {
+            client.player.sendMessage(Text.translatable("hud.pf2craft.action.not_your_turn")
+                    .formatted(Formatting.RED), true);
+            return;
+        }
+        if (ClientPlayNetworking.canSend(ActionRequestPayload.ID)) {
+            ClientPlayNetworking.send(new ActionRequestPayload(actor.get(), "stride", -1));
         }
     }
 

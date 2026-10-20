@@ -243,6 +243,10 @@ public final class CombatHud {
                     .formatted(Formatting.YELLOW);
             drawAnchored(context, font, hint, anchor, screenW, screenH - (centered ? 87 : HEALTH_Y + 2 * LINE_STEP),
                     screenW / 2, true);
+        } else if (state.strideBlocksLeft() <= 0 && state.actionsLeft() > 0) {
+            Text hint = Text.translatable("hud.pf2craft.combat.choose_stride").formatted(Formatting.YELLOW);
+            drawAnchored(context, font, hint, anchor, screenW, screenH - (centered ? 87 : HEALTH_Y + 2 * LINE_STEP),
+                    screenW / 2, true);
         }
     }
 }

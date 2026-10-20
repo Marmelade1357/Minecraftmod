@@ -390,5 +390,11 @@
   "screen.pf2craft.conditions.heading": "Conditions: %s",
   "pf2craft.condition.unknown": "Unknown condition.",
   "pf2craft.condition.bad_value": "The value must be between 0 and %s.",
-  "pf2craft.condition.set": "Condition set: %s"
+  "pf2craft.condition.set": "Condition set: %s",
+  "key.pf2craft.stride": "Stride",
+  "key.pf2craft.range_toggle": "Toggle movement range display",
+  "hud.pf2craft.range.on": "Movement range display: on",
+  "hud.pf2craft.range.off": "Movement range display: off",
+  "hud.pf2craft.combat.choose_stride": "Choose Stride (G) to move",
+  "screen.pf2craft.action_menu.stride_active": "You are already striding."
 }

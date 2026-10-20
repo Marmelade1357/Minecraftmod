@@ -136,6 +136,9 @@ public class ActionMenuScreen extends Screen {
         if (combat.get().actionsLeft() < action.cost()) {
             return Optional.of(Text.translatable("screen.pf2craft.action_menu.no_actions"));
         }
+        if ("stride".equals(action.id()) && combat.get().strideBlocksLeft() > 0) {
+            return Optional.of(Text.translatable("screen.pf2craft.action_menu.stride_active"));
+        }
         // The sync carries the actor's conditions (own ones for a player, all of them for a GM).
         var conditions = ClientConditions.of(actor.get());
         if ("stand_up".equals(action.id()) && !conditions.containsKey(Condition.PRONE)) {

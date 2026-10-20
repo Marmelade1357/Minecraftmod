@@ -390,5 +390,11 @@
   "screen.pf2craft.conditions.heading": "Zustände: %s",
   "pf2craft.condition.unknown": "Unbekannter Zustand.",
   "pf2craft.condition.bad_value": "Der Wert muss zwischen 0 und %s liegen.",
-  "pf2craft.condition.set": "Zustand gesetzt: %s"
+  "pf2craft.condition.set": "Zustand gesetzt: %s",
+  "key.pf2craft.stride": "Schreiten",
+  "key.pf2craft.range_toggle": "Reichweitenanzeige umschalten",
+  "hud.pf2craft.range.on": "Reichweitenanzeige: an",
+  "hud.pf2craft.range.off": "Reichweitenanzeige: aus",
+  "hud.pf2craft.combat.choose_stride": "Schreiten wählen (G), um zu laufen",
+  "screen.pf2craft.action_menu.stride_active": "Du schreitest bereits."
 }

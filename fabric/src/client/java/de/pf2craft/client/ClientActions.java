@@ -25,6 +25,7 @@ public final class ClientActions {
     private static final String COMBAT_CHAT_SCALE = "combatChatScale";
     private static final String COMBAT_CHAT_HEIGHT = "combatChatHeight";
     private static final String HUD_ANCHOR = "hudAnchor";
+    private static final String RANGE_DISPLAY = "rangeDisplay";
     private static final double MIN_FACTOR = 0.3;
     private static final double MAX_FACTOR = 1.0;
 
@@ -35,6 +36,7 @@ public final class ClientActions {
     private static double combatChatScale = 0.7;
     private static double combatChatHeight = 0.6;
     private static HudAnchor hudAnchor = HudAnchor.RIGHT;
+    private static boolean rangeDisplay = true;
     private static boolean settingsLoaded;
     private static String pending = "";
 
@@ -63,6 +65,18 @@ public final class ClientActions {
         return hudAnchor;
     }
 
+    /** Whether the movement range outline is shown in the own turn (config key {@code rangeDisplay}, default true). */
+    public static boolean rangeDisplay() {
+        loadSettings();
+        return rangeDisplay;
+    }
+
+    public static void setRangeDisplay(boolean on) {
+        loadSettings();
+        rangeDisplay = on;
+        save();
+    }
+
     private static void loadSettings() {
         if (settingsLoaded) {
             return;
@@ -75,6 +89,10 @@ public final class ClientActions {
                 if (root != null) {
                     combatChatScale = factor(root.get(COMBAT_CHAT_SCALE), combatChatScale);
                     combatChatHeight = factor(root.get(COMBAT_CHAT_HEIGHT), combatChatHeight);
+                    JsonElement range = root.get(RANGE_DISPLAY);
+                    if (range != null && range.isJsonPrimitive() && range.getAsJsonPrimitive().isBoolean()) {
+                        rangeDisplay = range.getAsBoolean();
+                    }
                     JsonElement anchor = root.get(HUD_ANCHOR);
                     if (anchor != null && anchor.isJsonPrimitive()) {
                         for (HudAnchor candidate : HudAnchor.values()) {
@@ -138,7 +156,7 @@ public final class ClientActions {
     private static void save() {
         try {
             JsonArray list = new JsonArray();
-            favorites.forEach(list::add);
+            favorites().forEach(list::add);
             Path file = file();
             JsonObject root = null;
             try {
@@ -152,6 +170,7 @@ public final class ClientActions {
                 root = new JsonObject();
             }
             root.add(FAVORITES, list);
+            root.addProperty(RANGE_DISPLAY, rangeDisplay);
             Files.createDirectories(file.getParent());
             Files.writeString(file, GSON.toJson(root), StandardCharsets.UTF_8);
         } catch (IOException | RuntimeException e) {
