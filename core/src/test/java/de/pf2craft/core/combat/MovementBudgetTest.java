@@ -199,6 +199,83 @@ class MovementBudgetTest {
     }
 
     @Test
+    void startStrideSpendsOneActionAndFillsBudget() {
+        TurnState turn = new TurnState();
+        MovementBudget budget = new MovementBudget(25);
+        assertTrue(budget.startStride(turn));
+        assertEquals(2, turn.actionsLeft());
+        assertEquals(5.0, budget.remainingInStride(), 1e-9);
+        assertTrue(budget.strideActive());
+    }
+
+    @Test
+    void startStrideRefusedWithoutActions() {
+        TurnState turn = new TurnState();
+        turn.spendActions(3);
+        MovementBudget budget = new MovementBudget(25);
+        assertFalse(budget.startStride(turn));
+        assertFalse(budget.strideActive());
+        assertFalse(new MovementBudget(0).startStride(new TurnState()));
+    }
+
+    @Test
+    void startStrideRefusedWhileActive() {
+        TurnState turn = new TurnState();
+        MovementBudget budget = new MovementBudget(25);
+        assertTrue(budget.startStride(turn));
+        assertFalse(budget.startStride(turn));
+        assertEquals(2, turn.actionsLeft());
+        assertEquals(5.0, budget.remainingInStride(), 1e-9);
+    }
+
+    @Test
+    void moveWithinStrideWithoutStrideIsRefused() {
+        MovementBudget budget = new MovementBudget(25);
+        assertFalse(budget.moveWithinStride(1));
+        assertEquals(0.0, budget.remainingInStride(), 1e-9);
+    }
+
+    @Test
+    void moveWithinStrideConsumesBlocks() {
+        MovementBudget budget = new MovementBudget(25);
+        budget.startStride(new TurnState());
+        assertTrue(budget.moveWithinStride(2));
+        assertEquals(3.0, budget.remainingInStride(), 1e-9);
+        assertFalse(budget.moveWithinStride(10));
+        assertEquals(3.0, budget.remainingInStride(), 1e-9);
+    }
+
+    @Test
+    void moveWithinStrideAllowsOneStepOvershootThenEnds() {
+        MovementBudget budget = new MovementBudget(25);
+        budget.startStride(new TurnState());
+        assertTrue(budget.moveWithinStride(4.6));
+        assertEquals(0.4, budget.remainingInStride(), 1e-9);
+        assertTrue(budget.moveWithinStride(1));
+        assertEquals(0.0, budget.remainingInStride(), 1e-9);
+        assertFalse(budget.strideActive());
+        assertFalse(budget.moveWithinStride(0.5));
+    }
+
+    @Test
+    void grantedStepCanBeUsedWithoutStartingStride() {
+        MovementBudget budget = new MovementBudget(25);
+        budget.grantStep();
+        assertTrue(budget.strideActive());
+        assertTrue(budget.moveWithinStride(1));
+        assertFalse(budget.strideActive());
+    }
+
+    @Test
+    void interruptEndsStride() {
+        MovementBudget budget = new MovementBudget(25);
+        budget.startStride(new TurnState());
+        budget.interrupt();
+        assertFalse(budget.strideActive());
+        assertFalse(budget.moveWithinStride(1));
+    }
+
+    @Test
     void interruptClearsTheStepMarker() {
         TurnState turn = new TurnState();
         MovementBudget budget = new MovementBudget(25);

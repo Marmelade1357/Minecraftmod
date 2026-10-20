@@ -50,6 +50,32 @@ public final class MovementBudget {
         inStep = true;
     }
 
+    public boolean strideActive() {
+        return remainingInStride > EPSILON;
+    }
+
+    /** Explicitly starts a Stride: spends one action and fills the budget. Refused (nothing changed) if one is active. */
+    public boolean startStride(TurnState turn) {
+        if (blocksPerStride == 0 || strideActive() || !turn.spendActions(1)) {
+            return false;
+        }
+        inStep = false;
+        remainingInStride = blocksPerStride;
+        return true;
+    }
+
+    /**
+     * Moves within the active Stride (or granted Step). Refused unchanged if none is active or {@code blocks}
+     * exceeds the remainder by more than one block; a final step may overshoot, the remainder is clamped at 0.
+     */
+    public boolean moveWithinStride(double blocks) {
+        if (!strideActive() || blocks > remainingInStride + 1 + EPSILON) {
+            return false;
+        }
+        remainingInStride = Math.max(0, remainingInStride - blocks);
+        return true;
+    }
+
     /** Moves {@code blocks}; starts a new Stride (one action) when the current one is used up. */
     public boolean tryMove(double blocks, TurnState turn) {
         if (blocks <= 0) {
