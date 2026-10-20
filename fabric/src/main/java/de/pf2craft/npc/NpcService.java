@@ -95,6 +95,7 @@ public final class NpcService {
 
     public static void remove(NpcEntity npc) {
         GmSelection.forget(npc.getUuid());
+        NpcControl.releaseNpc(npc.getServer(), npc.getUuid());
         npc.discard();
         CombatService.purgeGone();
     }

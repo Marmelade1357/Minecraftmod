@@ -396,5 +396,14 @@
   "hud.pf2craft.range.on": "Movement range display: on",
   "hud.pf2craft.range.off": "Movement range display: off",
   "hud.pf2craft.combat.choose_stride": "Choose Stride (G) to move",
-  "screen.pf2craft.action_menu.stride_active": "You are already striding."
+  "screen.pf2craft.action_menu.stride_active": "You are already striding.",
+  "pf2craft.control.taken": "You now control %s.",
+  "pf2craft.control.released": "You released %s.",
+  "pf2craft.control.too_far": "The selected NPC is too far away or in another world.",
+  "pf2craft.control.defeated": "The selected NPC is defeated.",
+  "pf2craft.control.not_current": "During a combat you can only take over the NPC whose turn it is.",
+  "pf2craft.control.already": "You already control an NPC.",
+  "pf2craft.control.none": "You do not control an NPC.",
+  "pf2craft.control.ended": "Control of %s ended.",
+  "pf2craft.control.no_target": "The NPC is not looking at a creature."
 }

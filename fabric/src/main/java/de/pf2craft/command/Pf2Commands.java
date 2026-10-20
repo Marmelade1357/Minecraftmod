@@ -29,6 +29,7 @@ import de.pf2craft.item.CharacterItems;
 import de.pf2craft.item.Pf2Items;
 import de.pf2craft.npc.GmSelection;
 import de.pf2craft.npc.MonsterDataLoader;
+import de.pf2craft.npc.NpcControl;
 import de.pf2craft.npc.NpcEntity;
 import de.pf2craft.npc.NpcService;
 import de.pf2craft.roll.RollService;
@@ -91,6 +92,13 @@ public final class Pf2Commands {
                                 .executes(Pf2Commands::npcInfo))
                         .then(literal("remove")
                                 .executes(Pf2Commands::removeNpc))
+                        .then(literal("control")
+                                .executes(ctx -> NpcControl.take(ctx.getSource().getPlayerOrThrow()) ? 1 : 0)
+                                .then(literal("release")
+                                        .executes(ctx -> {
+                                            NpcControl.release(ctx.getSource().getPlayerOrThrow());
+                                            return 1;
+                                        })))
                         .then(literal("hp")
                                 .then(argument("value", IntegerArgumentType.integer())
                                         .executes(Pf2Commands::npcHp))))

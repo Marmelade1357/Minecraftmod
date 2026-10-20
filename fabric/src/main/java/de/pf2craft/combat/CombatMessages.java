@@ -11,7 +11,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 /** Chat texts of the combat; every key exists in both language files. */
-final class CombatMessages {
+public final class CombatMessages {
     private CombatMessages() {
     }
 
@@ -99,16 +99,16 @@ final class CombatMessages {
                         reaction ? "yes" : "no")).formatted(Formatting.GOLD);
     }
 
-    static MutableText notRunning() {
+    public static MutableText notRunning() {
         return Text.translatableWithFallback("pf2craft.combat.not_running", "No combat is running.")
                 .formatted(Formatting.RED);
     }
 
-    static void error(ServerPlayerEntity player, MutableText text) {
+    public static void error(ServerPlayerEntity player, MutableText text) {
         player.sendMessage(text.formatted(Formatting.RED), false);
     }
 
-    static MutableText notGm() {
+    public static MutableText notGm() {
         return Text.translatableWithFallback("pf2craft.combat.not_gm", "Only a game master can do that.");
     }
 
@@ -186,12 +186,12 @@ final class CombatMessages {
         return Text.translatableWithFallback("pf2craft.combat.stride_active", "You are already striding.");
     }
 
-    static MutableText chooseStride() {
+    public static MutableText chooseStride() {
         return Text.translatableWithFallback("pf2craft.combat.choose_stride",
                 "Choose Stride in the action menu first.");
     }
 
-    static MutableText strideEnd() {
+    public static MutableText strideEnd() {
         return Text.translatableWithFallback("pf2craft.combat.stride_end",
                 "Stride used up - choose Stride again to go further.");
     }
@@ -207,7 +207,7 @@ final class CombatMessages {
 
     // ---- NPC turns -------------------------------------------------------------------------------------------
 
-    static MutableText npcNotCurrent() {
+    public static MutableText npcNotCurrent() {
         return Text.translatableWithFallback("pf2craft.combat.npc_not_current",
                 "The selected NPC is not up in the combat.");
     }
@@ -481,5 +481,46 @@ final class CombatMessages {
         }
         return java.util.Optional.of(Text.translatableWithFallback("pf2craft.combat.action_hint_" + key, english)
                 .formatted(Formatting.DARK_AQUA));
+    }
+
+    // ---- NPC take-over ----------------------------------------------------------------------------------------
+
+    public static MutableText controlTaken(String name) {
+        return Text.translatableWithFallback("pf2craft.control.taken", "You now control %s.", name);
+    }
+
+    public static MutableText controlReleased(String name) {
+        return Text.translatableWithFallback("pf2craft.control.released", "You released %s.", name);
+    }
+
+    public static MutableText controlTooFar() {
+        return Text.translatableWithFallback("pf2craft.control.too_far",
+                "The selected NPC is too far away or in another world.");
+    }
+
+    public static MutableText controlDefeated() {
+        return Text.translatableWithFallback("pf2craft.control.defeated", "The selected NPC is defeated.");
+    }
+
+    public static MutableText controlNotNpcTurn() {
+        return Text.translatableWithFallback("pf2craft.control.not_current",
+                "During a combat you can only take over the NPC whose turn it is.");
+    }
+
+    public static MutableText controlAlready() {
+        return Text.translatableWithFallback("pf2craft.control.already", "You already control an NPC.");
+    }
+
+    public static MutableText controlNone() {
+        return Text.translatableWithFallback("pf2craft.control.none", "You do not control an NPC.");
+    }
+
+    public static MutableText controlEnded(String name) {
+        return Text.translatableWithFallback("pf2craft.control.ended", "Control of %s ended.", name);
+    }
+
+    public static MutableText controlNoTarget() {
+        return Text.translatableWithFallback("pf2craft.control.no_target",
+                "The NPC is not looking at a creature.");
     }
 }

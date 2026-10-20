@@ -396,5 +396,14 @@
   "hud.pf2craft.range.on": "Reichweitenanzeige: an",
   "hud.pf2craft.range.off": "Reichweitenanzeige: aus",
   "hud.pf2craft.combat.choose_stride": "Schreiten wählen (G), um zu laufen",
-  "screen.pf2craft.action_menu.stride_active": "Du schreitest bereits."
+  "screen.pf2craft.action_menu.stride_active": "Du schreitest bereits.",
+  "pf2craft.control.taken": "Du steuerst jetzt %s.",
+  "pf2craft.control.released": "Du hast %s losgelassen.",
+  "pf2craft.control.too_far": "Der gewählte NPC ist zu weit weg oder in einer anderen Welt.",
+  "pf2craft.control.defeated": "Der gewählte NPC ist besiegt.",
+  "pf2craft.control.not_current": "Im Kampf kannst du nur den NPC übernehmen, der am Zug ist.",
+  "pf2craft.control.already": "Du steuerst bereits einen NPC.",
+  "pf2craft.control.none": "Du steuerst keinen NPC.",
+  "pf2craft.control.ended": "Die Steuerung von %s ist beendet.",
+  "pf2craft.control.no_target": "Der NPC sieht keine Kreatur an."
 }

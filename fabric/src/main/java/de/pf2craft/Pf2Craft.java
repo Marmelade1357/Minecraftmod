@@ -16,6 +16,7 @@ import de.pf2craft.item.Pf2Items;
 import de.pf2craft.item.Pf2Components;
 import de.pf2craft.network.Pf2Networking;
 import de.pf2craft.npc.MonsterDataLoader;
+import de.pf2craft.npc.NpcControl;
 import de.pf2craft.npc.NpcNetwork;
 import de.pf2craft.npc.Pf2Entities;
 import net.fabricmc.api.ModInitializer;
@@ -47,7 +48,10 @@ public class Pf2Craft implements ModInitializer {
         ServerLifecycleEvents.SERVER_STARTING.register(ClassData::load);
         ServerLifecycleEvents.SERVER_STARTING.register(ItemData::load);
         ServerLifecycleEvents.SERVER_STARTING.register(MonsterDataLoader::load);
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> CombatService.reset());
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            NpcControl.releaseAll(server);
+            CombatService.reset();
+        });
         ServerPlayConnectionEvents.JOIN.register(
                 (handler, sender, server) -> {
                     CharacterService.onJoin(handler.player);
@@ -58,6 +62,7 @@ public class Pf2Craft implements ModInitializer {
                     CombatService.onDisconnect(handler.player);
                     SheetService.onDisconnect(handler.player);
                     NpcNetwork.onDisconnect(handler.player);
+                    NpcControl.onDisconnect(handler.player);
                     AttackService.forget(handler.player.getUuid());
                     ActionService.forget(handler.player.getUuid());
                 });
@@ -75,6 +80,7 @@ public class Pf2Craft implements ModInitializer {
         GmReach.register();
         Enforcement.register();
         NpcWalk.register();
+        NpcControl.register();
         Pf2Networking.registerPayloads();
         Pf2Networking.registerServerReceivers();
         CommandRegistrationCallback.EVENT.register(Pf2Commands::register);

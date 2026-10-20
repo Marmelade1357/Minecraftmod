@@ -15,6 +15,7 @@ import de.pf2craft.core.dice.DiceParseException;
 import de.pf2craft.core.monster.NpcStats;
 import de.pf2craft.network.CombatSyncPayload;
 import de.pf2craft.network.OpenCombatScreenPayload;
+import de.pf2craft.npc.NpcControl;
 import de.pf2craft.npc.NpcEntity;
 import de.pf2craft.roll.RollService;
 import java.util.ArrayList;
@@ -312,6 +313,7 @@ public final class CombatService {
         ConditionService.clear(id);
         ActionService.clearPending(uuid);
         Enforcement.onLeft(uuid);
+        NpcControl.releaseNpc(server, uuid);
         for (ServerPlayerEntity r : audience) {
             r.sendMessage(CombatMessages.removed(name), false);
         }
@@ -595,6 +597,7 @@ public final class CombatService {
             }
         }
         announceTurn(next.get(), exclude);
+        NpcControl.onTurnChanged(server);
         sync(exclude);
     }
 
@@ -616,6 +619,7 @@ public final class CombatService {
         autoEndId = null;
         DEFEATED.clear();
         Enforcement.onCombatEnded();
+        NpcControl.releaseAll(server);
         Pf2Craft.LOGGER.info("Combat ended");
         if (server != null) {
             server.getPlayerManager().getPlayerList().forEach(CombatService::removeReach);

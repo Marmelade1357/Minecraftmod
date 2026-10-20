@@ -7,6 +7,7 @@ import de.pf2craft.combat.AttackService;
 import de.pf2craft.combat.CombatService;
 import de.pf2craft.combat.ConditionService;
 import de.pf2craft.core.dice.DiceParseException;
+import de.pf2craft.npc.NpcControl;
 import de.pf2craft.npc.NpcNetwork;
 import de.pf2craft.roll.RollService;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -49,6 +50,10 @@ public final class Pf2Networking {
         PayloadTypeRegistry.playC2S().register(ActionRequestPayload.ID, ActionRequestPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(PendingActionPayload.ID, PendingActionPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(ConditionEditPayload.ID, ConditionEditPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(TakeOverPayload.ID, TakeOverPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(ControlInputPayload.ID, ControlInputPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(ControlActionPayload.ID, ControlActionPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(ControlStatePayload.ID, ControlStatePayload.CODEC);
     }
 
     public static void registerServerReceivers() {
@@ -89,6 +94,12 @@ public final class Pf2Networking {
         ServerPlayNetworking.registerGlobalReceiver(ConditionEditPayload.ID,
                 (payload, context) -> ConditionService.editFromClient(context.player(), payload.target(),
                         payload.conditionId(), payload.value()));
+        ServerPlayNetworking.registerGlobalReceiver(TakeOverPayload.ID,
+                (payload, context) -> NpcControl.request(context.player(), payload.take()));
+        ServerPlayNetworking.registerGlobalReceiver(ControlInputPayload.ID,
+                (payload, context) -> NpcControl.input(context.player(), payload));
+        ServerPlayNetworking.registerGlobalReceiver(ControlActionPayload.ID,
+                (payload, context) -> NpcControl.action(context.player(), payload.kind()));
         ServerPlayNetworking.registerGlobalReceiver(RollRequestPayload.ID, (payload, context) -> {
             ServerPlayerEntity player = context.player();
             if (!RollService.checkCooldown(player)) {

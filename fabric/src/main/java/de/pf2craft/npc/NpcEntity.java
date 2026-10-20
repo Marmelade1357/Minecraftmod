@@ -6,6 +6,7 @@ import de.pf2craft.core.monster.NpcStats;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,11 +29,64 @@ public class NpcEntity extends VillagerEntity {
     private static final int MAX_NAME_LENGTH = 32;
 
     private NpcStats stats;
+    private boolean controlled; // a GM drives this NPC (see NpcControl); never saved
+    private float driveForward;
+    private float driveSideways;
+    private float driveSpeed;
+    private boolean driveJump;
 
     public NpcEntity(EntityType<? extends VillagerEntity> type, World world) {
         super(type, world);
         setPersistent();
         setCanPickUpLoot(false);
+        this.moveControl = new DriveMoveControl(this);
+    }
+
+    /**
+     * While controlled the GM's input drives the NPC (see NpcControl). The brain never runs for NPCs, so the
+     * only own movement logic to replace is the move control, which {@link DriveMoveControl} does.
+     */
+    public void setControlled(boolean controlled) {
+        this.controlled = controlled;
+        driveForward = 0;
+        driveSideways = 0;
+        driveSpeed = 0;
+        driveJump = false;
+        if (controlled) {
+            getNavigation().stop();
+        }
+    }
+
+    public boolean controlled() {
+        return controlled;
+    }
+
+    /** The movement the next move-control tick applies: inputs in -1..1, speed as the vanilla movement speed. */
+    public void setDrive(float forward, float sideways, float speed, boolean jump) {
+        driveForward = forward;
+        driveSideways = sideways;
+        driveSpeed = speed;
+        driveJump = jump;
+    }
+
+    private final class DriveMoveControl extends MoveControl {
+        DriveMoveControl(NpcEntity npc) {
+            super(npc);
+        }
+
+        @Override
+        public void tick() {
+            if (!controlled) {
+                super.tick();
+                return;
+            }
+            setMovementSpeed(driveSpeed);
+            setForwardSpeed(driveForward);
+            setSidewaysSpeed(driveSideways);
+            if (driveJump) {
+                getJumpControl().setActive();
+            }
+        }
     }
 
     public NpcStats stats() {
