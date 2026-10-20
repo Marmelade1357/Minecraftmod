@@ -204,7 +204,7 @@ Schild und Deckung sind **zeitweilige Effekte**: Sie erhöhen die RK in Angriffe
 
 **Aufstehen** (1 Aktion, nur wenn liegend) und **Befreien** (1 Aktion, nur wenn gepackt) stehen ebenfalls bei den Grundaktionen.
 Befreien ist Athletik oder Akrobatik (die bessere) gegen den Zähigkeits-SG des Packers; Erfolg beendet „Gepackt“, ein kritischer Erfolg gibt zusätzlich einen freien Schritt.
-Greift die Aktion nicht (z. B. nicht liegend), lehnt der Server sie ab, ohne Aktionen zu verbrauchen. Das Menü graut diese beiden Aktionen nicht aus.
+Greift die Aktion nicht (z. B. nicht liegend), lehnt der Server sie ab, ohne Aktionen zu verbrauchen. Das Menü graut diese beiden Aktionen aus, solange sie nicht möglich sind.
 
 **NPC-Aktionen (Spielleiter):** Ist ein NPC dran und ausgewählt, öffnet **V** dasselbe Menü für ihn; ebenso gilt `/pf2 combat action <id>`.
 NPCs können alle Grundaktionen außer **Schild hochnehmen** (keine Schilddaten, die Aktion wird abgelehnt). Beim Schritt wird nur die Aktion
@@ -216,7 +216,7 @@ Mit Taste **J** (änderbar unter Steuerung → PF2 Craft; Ersatz: `/pf2 npc cont
 Die Kamera wechselt in die **Ich-Perspektive** des NPCs; mit **F5** wechselt man wie gewohnt die Kameraansicht. Der eigene Körper bleibt stehen und ist geschützt.
 - **Steuerung:** WASD, Springen und Sprinten bewegen den NPC, die Maus dreht ihn. Der **Linksklick** greift an (Strahl aus den Augen des NPCs, bis 64 Blöcke) und öffnet das Angriffsfenster wie beim Befehlsstab.
   **V** öffnet das Aktionsmenü des NPCs, **G** wählt Schreiten. Blöcke abbauen, setzen und benutzen ist währenddessen gesperrt.
-- **Regeln:** Es lässt sich nur ein NPC pro Spielleiter übernehmen (nicht besiegt, in derselben Welt, unter 128 Blöcken Entfernung). Im Kampf geht das nur, solange der NPC am Zug ist; es gelten dieselben Bewegungsregeln wie für Spieler
+- **Regeln:** Es lässt sich nur ein NPC pro Spielleiter übernehmen (nicht besiegt, in derselben Welt, unter 64 Blöcken Entfernung; entfernt sich der NPC später auf über 80 Blöcke, wird die Steuerung beendet). Im Kampf geht das nur, solange der NPC am Zug ist; es gelten dieselben Bewegungsregeln wie für Spieler
   (ohne gewähltes Schreiten bleibt der NPC auf seinem Block). Außerhalb des Kampfes gibt es keine Grenzen.
 - **Loslassen** passiert bei erneutem Druck auf J, bei Zugwechsel, Kampfende, Entfernen oder Besiegen des NPCs, Verlust der GM-Rolle und beim Trennen der Verbindung.
 - Übernehmen bricht einen bezahlten Klick-Lauf des NPCs ab; die bezahlten Aktionen werden nicht erstattet.

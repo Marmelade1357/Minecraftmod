@@ -45,18 +45,19 @@ public final class RangeOverlay {
             return Optional.empty();
         }
         Optional<CombatSyncPayload> combat = ClientCombat.get();
-        if (combat.isEmpty() || !ClientCombat.isTurnOf(client.player.getUuid())) {
-            return Optional.empty();
-        }
-        CombatSyncPayload state = combat.get();
-        int blocks;
-        if (ClientControl.isControlling()) {
+        if (combat.isPresent() && ClientControl.isControlling()) {
+            CombatSyncPayload state = combat.get();
             // The sync carries no NPC speed, so a controlled NPC only shows an active stride.
             var npc = client.getCameraEntity();
             boolean its = ClientControl.controlled().map(ClientCombat::isTurnOf).orElse(false);
             return npc != null && npc != client.player && its && state.strideBlocksLeft() > 0
                     ? Optional.of(new Target(npc.getBlockPos(), state.strideBlocksLeft())) : Optional.empty();
         }
+        if (combat.isEmpty() || !ClientCombat.isTurnOf(client.player.getUuid())) {
+            return Optional.empty();
+        }
+        CombatSyncPayload state = combat.get();
+        int blocks;
         if (state.strideBlocksLeft() > 0) {
             blocks = state.strideBlocksLeft();
         } else if (state.actionsLeft() > 0) {

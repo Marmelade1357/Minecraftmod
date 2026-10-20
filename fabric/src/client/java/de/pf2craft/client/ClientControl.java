@@ -18,10 +18,10 @@ import net.minecraft.util.Formatting;
  */
 public final class ClientControl {
     /** Ticks to wait for the NPC entity to show up in the client world. */
-    private static final int LOOKUP_TICKS = 40;
+    private static final int LOOKUP_INTERVAL = 20;
 
     private static UUID controlled;
-    private static int lookupLeft;
+    private static int lookupWait;
     private static boolean cameraSet;
 
     private ClientControl() {
@@ -40,7 +40,7 @@ public final class ClientControl {
         Optional<UUID> npc = payload.npcEntityUuid();
         if (npc.isPresent()) {
             controlled = npc.get();
-            lookupLeft = LOOKUP_TICKS;
+            lookupWait = LOOKUP_INTERVAL;
             cameraSet = false;
             tryAttachCamera(client);
         } else {
@@ -51,7 +51,7 @@ public final class ClientControl {
     /** Restores the camera and forgets the controlled NPC (release message or disconnect). */
     public static void release(MinecraftClient client) {
         controlled = null;
-        lookupLeft = 0;
+        lookupWait = 0;
         cameraSet = false;
         if (client != null && client.player != null) {
             client.setCameraEntity(client.player);
@@ -116,13 +116,15 @@ public final class ClientControl {
             return;
         }
         if (!cameraSet) {
-            if (lookupLeft-- > 0) {
+            // Keep trying (every 20 ticks) for as long as control is active; the server releases if it never works.
+            if (--lookupWait <= 0) {
+                lookupWait = LOOKUP_INTERVAL;
                 tryAttachCamera(client);
             }
         } else if (client.getCameraEntity() != findEntity(client)) {
             // The NPC entity was reloaded or the camera was reset: attach again.
             cameraSet = false;
-            lookupLeft = LOOKUP_TICKS;
+            lookupWait = LOOKUP_INTERVAL;
             tryAttachCamera(client);
         }
         if (!ClientPlayNetworking.canSend(ControlInputPayload.ID)) {

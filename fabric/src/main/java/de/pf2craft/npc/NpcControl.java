@@ -35,7 +35,9 @@ import net.minecraft.world.World;
  * thread only, in memory (a restart releases everything).
  */
 public final class NpcControl {
-    public static final double MAX_DISTANCE = 128.0;
+    public static final double MAX_DISTANCE = 64.0;
+    /** Beyond this the NPC is out of the GM's tracking range (the camera cannot follow): control is released. */
+    private static final double RELEASE_DISTANCE = 80.0;
     /** How far the controlled NPC's crosshair reaches for an attack target. */
     private static final double ATTACK_RAY = 64.0;
     private static final double EDGE = 0.05;
@@ -323,6 +325,7 @@ public final class NpcControl {
             NpcEntity npc = find(server, c.npcId);
             if (gm == null || !GmRoles.isGm(gm) || npc == null || npc.stats() == null || npc.stats().defeated()
                     || npc.getWorld() != gm.getWorld()
+                    || npc.squaredDistanceTo(gm) > RELEASE_DISTANCE * RELEASE_DISTANCE
                     || (CombatService.active()
                     && CombatService.currentId().filter(c.npcId.toString()::equals).isEmpty())) {
                 if (gm == null) {

@@ -140,7 +140,7 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
 - Phase 4 (Schreiten als gewählte Aktion mit Taste G und Reichweitenkreis Taste H/`rangeDisplay`; NPC übernehmen mit Taste J bzw. `/pf2 npc control [release]`;
   Chat als NPC bei Übernahme, `/pf2 npc say`, Sprechblasen ~5 s, `SpeechText` in `core`) ist gebaut, per Unit-Tests in `core` und Bot-Tests auf dem Dedicated Server geprüft;
   der Ingame-Test des Nutzers steht aus. Kamera, Mauseingabe, Sprechblasen und Reichweitenkreis wurden nie auf einem echten Bildschirm gesehen.
-  Bekannte Grenzen: keine Schreiten-Vorschau für einen übernommenen NPC (nur verbleibende Blöcke nach dem Schreiten); Kamera-Rotation kann hinterherhinken (Entity-Tracking);
+  Bekannte Grenzen: keine Vorschau vor der Wahl von Schreiten für einen übernommenen NPC (der Kreis erscheint erst nach dem Schreiten); Kamera-Rotation kann hinterherhinken (Entity-Tracking);
   Mausrad/Zahlentasten ändern weiter den GM-Hotbar-Slot; Schreiten kann das Limit um bis zu 1 Block überschreiten; Übernahme bricht einen bezahlten Klick-Lauf ab (ohne Erstattung);
   Kreis um die aktuelle Position auf flachem Boden; Loslassen bei Disconnect/GM-Rollenverlust nicht getestet; Vorzeichen von A/D ungeprüft (ggf. in `ClientControl.tick` invertieren);
   kein zweiter `/npc`-Befehlsbaum; Bewegung ohne gewähltes Schreiten löst `onMoved` nicht aus (Deckung bleibt bis zum echten Schreiten).
