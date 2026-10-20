@@ -74,6 +74,11 @@ public class ActionMenuScreen extends Screen {
             return Optional.empty();
         }
         CombatSyncPayload.Entry entry = current.get();
+        Optional<UUID> controlled = ClientControl.controlled();
+        if (controlled.isPresent()) {
+            // While controlling, the controlled NPC is the actor (and only on its turn).
+            return controlled.get().equals(entry.id()) ? controlled : Optional.empty();
+        }
         if (entry.id().equals(client.player.getUuid())) {
             return Optional.of(entry.id());
         }

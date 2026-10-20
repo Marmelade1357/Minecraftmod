@@ -66,6 +66,11 @@ public final class CombatHud {
         int width = context.getScaledWindowWidth();
         int height = context.getScaledWindowHeight();
 
+        if (ClientControl.isControlling()) {
+            Text control = Text.translatable("hud.pf2craft.control.active", ClientControl.name(client),
+                    Pf2CraftClient.takeOverKeyText()).formatted(Formatting.GOLD, Formatting.BOLD);
+            context.drawCenteredTextWithShadow(font, control, width / 2, height - 60, COLOR_WHITE);
+        }
         Optional<ClientSheets.Synced> own = ownSheet(client);
         Optional<CombatSyncPayload> combat = ClientCombat.get();
         // Outside a combat the TP text sits where the hearts were; during one it follows the HUD anchor.
@@ -78,7 +83,7 @@ public final class CombatHud {
         }
         CombatSyncPayload state = combat.get();
         int barBottom = drawInitiativeBar(context, font, state, width);
-        if (ClientCombat.isTurnOf(player.getUuid())) {
+        if (ClientCombat.isTurnOf(ClientControl.controlled().orElse(player.getUuid()))) {
             Text banner = Text.translatable("hud.pf2craft.combat.your_turn")
                     .formatted(Formatting.GOLD, Formatting.BOLD);
             context.getMatrices().push();

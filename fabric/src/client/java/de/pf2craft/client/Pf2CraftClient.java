@@ -2,6 +2,7 @@ package de.pf2craft.client;
 
 import de.pf2craft.network.ActionRequestPayload;
 import de.pf2craft.network.CombatSyncPayload;
+import de.pf2craft.network.ControlStatePayload;
 import de.pf2craft.network.EndTurnPayload;
 import de.pf2craft.network.NpcSearchResultPayload;
 import de.pf2craft.network.NpcSheetPayload;
@@ -47,6 +48,7 @@ public class Pf2CraftClient implements ClientModInitializer {
     private static KeyBinding actionMenuKey;
     private static KeyBinding strideKey;
     private static KeyBinding rangeToggleKey;
+    private static KeyBinding takeOverKey;
     /** Ticks left to wait for the own sheet after a C press, or -1. */
     private static int waitingForOwnSheet = -1;
     /** A screen the server asked for while another (e.g. the terrain loading) screen was open. */
@@ -69,6 +71,9 @@ public class Pf2CraftClient implements ClientModInitializer {
                 "key.pf2craft.stride", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, KEY_CATEGORY));
         rangeToggleKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.pf2craft.range_toggle", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_H, KEY_CATEGORY));
+
+        takeOverKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.pf2craft.take_over", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_J, KEY_CATEGORY));
 
         ClientTickEvents.END_CLIENT_TICK.register(Pf2CraftClient::tick);
         RangeOverlay.register();
@@ -113,6 +118,8 @@ public class Pf2CraftClient implements ClientModInitializer {
                         screen.refresh();
                     }
                 });
+        ClientPlayNetworking.registerGlobalReceiver(ControlStatePayload.ID,
+                (payload, context) -> ClientControl.onState(context.client(), payload));
         ClientPlayNetworking.registerGlobalReceiver(PendingActionPayload.ID,
                 (payload, context) -> ClientActions.setPending(payload.actionId()));
         ClientPlayNetworking.registerGlobalReceiver(OpenCombatScreenPayload.ID,
@@ -120,6 +127,7 @@ public class Pf2CraftClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(OpenAttackScreenPayload.ID,
                 (payload, context) -> show(context.client(), () -> new AttackScreen(payload)));
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
+            ClientControl.release(null);
             ClientSheets.clear();
             ClientCombat.clear();
             ClientActions.setPending("");
@@ -145,6 +153,11 @@ public class Pf2CraftClient implements ClientModInitializer {
         HudRenderCallback.EVENT.register(RollHud::render);
         HudRenderCallback.EVENT.register(CombatHud::render);
         EntityRendererRegistry.register(Pf2Entities.NPC, VillagerEntityRenderer::new);
+    }
+
+    /** The bound key of the take-over action for the HUD hint. */
+    public static Text takeOverKeyText() {
+        return takeOverKey.getBoundKeyLocalizedText();
     }
 
     private static void tick(MinecraftClient client) {
@@ -177,6 +190,12 @@ public class Pf2CraftClient implements ClientModInitializer {
                 onStrideKey(client);
             }
         }
+        while (takeOverKey.wasPressed()) {
+            if (client.currentScreen == null && client.player != null) {
+                ClientControl.toggle(client);
+            }
+        }
+        ClientControl.tick(client);
         while (rangeToggleKey.wasPressed()) {
             if (client.currentScreen == null && client.player != null) {
                 boolean on = !ClientActions.rangeDisplay();

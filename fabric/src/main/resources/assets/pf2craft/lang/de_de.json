@@ -405,5 +405,7 @@
   "pf2craft.control.already": "Du steuerst bereits einen NPC.",
   "pf2craft.control.none": "Du steuerst keinen NPC.",
   "pf2craft.control.ended": "Die Steuerung von %s ist beendet.",
-  "pf2craft.control.no_target": "Der NPC sieht keine Kreatur an."
+  "pf2craft.control.no_target": "Der NPC sieht keine Kreatur an.",
+  "key.pf2craft.take_over": "NPC übernehmen / loslassen",
+  "hud.pf2craft.control.active": "Du steuerst: %s (%s zum Loslassen)"
 }

@@ -405,5 +405,7 @@
   "pf2craft.control.already": "You already control an NPC.",
   "pf2craft.control.none": "You do not control an NPC.",
   "pf2craft.control.ended": "Control of %s ended.",
-  "pf2craft.control.no_target": "The NPC is not looking at a creature."
+  "pf2craft.control.no_target": "The NPC is not looking at a creature.",
+  "key.pf2craft.take_over": "Take over / release NPC",
+  "hud.pf2craft.control.active": "Controlling: %s (%s to release)"
 }
