@@ -256,6 +256,9 @@ Chat-Meldungen beim Entstehen und Enden folgen derselben Regel. Der eigene TP-Te
 Dasselbe geht per Befehl, siehe `/pf2 combat condition …`. Bewusstlos entfernen beendet auch Sterbend; Sterbend setzen macht bewusstlos.
 Bearbeiten geht nur im laufenden Kampf und nur bei Kämpfern.
 
+### Kollision
+Kollision: NPCs und Spieler schieben sich nicht weg. Das gilt immer (nicht nur im Kampf), auch für liegende oder besiegte NPCs.
+
 ### Bekannte Grenzen
 - Taste **C** kollidiert mit der Vanilla-Belegung „Hotbar-Aktivator speichern“; eine der beiden Tasten unter Steuerung umbelegen.
 - Talente werden nur mit Namen geführt, ihre Effekte werden nicht berechnet.

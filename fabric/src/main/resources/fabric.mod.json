@@ -12,6 +12,7 @@
     "client": ["de.pf2craft.client.Pf2CraftClient"]
   },
   "mixins": [
+    "pf2craft.mixins.json",
     {
       "config": "pf2craft.client.mixins.json",
       "environment": "client"

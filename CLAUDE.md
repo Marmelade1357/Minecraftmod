@@ -161,6 +161,8 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
   nur Verängstigt hat einen numerischen Statusmalus (wirkt auf Angriffe, RK, Aktionsproben und Bogenwürfe im Kampf);
   Verlangsamt/Benommen, Sterbend 4 und kritischer Niederschlag nicht per Bot getestet; Befreien scheitert, wenn die Packer-Entity fehlt, obwohl GRABBED bleibt.
 - GM-Fernreichweite (`GmReach`): temporäre Attribut-Modifier (+96, `pf2craft:gm_far_reach`; Minecraft begrenzt die Reichweite-Attribute auf 64, effektiv gelten also 64 Blöcke) auf Entity-/Block-Reichweite, solange ein GM Befehlsstab/Kampfglocke hält; `CombatService.RADIUS` = 96, `NpcNetwork.MAX_DISTANCE` = 128. Per Bot geprüft (siehe `.superpowers/sdd/gm-far-reach-report.md`); das Fadenkreuz-Zielen eines echten Clients auf Distanz ist ungetestet.
+- Kollision: `EntityMixin` (gemeinsam, `pf2craft.mixins.json`) bricht `Entity.pushAwayFrom` ab, wenn beide Seiten Spieler oder NPC sind;
+  `NpcEntity.isPushable()` ist false. Bewusst kein Scoreboard-Team (kein persistenter Zustand). Per Bot geprüft, nicht mit echten Clients.
 - Bekannte Grenzen Teil 2: NPCs handeln nicht von selbst und sind noch nicht im Kampf nutzbar; Platzhaltermodell
   (Dorfbewohner); Strike-Boni im Werte-Fenster nicht editierbar; Zusatzeffekte (Grab, anhaltender Schaden)
   nur als Namen/Hinweise; Spawn-Schutz kann Blockklicks von Nicht-OP-GMs verschlucken.

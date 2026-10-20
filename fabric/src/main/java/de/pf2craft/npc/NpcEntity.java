@@ -89,6 +89,12 @@ public class NpcEntity extends VillagerEntity {
         }
     }
 
+    /** Nobody pushes an NPC around; it only moves through its own navigation or the GM's control. */
+    @Override
+    public boolean isPushable() {
+        return false;
+    }
+
     public NpcStats stats() {
         return stats;
     }
