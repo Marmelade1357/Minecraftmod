@@ -3,6 +3,7 @@ package de.pf2craft.client;
 import de.pf2craft.network.ActionRequestPayload;
 import de.pf2craft.network.CombatSyncPayload;
 import de.pf2craft.network.ControlStatePayload;
+import de.pf2craft.network.NpcSpeechPayload;
 import de.pf2craft.network.EndTurnPayload;
 import de.pf2craft.network.NpcSearchResultPayload;
 import de.pf2craft.network.NpcSheetPayload;
@@ -77,6 +78,7 @@ public class Pf2CraftClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(Pf2CraftClient::tick);
         RangeOverlay.register();
+        SpeechBubbles.register();
 
         ClientPlayNetworking.registerGlobalReceiver(RollResultPayload.ID, (payload, context) -> {
             context.client().inGameHud.getChatHud().addMessage(RollMessages.chatLine(payload));
@@ -120,6 +122,8 @@ public class Pf2CraftClient implements ClientModInitializer {
                 });
         ClientPlayNetworking.registerGlobalReceiver(ControlStatePayload.ID,
                 (payload, context) -> ClientControl.onState(context.client(), payload));
+        ClientPlayNetworking.registerGlobalReceiver(NpcSpeechPayload.ID,
+                (payload, context) -> SpeechBubbles.show(payload.npcEntityUuid(), payload.text()));
         ClientPlayNetworking.registerGlobalReceiver(PendingActionPayload.ID,
                 (payload, context) -> ClientActions.setPending(payload.actionId()));
         ClientPlayNetworking.registerGlobalReceiver(OpenCombatScreenPayload.ID,
@@ -128,6 +132,7 @@ public class Pf2CraftClient implements ClientModInitializer {
                 (payload, context) -> show(context.client(), () -> new AttackScreen(payload)));
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(() -> {
             ClientControl.release(null);
+            SpeechBubbles.clear();
             ClientSheets.clear();
             ClientCombat.clear();
             ClientActions.setPending("");

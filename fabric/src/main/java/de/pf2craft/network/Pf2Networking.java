@@ -54,6 +54,7 @@ public final class Pf2Networking {
         PayloadTypeRegistry.playC2S().register(ControlInputPayload.ID, ControlInputPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(ControlActionPayload.ID, ControlActionPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(ControlStatePayload.ID, ControlStatePayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(NpcSpeechPayload.ID, NpcSpeechPayload.CODEC);
     }
 
     public static void registerServerReceivers() {

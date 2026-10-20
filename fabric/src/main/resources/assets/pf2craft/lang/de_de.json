@@ -151,6 +151,8 @@
   "pf2craft.npc.not_gm": "Das darf nur ein Spielleiter.",
   "pf2craft.npc.not_found": "Dieser NSC ist nicht geladen oder zu weit weg (maximal 128 Blöcke).",
   "pf2craft.npc.selected": "Ausgewählt: %s",
+  "pf2craft.npc.say": "%s: %s",
+  "pf2craft.npc.say_empty": "Es gibt nichts zu sagen.",
   "pf2craft.npc.none_selected": "Kein NSC ausgewählt. Klicke zuerst mit dem Stab mit Rechtsklick auf einen NSC.",
   "pf2craft.npc.edit_failed": "Ungültiger Wert: %s",
   "pf2craft.npc.hp_set": "%s hat jetzt %s TP.",

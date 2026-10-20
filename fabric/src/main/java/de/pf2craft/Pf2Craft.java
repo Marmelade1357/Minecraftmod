@@ -18,6 +18,7 @@ import de.pf2craft.network.Pf2Networking;
 import de.pf2craft.npc.MonsterDataLoader;
 import de.pf2craft.npc.NpcControl;
 import de.pf2craft.npc.NpcNetwork;
+import de.pf2craft.npc.NpcSpeech;
 import de.pf2craft.npc.Pf2Entities;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -81,6 +82,7 @@ public class Pf2Craft implements ModInitializer {
         Enforcement.register();
         NpcWalk.register();
         NpcControl.register();
+        NpcSpeech.register();
         Pf2Networking.registerPayloads();
         Pf2Networking.registerServerReceivers();
         CommandRegistrationCallback.EVENT.register(Pf2Commands::register);

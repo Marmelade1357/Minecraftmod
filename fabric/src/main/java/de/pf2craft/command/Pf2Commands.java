@@ -32,6 +32,7 @@ import de.pf2craft.npc.MonsterDataLoader;
 import de.pf2craft.npc.NpcControl;
 import de.pf2craft.npc.NpcEntity;
 import de.pf2craft.npc.NpcService;
+import de.pf2craft.npc.NpcSpeech;
 import de.pf2craft.roll.RollService;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -99,6 +100,9 @@ public final class Pf2Commands {
                                             NpcControl.release(ctx.getSource().getPlayerOrThrow());
                                             return 1;
                                         })))
+                        .then(literal("say")
+                                .then(argument("text", StringArgumentType.greedyString())
+                                        .executes(Pf2Commands::npcSay)))
                         .then(literal("hp")
                                 .then(argument("value", IntegerArgumentType.integer())
                                         .executes(Pf2Commands::npcHp))))
@@ -331,6 +335,17 @@ public final class Pf2Commands {
         ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.npc.removed",
                 "Removed %s.", name), true);
         return 1;
+    }
+
+    private static int npcSay(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        ServerPlayerEntity gm = ctx.getSource().getPlayerOrThrow();
+        Optional<NpcEntity> npc = GmSelection.get(gm);
+        if (npc.isEmpty()) {
+            ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.npc.none_selected",
+                    "No NPC selected. Right-click an NPC with the staff first."));
+            return 0;
+        }
+        return NpcSpeech.say(gm, npc.get(), StringArgumentType.getString(ctx, "text")) ? 1 : 0;
     }
 
     private static int npcHp(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {

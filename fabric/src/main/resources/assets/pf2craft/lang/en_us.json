@@ -151,6 +151,8 @@
   "pf2craft.npc.not_gm": "Only a game master can do that.",
   "pf2craft.npc.not_found": "That NPC is not loaded or too far away (within 128 blocks).",
   "pf2craft.npc.selected": "Selected: %s",
+  "pf2craft.npc.say": "%s: %s",
+  "pf2craft.npc.say_empty": "There is nothing to say.",
   "pf2craft.npc.none_selected": "No NPC selected. Right-click an NPC with the staff first.",
   "pf2craft.npc.edit_failed": "Invalid value: %s",
   "pf2craft.npc.hp_set": "%s now has %s HP.",
