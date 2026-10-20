@@ -298,6 +298,14 @@ public final class ActionService {
         if (CombatService.turn().actionsLeft() < action.cost()) {
             return actorFail(sender, CombatMessages.actionNotEnough(action.cost()), interactive);
         }
+        if (action.id().equals("stride")) {
+            if (CombatService.budget().strideActive()) {
+                return actorFail(sender, CombatMessages.strideActive(), interactive);
+            }
+            if (CombatService.budget().blocksPerStride() == 0) {
+                return actorFail(sender, CombatMessages.noActions(), interactive); // speed 0: cannot move at all
+            }
+        }
         if (action.id().equals("stand_up") && !ConditionService.of(actor.id()).has(Condition.PRONE)) {
             return actorFail(sender, CombatMessages.notProne(), interactive);
         }
@@ -451,12 +459,19 @@ public final class ActionService {
         }
         LAST_ACTION.put(sender.getUuid(), System.currentTimeMillis()); // only an accepted action starts the cooldown
         clearPending(sender.getUuid());
-        CombatService.turn().spendActions(action.cost());
+        if (!action.id().equals("stride")) {
+            CombatService.turn().spendActions(action.cost()); // a Stride is paid by startStride below
+        }
         CombatEffects effects = CombatService.effects();
         List<Text> publicLines = new ArrayList<>();
         List<Text> gmLines = new ArrayList<>();
         Runnable applyAfter = null; // conditions are announced after the action's own line
         switch (action.id()) {
+            case "stride" -> {
+                // Spends the action and fills the budget; deliberately no interrupt() (that would drop the stride).
+                CombatService.budget().startStride(CombatService.turn());
+                publicLines.add(CombatMessages.actionSay("stride", actor.name()));
+            }
             case "step" -> {
                 CombatService.budget().grantStep(); // the block is free of Stride costs (NPCs walk it via NpcWalk)
                 if (actor.npc() != null) {

@@ -6,6 +6,7 @@ import java.util.Optional;
 /** The basic actions available in the action menu. */
 public final class BasicActions {
     public static final List<BasicAction> ALL = List.of(
+            new BasicAction("stride", 1, ActionKind.SELF, "", "", false, false, 0),
             new BasicAction("step", 1, ActionKind.SELF, "", "", false, false, 0),
             new BasicAction("raise_shield", 1, ActionKind.SELF, "", "", false, true, 0),
             new BasicAction("take_cover", 1, ActionKind.SELF, "", "", false, false, 0),

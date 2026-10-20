@@ -9,8 +9,18 @@ import org.junit.jupiter.api.Test;
 
 class BasicActionsTest {
     @Test
-    void allHasTheNineActions() {
-        assertEquals(List.of("step", "raise_shield", "take_cover", "seek", "demoralize", "trip", "grapple",
+    void strideIsTheFirstOneActionSelfAction() {
+        BasicAction stride = BasicActions.ALL.get(0);
+        assertEquals("stride", stride.id());
+        assertEquals(1, stride.cost());
+        assertEquals(ActionKind.SELF, stride.kind());
+        assertEquals("", stride.skill());
+        assertFalse(stride.countsAsAttack());
+    }
+
+    @Test
+    void allHasTheTenActions() {
+        assertEquals(List.of("stride", "step", "raise_shield", "take_cover", "seek", "demoralize", "trip", "grapple",
                         "stand_up", "escape"),
                 BasicActions.ALL.stream().map(BasicAction::id).toList());
     }

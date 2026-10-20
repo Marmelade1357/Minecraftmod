@@ -57,6 +57,8 @@ public final class Enforcement {
     private static Object trackedBudget;
     private static Vec3d lastAccepted;
     private static RegistryKey<World> lastAcceptedWorld;
+    private static Vec3d blockAnchor; // where the current player is held while no Stride is active
+    private static boolean strideEnded; // the last Stride ran out (picks the hint text)
 
     private Enforcement() {
     }
@@ -139,6 +141,8 @@ public final class Enforcement {
         trackedBudget = null;
         lastAccepted = null;
         lastAcceptedWorld = null;
+        blockAnchor = null;
+        strideEnded = false;
     }
 
     private static boolean bypasses(DamageSource source) {
@@ -259,12 +263,16 @@ public final class Enforcement {
             return;
         }
         Vec3d anchor = held.pos();
-        double minX = MathHelper.floor(anchor.x) - EDGE;
-        double minZ = MathHelper.floor(anchor.z) - EDGE;
-        boolean outside = pos.x < minX || pos.x > minX + 1 + 2 * EDGE || pos.z < minZ || pos.z > minZ + 1 + 2 * EDGE;
-        if (outside) {
+        if (outsideBlock(anchor, pos)) {
             teleport(p, anchor.x, pos.y, anchor.z);
         }
+    }
+
+    /** True if {@code pos} has left the block (plus edge tolerance) that contains {@code anchor}. */
+    private static boolean outsideBlock(Vec3d anchor, Vec3d pos) {
+        double minX = MathHelper.floor(anchor.x) - EDGE;
+        double minZ = MathHelper.floor(anchor.z) - EDGE;
+        return pos.x < minX || pos.x > minX + 1 + 2 * EDGE || pos.z < minZ || pos.z > minZ + 1 + 2 * EDGE;
     }
 
     private static void moveCurrent(ServerPlayerEntity p) {
@@ -273,8 +281,25 @@ public final class Enforcement {
         if (lastAccepted == null || lastAcceptedWorld != world) {
             lastAccepted = pos;
             lastAcceptedWorld = world;
+            blockAnchor = null;
+            strideEnded = false;
             return;
         }
+        if (!CombatService.budget().strideActive()) {
+            // No Stride chosen: the player stays on their block (same edge logic as hold).
+            if (blockAnchor == null) {
+                blockAnchor = lastAccepted;
+            }
+            if (outsideBlock(blockAnchor, pos)) {
+                teleport(p, blockAnchor.x, pos.y, blockAnchor.z);
+                sendLimited(p, LAST_ACTION_MSG, strideEnded ? CombatMessages.strideEnd() : CombatMessages.chooseStride());
+            } else {
+                lastAccepted = pos; // the first accepted position of the next Stride is the current one
+            }
+            return;
+        }
+        blockAnchor = null;
+        strideEnded = false;
         double dx = pos.x - lastAccepted.x;
         double dz = pos.z - lastAccepted.z;
         double delta = Math.sqrt(dx * dx + dz * dz);
@@ -288,8 +313,9 @@ public final class Enforcement {
         }
         int before = CombatService.turn().actionsLeft();
         int strideBefore = (int) Math.ceil(CombatService.budget().remainingInStride());
-        if (CombatService.budget().tryMove(delta, CombatService.turn())) {
+        if (CombatService.budget().moveWithinStride(delta)) {
             lastAccepted = pos;
+            strideEnded = !CombatService.budget().strideActive();
             if (delta > EDGE) {
                 CombatService.effects().onMoved(p.getUuid().toString()); // leaving cover and the like
                 ConditionService.onGrabberMoved(p.getUuid().toString());
@@ -301,7 +327,7 @@ public final class Enforcement {
             }
         } else {
             teleport(p, lastAccepted.x, pos.y, lastAccepted.z);
-            sendLimited(p, LAST_ACTION_MSG, CombatMessages.noActions());
+            sendLimited(p, LAST_ACTION_MSG, CombatMessages.strideEnd());
         }
     }
 

@@ -182,6 +182,20 @@ final class CombatMessages {
         return Text.translatableWithFallback("pf2craft.combat.no_actions", "You have no actions left to move.");
     }
 
+    static MutableText strideActive() {
+        return Text.translatableWithFallback("pf2craft.combat.stride_active", "You are already striding.");
+    }
+
+    static MutableText chooseStride() {
+        return Text.translatableWithFallback("pf2craft.combat.choose_stride",
+                "Choose Stride in the action menu first.");
+    }
+
+    static MutableText strideEnd() {
+        return Text.translatableWithFallback("pf2craft.combat.stride_end",
+                "Stride used up - choose Stride again to go further.");
+    }
+
     static MutableText alreadyRunning() {
         return Text.translatableWithFallback("pf2craft.combat.already_running", "A combat is already running.");
     }
@@ -323,6 +337,7 @@ final class CombatMessages {
 
     private static String actionEnglish(String id) {
         return switch (id) {
+            case "stride" -> "Stride";
             case "step" -> "Step";
             case "raise_shield" -> "Raise a Shield";
             case "take_cover" -> "Take Cover";
@@ -390,6 +405,7 @@ final class CombatMessages {
 
     static MutableText actionSay(String actionId, String actor) {
         String english = switch (actionId) {
+            case "stride" -> "%s strides.";
             case "step" -> "%s takes a Step.";
             case "raise_shield" -> "%s raises a shield.";
             case "take_cover" -> "%s takes cover.";
