@@ -56,7 +56,8 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
                                   PathbuilderFetcher, CharacterService (Import/Reset/Aufstieg), SheetService (Bogen, TP, GM-Edits)
     item/                         Pf2ItemFactory (Vanilla-Items für Waffen/Schild), CharacterItems (geben/ersetzen/entfernen),
                                   ItemData (Jar + config/pf2craft/items/*.json), Pf2Components, WeaponRef/ShieldRef
-    npc/                          NpcEntity (Dorfbewohner-basiert), NpcService, NpcNetwork, GmSelection, CommandStaffItem
+    npc/                          NpcEntity (Dorfbewohner-basiert, DriveMoveControl nur bei Übernahme), NpcService, NpcNetwork, GmSelection, CommandStaffItem
+                                  NpcControl (GM übernimmt NPC: Eingabe, Bewegungsregeln, Loslassen), NpcSpeech (Dialog/`/pf2 npc say`, Chat als NPC),
                                   (Befehlsstab), MonsterDataLoader (Jar + config/pf2craft/monsters/*.json; Vorlagen
                                   überschreiben nie Eingebautes, ID bekommt `-custom`, `-custom-2` …), Pf2Entities
     combat/                       CombatService (Kampfzustand, Züge), ConditionService (Zustände je Kämpfer im Speicher, Chat, GM-Edit),
@@ -66,8 +67,9 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
     command/                      Pf2Commands (/roll, /gmroll, /pf2 gm|hp|sheet|items|tools|npc|character …)
   src/client/java/de/pf2craft/client  nur Client: Pf2CraftClient, DiceScreen, RollHud, ImportScreen,
                                   CharacterScreen (Reiter, Verdeckt, GM-Knöpfe), ConditionEditScreen/ClientConditions (Zustandsliste), LevelUpScreen, ClientSheets,
-                                  ActionMenuScreen (Taste V), ClientActions, NpcSpawnScreen, NpcSheetScreen (der NPC-Renderer wird in Pf2CraftClient registriert)
-  src/client/resources/pf2craft.client.mixins.json  Client-Mixin (InGameHudMixin: TP statt Herzen/Hunger)
+                                  ActionMenuScreen (Taste V), ClientActions, NpcSpawnScreen, NpcSheetScreen (der NPC-Renderer wird in Pf2CraftClient registriert),
+                                  ClientControl (Kamera/Eingabe bei Übernahme, Taste J), RangeOverlay (Reichweitenkreis, Taste H), SpeechBubbles; Taste G = Schreiten
+  src/client/resources/pf2craft.client.mixins.json  Client-Mixins (InGameHudMixin: TP statt Herzen/Hunger; ChatHudMixin; KeyboardInputMixin und MinecraftClientMixin für die Übernahme)
   src/main/resources/assets/pf2craft/lang/  en_us.json, de_de.json
 ```
 
@@ -135,6 +137,13 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
   wartende Zielaktionen, Schild per Rechtsklick, NPC-Aktionen, `/pf2 combat action`) ist gebaut und per Unit-Tests in `core`
   sowie Bot-Tests auf dem Dedicated Server abgedeckt; der Ingame-Test des Nutzers steht aus. Abbrechen nur mit V oder
   `/pf2 combat action cancel` (nicht Esc). Teil 4 ist in den Feature-Branch gemerged; Ingame-Test steht aus.
+- Phase 4 (Schreiten als gewählte Aktion mit Taste G und Reichweitenkreis Taste H/`rangeDisplay`; NPC übernehmen mit Taste J bzw. `/pf2 npc control [release]`;
+  Chat als NPC bei Übernahme, `/pf2 npc say`, Sprechblasen ~5 s, `SpeechText` in `core`) ist gebaut, per Unit-Tests in `core` und Bot-Tests auf dem Dedicated Server geprüft;
+  der Ingame-Test des Nutzers steht aus. Kamera, Mauseingabe, Sprechblasen und Reichweitenkreis wurden nie auf einem echten Bildschirm gesehen.
+  Bekannte Grenzen: keine Schreiten-Vorschau für einen übernommenen NPC (nur verbleibende Blöcke nach dem Schreiten); Kamera-Rotation kann hinterherhinken (Entity-Tracking);
+  Mausrad/Zahlentasten ändern weiter den GM-Hotbar-Slot; Schreiten kann das Limit um bis zu 1 Block überschreiten; Übernahme bricht einen bezahlten Klick-Lauf ab (ohne Erstattung);
+  Kreis um die aktuelle Position auf flachem Boden; Loslassen bei Disconnect/GM-Rollenverlust nicht getestet; Vorzeichen von A/D ungeprüft (ggf. in `ClientControl.tick` invertieren);
+  kein zweiter `/npc`-Befehlsbaum; Bewegung ohne gewähltes Schreiten löst `onMoved` nicht aus (Deckung bleibt bis zum echten Schreiten).
 - Bekannte Grenzen Teil 3/4: keine Reaktionen, kein Schild-Block, kein Zauber-/Gegenstandsmenü, keine Zauber, keine Sichtlinienprüfung,
   Munition/Nachladen nicht erzwungen, Kampf endet beim Serverneustart, `/tp` eines Kämpfers wird zurückgesetzt (außer
   `/pf2 combat anchor`).
@@ -177,10 +186,10 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
    - Angriff gegen RK mit Erfolgsgrad, Schaden, TP.
    - Zustände (frightened, off-guard, …) – seit Teil 5.
    - Raster: 1 Block = 5 ft, Bewegung nach Speed. Wer nicht dran ist, kann nicht handeln.
-4. **Phase 4 – NPCs im Kampf:**
-   - (Entity mit Werteblock und Spawn-Werkzeug sind seit Phase 3 Teil 2 gebaut.)
-   - Steuerung im Kommandomodus (NPC anklicken → Ziel anklicken) und per „Übernehmen“ (Kamera/Steuerung in den NPC).
-   - `/npc say` für Dialoge.
+4. ✅ **Phase 4 – NPCs im Kampf:** gebaut (Ingame-Test des Nutzers steht aus).
+   - ✅ Entity mit Werteblock und Spawn-Werkzeug (seit Phase 3 Teil 2).
+   - ✅ Schreiten als gewählte Aktion (G) mit Reichweitenkreis (H); Steuerung im Kommandomodus (Befehlsstab) und per „Übernehmen“ (J, Kamera/Steuerung in den NPC).
+   - ✅ Dialoge: Chat als NPC, `/pf2 npc say` (kein eigener `/npc`-Baum), Sprechblasen.
 5. **Phase 5:** Zauber, Gegenstände, mehr Inhalte, physische Würfel (werfbares Item mit Rollanimation).
 
 ## Pathfinder-2e-Regeln, die schon feststehen

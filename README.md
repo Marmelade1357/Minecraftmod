@@ -6,7 +6,7 @@ Ein Spieler ist Spielleiter (GM) und steuert NPCs, die anderen spielen ihre Char
 **Plattform:** Fabric · Minecraft 1.21.1 · Java 21. Server **und** alle Spieler brauchen die Mod
 (plus [Fabric API](https://modrinth.com/mod/fabric-api)).
 
-## Aktueller Stand (Phase 1 bis 3, Teil 5)
+## Aktueller Stand (Phase 1 bis 4)
 
 ### Würfelfenster
 - Taste **R** (änderbar unter Steuerung → PF2 Craft) öffnet das Würfelfenster.
@@ -36,6 +36,8 @@ groß oben auf dem Bildschirm (natürliche 20 golden, natürliche 1 rot) und im 
 | `/pf2 npc info` | Werte des ausgewählten (sonst angesehenen, max. 16 Blöcke) NPCs im Chat (Spielleiter oder OP) |
 | `/pf2 npc remove` | ausgewählten (sonst angesehenen) NPC entfernen (Spielleiter oder OP) |
 | `/pf2 npc hp <Wert>` | aktuelle TP des ausgewählten NPCs setzen (Spielleiter oder OP) |
+| `/pf2 npc say <Text>` | der ausgewählte NPC spricht: Chatzeile „Name: Text“ für alle und eine Sprechblase (nur Spielleiter) |
+| `/pf2 npc control` / `/pf2 npc control release` | den ausgewählten NPC übernehmen bzw. wieder loslassen (Ersatz zur Taste J, nur Spielleiter) |
 | `/pf2 combat start` | Kampf starten: alle Charaktere und NPCs im Umkreis von 32 Blöcken, Initiative wird gewürfelt (Spielleiter oder OP) |
 | `/pf2 combat status` | Runde, wer dran ist und die Reihenfolge anzeigen (Spielleiter oder OP) |
 | `/pf2 combat next` | Zug überspringen (Spielleiter oder OP) |
@@ -142,10 +144,14 @@ Mod bei Spielern mit Charakter „TP: x/y“. Vanilla-Schaden, -Tod und -Hunger 
 
 **Dein Zug:** 3 Aktionen und 1 Reaktion pro Zug. Wer nicht dran ist, kann sich nur auf seinem Block bewegen (dem, auf dem sein Zug endete); verlässt er ihn, wird er zurückgesetzt. Blöcke
 abbauen, setzen, benutzen und Interaktionen mit Entities sind gesperrt. Bewegung wird in Blöcken gezählt (1 Block = 5 ft):
-der erste Schritt beginnt ein Schreiten (1 Aktion) von Geschwindigkeit/5 Blöcken, danach ein weiteres, solange Aktionen übrig sind.
+Gehen ist erst erlaubt, nachdem du **Schreiten** gewählt hast (Taste **G** oder im Aktionsmenü, 1 Aktion): dann darfst du Geschwindigkeit/5 Blöcke laufen.
+Ohne gewähltes Schreiten bleibst du auf deinem Block und bekommst einen Hinweis; ein zweites Schreiten ist erst möglich, wenn das erste aufgebraucht ist.
+Das Ende der Strecke kann um bis zu einen Block überschritten werden, bevor der Server dich zurücksetzt.
 Mit **Enter** (änderbar unter Steuerung → PF2 Craft) beendest du den Zug früher; der Spielleiter beendet damit auch die Züge der NPCs.
-Sind alle 3 Aktionen aufgebraucht (und ein begonnenes Schreiten zu Ende gelaufen), endet der Zug etwa 1 Sekunde später von selbst.
-Ein Angriff unterbricht ein Schreiten: der Rest der Strecke verfällt, weitere Schritte beginnen ein neues Schreiten (1 Aktion).
+Sind alle 3 Aktionen aufgebraucht (und ein gewähltes Schreiten zu Ende gelaufen), endet der Zug etwa 1 Sekunde später von selbst.
+Ein Angriff unterbricht ein Schreiten: der Rest der Strecke verfällt, danach musst du erneut Schreiten wählen.
+
+**Reichweitenanzeige:** Auf deinem Zug zeichnet die Mod einen Kreis auf den Boden: vor dem Schreiten die Strecke, die ein Schreiten schaffen würde, während des Schreitens die noch verbleibenden Blöcke. Taste **H** schaltet die Anzeige an oder aus (gespeichert als `rangeDisplay` in `config/pf2craft-client.json`, Standard an; andere Schlüssel bleiben erhalten). Der Kreis ist um deine aktuelle Position gezeichnet und liegt flach auf Höhe deines Blocks.
 
 **Angriff:** Waffe deines Charakters in die Haupthand nehmen und auf deinem Zug einen NPC **links anklicken**. Im Fenster wählst du
 den **1., 2. oder 3. Angriff** (der Mehrfachangriffsmalus ist eingerechnet, der passende Vorschlag ist hervorgehoben, jeder
@@ -184,7 +190,8 @@ Wesen. Ein ungültiges Ziel (zu weit weg, kein Kämpfer) zeigt nur einen Hinweis
 Ein Spielleiter-Linksklick mit dem Befehlsstab auf ein ungültiges Ziel wählt wie gewohnt aus.
 
 **Grundaktionen** (je 1 Aktion):
-- **Schreiten:** 1 Block gehen, ohne dass ein Schreiten beginnt.
+- **Schreiten** (Taste **G**): Geschwindigkeit/5 Blöcke laufen (siehe „Dein Zug“).
+- **Schritt:** 1 Block gehen, ohne dass ein Schreiten beginnt.
 - **Schild hochnehmen:** +RK-Bonus deines Schilds bis zum Beginn deines nächsten Zugs. Du musst den Schild deines Charakters in der Hand halten;
   ein **Rechtsklick mit dem Schild** auf deinem Zug ist dasselbe wie die Menüaktion (der Vanilla-Block ist abgeschaltet).
 - **Deckung nehmen:** +2 RK, bis du dich bewegst oder dein nächster Zug beginnt.
@@ -200,8 +207,25 @@ Befreien ist Athletik oder Akrobatik (die bessere) gegen den Zähigkeits-SG des 
 Greift die Aktion nicht (z. B. nicht liegend), lehnt der Server sie ab, ohne Aktionen zu verbrauchen. Das Menü graut diese beiden Aktionen nicht aus.
 
 **NPC-Aktionen (Spielleiter):** Ist ein NPC dran und ausgewählt, öffnet **V** dasselbe Menü für ihn; ebenso gilt `/pf2 combat action <id>`.
-NPCs können alle Grundaktionen außer **Schild hochnehmen** (keine Schilddaten, die Aktion wird abgelehnt). Beim Schreiten wird nur die Aktion
+NPCs können alle Grundaktionen außer **Schild hochnehmen** (keine Schilddaten, die Aktion wird abgelehnt). Beim Schritt wird nur die Aktion
 bezahlt; der Spielleiter bekommt den Hinweis „darf 1 Block gehen“ und lässt den NPC selbst laufen.
+
+### NPC übernehmen (Spielleiter)
+
+Mit Taste **J** (änderbar unter Steuerung → PF2 Craft; Ersatz: `/pf2 npc control`, Loslassen mit `/pf2 npc control release`) übernimmt der Spielleiter den **ausgewählten NPC**.
+Die Kamera wechselt in die **Ich-Perspektive** des NPCs; mit **F5** wechselt man wie gewohnt die Kameraansicht. Der eigene Körper bleibt stehen und ist geschützt.
+- **Steuerung:** WASD, Springen und Sprinten bewegen den NPC, die Maus dreht ihn. Der **Linksklick** greift an (Strahl aus den Augen des NPCs, bis 64 Blöcke) und öffnet das Angriffsfenster wie beim Befehlsstab.
+  **V** öffnet das Aktionsmenü des NPCs, **G** wählt Schreiten. Blöcke abbauen, setzen und benutzen ist währenddessen gesperrt.
+- **Regeln:** Es lässt sich nur ein NPC pro Spielleiter übernehmen (nicht besiegt, in derselben Welt, unter 128 Blöcken Entfernung). Im Kampf geht das nur, solange der NPC am Zug ist; es gelten dieselben Bewegungsregeln wie für Spieler
+  (ohne gewähltes Schreiten bleibt der NPC auf seinem Block). Außerhalb des Kampfes gibt es keine Grenzen.
+- **Loslassen** passiert bei erneutem Druck auf J, bei Zugwechsel, Kampfende, Entfernen oder Besiegen des NPCs, Verlust der GM-Rolle und beim Trennen der Verbindung.
+- Übernehmen bricht einen bezahlten Klick-Lauf des NPCs ab; die bezahlten Aktionen werden nicht erstattet.
+
+### Dialoge und Sprechblasen
+
+Während du einen NPC übernommen hast, wird dein **Chat zur Rede des NPCs**: aus deiner Nachricht wird die Zeile „NPC-Name: Text“ für alle (Vanilla-Chat wirkt erst nach dem Loslassen wieder).
+Ohne Übernahme geht dasselbe mit `/pf2 npc say <Text>` für den ausgewählten NPC. Zusätzlich erscheint für Spieler im Umkreis von 64 Blöcken etwa **5 Sekunden** lang eine Sprechblase über dem NPC
+(höchstens 120 Zeichen, auf 4 Zeilen umgebrochen; Formatierungscodes werden entfernt). Die eigene Blase des übernommenen NPCs wird in der Ich-Perspektive nicht gezeigt.
 
 ### Zustände
 
@@ -248,7 +272,12 @@ Bearbeiten geht nur im laufenden Kampf und nur bei Kämpfern.
 - Die Bezeichnungen der Würfe im Chat sind englisch.
 - Steigt der INT-Modifikator, muss der Spielleiter die zusätzliche trainierte Fertigkeit von Hand setzen.
 - Die geführte Charaktererschaffung im Spiel fehlt noch; Charaktere kommen aus Pathbuilder.
-- NPCs handeln nicht von selbst, der Spielleiter steuert sie mit dem Befehlsstab.
+- NPCs handeln nicht von selbst, der Spielleiter steuert sie mit dem Befehlsstab oder per Übernahme.
+- NPC übernehmen (Phase 4, gebaut und per Bot auf dem Dedicated Server geprüft, **vom Nutzer noch nicht ingame getestet**): Kamera, Maussteuerung und Sprechblasen wurden noch nie auf einem echten Bildschirm gesehen.
+  Die Kamera kann der Mausdrehung leicht hinterherhinken, weil die Drehung des NPCs über das Entity-Tracking ankommt. Ob A und D richtig herum laufen, ist ungeprüft.
+  Das Mausrad und die Zahlentasten ändern weiterhin den Hotbar-Slot des Spielleiters. Für einen übernommenen NPC gibt es keine Reichweitenvorschau vor dem Schreiten (nur die verbleibenden Blöcke danach).
+  Die Reichweitenanzeige zeigt einen flachen Kreis um die aktuelle Position, unabhängig vom Gelände. Ein Schreiten kann das Limit um bis zu einen Block überschreiten.
+  Das Loslassen bei Verbindungsabbruch oder Verlust der GM-Rolle ist nicht getestet. Einen zweiten Befehlsbaum `/npc …` gibt es nicht, alles läuft unter `/pf2 npc …`.
 - Das NPC-Modell ist ein Platzhalter (Dorfbewohner).
 - Angriffsboni (Strikes) lassen sich im Werte-Fenster noch nicht ändern.
 - Zusatzeffekte wie Ergreifen (Grab) oder anhaltender Schaden sind nur Namen bzw. Hinweise, ohne Regelwirkung.
@@ -282,7 +311,7 @@ Der Regelkern wird direkt in die Mod-Jar kompiliert.
    - ✅ Teil 3: Kampfkern (Initiative, 3 Aktionen + Reaktion, Angriffe, Mehrfachangriffsmalus; im Einzelspieler getestet, Mehrspieler ungetestet)
    - ✅ Teil 4: Aktionsmenü (Taste V, Grundaktionen, Schild und Deckung; gebaut, Ingame-Test steht aus)
    - ✅ Teil 5: Zustände und Sterbend (gebaut, Ingame-Test steht aus)
-4. NPC-Steuerung im Kampf und „Übernehmen“ durch den GM
+4. ✅ NPC-Steuerung: Schreiten als gewählte Aktion mit Reichweitenanzeige, „Übernehmen“ eines NPCs durch den GM, Dialoge mit Sprechblasen (`/pf2 npc say`); gebaut, Ingame-Test steht aus
 5. Zauber, Gegenstände, mehr Inhalte, physische Würfel
 
 ## Lizenzhinweis
