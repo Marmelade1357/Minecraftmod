@@ -17,6 +17,11 @@ public final class DamageResolver {
     private DamageResolver() {
     }
 
+    /** True when the name is a real damage type (lowercase), e.g. "fire" or "slashing". */
+    public static boolean isDamageType(String type) {
+        return ALL_TYPES.contains(type);
+    }
+
     /** A defence type matches a damage type when equal or via the groups physical, energy and all-damage. */
     static boolean matches(String defenceType, String damageType) {
         return defenceType.equals(damageType)
