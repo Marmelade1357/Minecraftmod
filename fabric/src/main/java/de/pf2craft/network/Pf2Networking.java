@@ -31,6 +31,7 @@ public final class Pf2Networking {
         PayloadTypeRegistry.playS2C().register(SheetSyncPayload.ID, SheetSyncPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(SpellbookSyncPayload.ID, SpellbookSyncPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(CastSpellPayload.ID, CastSpellPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(SpellTargetPayload.ID, SpellTargetPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(CheckRollPayload.ID, CheckRollPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(GmEditPayload.ID, GmEditPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(GrantLevelUpPayload.ID, GrantLevelUpPayload.CODEC);
@@ -68,6 +69,8 @@ public final class Pf2Networking {
         ServerPlayNetworking.registerGlobalReceiver(CastSpellPayload.ID,
                 (payload, context) -> SpellService.cast(context.player(), payload.entry(), payload.spell(),
                         payload.rank()));
+        ServerPlayNetworking.registerGlobalReceiver(SpellTargetPayload.ID,
+                (payload, context) -> SpellService.target(context.player(), payload.entityId()));
         ServerPlayNetworking.registerGlobalReceiver(CheckRollPayload.ID,
                 (payload, context) -> SheetService.rollCheck(context.player(), payload.checkId(), payload.secret()));
         ServerPlayNetworking.registerGlobalReceiver(GmEditPayload.ID,

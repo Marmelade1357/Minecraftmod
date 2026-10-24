@@ -91,6 +91,31 @@ public final class SpellService {
         return PENDING.containsKey(player.getUuid());
     }
 
+    /** Everybody with a pending spell. */
+    public static java.util.Set<UUID> pendingPlayers() {
+        return new java.util.HashSet<>(PENDING.keySet());
+    }
+
+    private static final Map<UUID, Long> LAST_TARGET = new HashMap<>();
+    private static final long TARGET_GAP_MS = 150;
+
+    /** The client's raycast pick for the pending spell (reach beyond vanilla click range); treated like a click. */
+    public static void target(ServerPlayerEntity player, int entityId) {
+        if (!PENDING.containsKey(player.getUuid())) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        Long last = LAST_TARGET.get(player.getUuid());
+        if (last != null && now - last < TARGET_GAP_MS) {
+            return;
+        }
+        LAST_TARGET.put(player.getUuid(), now);
+        Entity e = player.getServerWorld().getEntityById(entityId);
+        if (e != null) {
+            executePending(player, e);
+        }
+    }
+
     /** Drops a pending spell without telling the client; returns whether there was one. */
     public static boolean dropPending(UUID player) {
         return PENDING.remove(player) != null;
@@ -99,6 +124,7 @@ public final class SpellService {
     public static void forget(UUID player) {
         PENDING.remove(player);
         LAST_CAST.remove(player);
+        LAST_TARGET.remove(player);
     }
 
     // ---- entry points ----------------------------------------------------------------------------------------
@@ -213,11 +239,8 @@ public final class SpellService {
         if (entryIndex < 0 || entryIndex >= book.entries().size()) {
             return fail(player, SpellMessages.noEntry(), interactive);
         }
-        Optional<SpellDefinition> found = SpellData.catalog().byName(spellName);
-        if (found.isEmpty()) {
-            return fail(player, SpellMessages.notInCatalog(), interactive);
-        }
-        SpellDefinition def = found.get();
+        // A spell missing from the catalog (homebrew) is still castable: it takes effect without automation.
+        SpellDefinition def = SpellData.catalog().byName(spellName).orElseGet(() -> unknownSpell(spellName));
         SpellcastingEntry entry = book.entries().get(entryIndex);
         OptionalInt listed = listedRank(entry, def);
         if (listed.isEmpty()) {
@@ -258,6 +281,9 @@ public final class SpellService {
         }
         int cost = Math.max(1, def.actions());
         boolean inCombat = CombatService.active() && CombatService.contains(player.getUuid());
+        if (!inCombat && sheet.get().currentHp() <= 0) {
+            return fail(player, CombatMessages.cannotAct(), interactive); // down characters cannot cast either
+        }
         if (inCombat) {
             if (CombatService.currentId().filter(player.getUuid().toString()::equals).isEmpty()) {
                 return fail(player, CombatMessages.notYourTurn(), interactive);
@@ -270,6 +296,12 @@ public final class SpellService {
             }
         }
         return new Plan(sheet.get(), book, entry, entryIndex, def, castRank, slotRank, usesFocus, cost, inCombat);
+    }
+
+    /** Placeholder for a spell without catalog data: two actions, no target, no automatic effect. */
+    private static SpellDefinition unknownSpell(String name) {
+        return new SpellDefinition(name.toLowerCase(java.util.Locale.ROOT), name, 0, 2, 0, 0, SpellKind.UTILITY, "",
+                false, "", 0, "", "", 0, false, 0, "", "", "");
     }
 
     /** The rank under which the entry lists the spell (name or id, ignoring case); empty if it is not listed. */
@@ -296,6 +328,10 @@ public final class SpellService {
     /** Null if the creature is a valid target for the planned spell, else the reason. */
     private static MutableText checkTarget(ServerPlayerEntity caster, Plan plan, Entity target) {
         boolean heal = plan.def().kind() == SpellKind.HEAL;
+        if (CombatService.active() && !plan.inCombat() && !GmRoles.isGm(caster)
+                && CombatService.contains(target.getUuid())) {
+            return SpellMessages.combatTarget(); // outsiders cannot interfere with a running combat
+        }
         if (target instanceof NpcEntity npc) {
             if (npc.isRemoved() || npc.stats() == null || (!heal && npc.stats().defeated())) {
                 return SpellMessages.badTarget();

@@ -512,7 +512,8 @@ public final class Pf2Commands {
             return 0;
         }
         Optional<SpellDefinition> def = SpellData.catalog().byName(name);
-        if (def.isEmpty() || rank < Math.max(def.get().rank(), 0)) {
+        // Spells outside the catalog (homebrew) can be granted too; they are cast without automation.
+        if (def.isPresent() && rank < def.get().rank()) {
             ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.spell.grant.bad_spell",
                     "Unknown spell, or the rank is below the spell's own rank."));
             return 0;
@@ -534,9 +535,11 @@ public final class Pf2Commands {
         }
         Map<Integer, List<String>> spells = new TreeMap<>();
         entry.spellsByRank().forEach((k, v) -> spells.put(k, new ArrayList<>(v)));
-        List<String> atRank = spells.computeIfAbsent(def.get().rank(), k -> new ArrayList<>());
-        if (atRank.stream().noneMatch(def.get().name()::equalsIgnoreCase)) {
-            atRank.add(def.get().name());
+        String spellName = def.map(SpellDefinition::name).orElse(name);
+        List<String> atRank = spells.computeIfAbsent(def.map(SpellDefinition::rank).orElse(rank),
+                k -> new ArrayList<>());
+        if (atRank.stream().noneMatch(spellName::equalsIgnoreCase)) {
+            atRank.add(spellName);
         }
         SpellcastingEntry updated = new SpellcastingEntry(entry.name(), entry.tradition(), entry.type(),
                 entry.ability(), entry.rank(), perDay, spells);
@@ -557,7 +560,7 @@ public final class Pf2Commands {
         }
         SpellbookStore.set(target, new Spellbook(entries, old.focusMax(), old.focusCurrent(), used));
         SheetService.sendSpellbook(ctx.getSource().getServer(), target);
-        String granted = def.get().name();
+        String granted = spellName;
         int entryIndex = index;
         ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.spell.grant.done",
                 "Granted %s (rank %s, entry %s) to %s.", granted, rank, entryIndex, target.getDisplayName()), true);

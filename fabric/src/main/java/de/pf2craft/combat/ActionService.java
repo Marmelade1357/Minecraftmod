@@ -101,7 +101,9 @@ public final class ActionService {
     }
 
     public static void clearAllPending() {
-        for (UUID sender : new ArrayList<>(PENDING.keySet())) {
+        java.util.Set<UUID> all = new java.util.HashSet<>(PENDING.keySet());
+        all.addAll(SpellService.pendingPlayers());
+        for (UUID sender : all) {
             clearPending(sender);
         }
     }

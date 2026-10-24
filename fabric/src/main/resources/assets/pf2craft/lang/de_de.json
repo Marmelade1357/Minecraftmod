@@ -425,6 +425,7 @@
   "pf2craft.spell.error.bad_target": "Das ist kein gültiges Ziel für diesen Zauber.",
   "pf2craft.spell.error.self_target": "Du kannst dich mit diesem Zauber nicht selbst als Ziel wählen.",
   "pf2craft.spell.error.duplicate_target": "Dieses Ziel ist schon gewählt.",
+  "pf2craft.spell.error.combat_target": "Ein Kampf läuft: Du kannst seine Teilnehmer nicht als Ziel wählen.",
   "pf2craft.spell.error.confirm_none": "Wähle zuerst mindestens ein Ziel.",
   "pf2craft.spell.error.no_pending": "Kein Zauber wartet auf Ziele.",
   "pf2craft.spell.error.failed": "Der Zauber konnte nicht abgehandelt werden: %s",
@@ -447,6 +448,6 @@
   "pf2craft.spell.gm.heal": "[SL] %s heilt %s (%s/%s Trefferpunkte)",
   "pf2craft.spell.gm.numbers": "[SL] Zauberangriff %s, Zauber-SG %s",
   "pf2craft.spell.grant.no_character": "%s hat keinen Charakter.",
-  "pf2craft.spell.grant.bad_spell": "Unbekannter Zauber, oder der Grad liegt unter dem Grad des Zaubers.",
+  "pf2craft.spell.grant.bad_spell": "Der Grad liegt unter dem Grad des Zaubers.",
   "pf2craft.spell.grant.done": "%s (Grad %s, Liste %s) an %s vergeben."
 }

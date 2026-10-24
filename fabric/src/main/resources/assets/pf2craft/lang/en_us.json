@@ -425,6 +425,7 @@
   "pf2craft.spell.error.bad_target": "That is not a valid target for this spell.",
   "pf2craft.spell.error.self_target": "You cannot target yourself with this spell.",
   "pf2craft.spell.error.duplicate_target": "That creature is already targeted.",
+  "pf2craft.spell.error.combat_target": "A combat is running: you cannot target its participants.",
   "pf2craft.spell.error.confirm_none": "Choose at least one target first.",
   "pf2craft.spell.error.no_pending": "No spell is waiting for targets.",
   "pf2craft.spell.error.failed": "The spell could not be resolved: %s",
@@ -447,6 +448,6 @@
   "pf2craft.spell.gm.heal": "[GM] %s heals %s (%s/%s hit points)",
   "pf2craft.spell.gm.numbers": "[GM] Spell attack %s, spell DC %s",
   "pf2craft.spell.grant.no_character": "%s has no character.",
-  "pf2craft.spell.grant.bad_spell": "Unknown spell, or the rank is below the spell's own rank.",
+  "pf2craft.spell.grant.bad_spell": "The rank is below the spell's own rank.",
   "pf2craft.spell.grant.done": "Granted %s (rank %s, entry %s) to %s."
 }

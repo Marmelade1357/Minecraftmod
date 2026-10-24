@@ -56,6 +56,10 @@ final class SpellMessages {
         return t("error.self_target", "You cannot target yourself with this spell.");
     }
 
+    static MutableText combatTarget() {
+        return t("error.combat_target", "A combat is running: you cannot target its participants.");
+    }
+
     static MutableText duplicateTarget() {
         return t("error.duplicate_target", "That creature is already targeted.");
     }
