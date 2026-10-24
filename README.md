@@ -6,7 +6,7 @@ Ein Spieler ist Spielleiter (GM) und steuert NPCs, die anderen spielen ihre Char
 **Plattform:** Fabric · Minecraft 1.21.1 · Java 21. Server **und** alle Spieler brauchen die Mod
 (plus [Fabric API](https://modrinth.com/mod/fabric-api)).
 
-## Aktueller Stand (Phase 1 bis 4)
+## Aktueller Stand (Phase 1 bis 5 Teil 1)
 
 ### Würfelfenster
 - Taste **R** (änderbar unter Steuerung → PF2 Craft) öffnet das Würfelfenster.
@@ -31,6 +31,9 @@ groß oben auf dem Bildschirm (natürliche 20 golden, natürliche 1 rot) und im 
 | `/pf2 sheet <Spieler>` | Charakterbogen eines Spielers ansehen (Spielleiter oder OP) |
 | `/pf2 items <Spieler>` | Waffen und Schild eines Spielers aus dem gespeicherten Bogen neu ausgeben (Spielleiter oder OP) |
 | `/pf2 hp <Spieler> <Menge>` | TP eines Spielers ändern, negativ = Schaden (Spielleiter oder OP) |
+| `/pf2 rest <Spieler\|all>` | Rast: Zauberplätze und Fokuspunkte der Spieler auffüllen (Spielleiter oder OP) |
+| `/pf2 spells reset <Spieler>` | Zauberplätze und Fokuspunkte eines Spielers zurücksetzen (Spielleiter oder OP) |
+| `/pf2 spells grant <Spieler> <Zauber> <Rang>` | Spielleiter-/Testwerkzeug: Zauber (Katalog-ID oder Name, auch eigene) mit einem Rang ins Zauberbuch des Spielers legen (Spielleiter oder OP) |
 | `/pf2 tools` | Befehlsstab erhalten (nur Spieler mit GM-Rolle, OP allein genügt nicht) |
 | `/pf2 npc spawn <id>` | NPC aus den Monsterdaten neben dir erzeugen, z. B. `goblin-warrior` (Spielleiter oder OP) |
 | `/pf2 npc info` | Werte des ausgewählten (sonst angesehenen, max. 16 Blöcke) NPCs im Chat (Spielleiter oder OP) |
@@ -256,6 +259,64 @@ Chat-Meldungen beim Entstehen und Enden folgen derselben Regel. Der eigene TP-Te
 Dasselbe geht per Befehl, siehe `/pf2 combat condition …`. Bewusstlos entfernen beendet auch Sterbend; Sterbend setzen macht bewusstlos.
 Bearbeiten geht nur im laufenden Kampf und nur bei Kämpfern.
 
+### Zauber
+
+Zauber kommen mit dem Pathbuilder-Import in den Charakter (Zaubertradition, Attribut, Plätze pro Rang, Zauber je Rang, Fokuspunkte).
+Ein erneuter Import setzt die verbrauchten Plätze zurück.
+
+**Reiter Zauber** im Charakterbogen (Taste **C**): je Zauberliste Tradition, Typ, Zauberangriff und Zauber-SG
+(Attribut plus Übungsrang, wie bei Fertigkeiten), dann die Zauber nach Rang mit den übrigen Plätzen und die Fokuspunkte.
+Ein Knopf **Wirken** startet den Zauber; nicht wirkbare Zauber sind ausgegraut, der Mauszeiger nennt den Grund.
+Der Spielleiter sieht bei fremden Bögen die Liste nur lesend plus den Knopf **Plätze zurücksetzen** (der Spieler muss online sein).
+
+**Wirken:** Entweder über den Reiter oder im Aktionsmenü (Taste **V**) → Kategorie **Zauber**.
+- **Ziele:** Zauber mit Zielen warten danach auf einen Klick. Das Wesen wird per Fadenkreuz angeklickt (Sichtlinie bis 64 Blöcke;
+  Blöcke blockieren); der Server prüft die Reichweite des Zaubers selbst. Bei mehreren Zielen mehrere Wesen anklicken und mit **B** bestätigen.
+  **V** (oder `/pf2 combat action cancel`) bricht ab. Ein Zauber auf dich selbst wirkt sofort.
+- **Kosten im Kampf:** Der Zauber kostet seine Aktionen (meist 2) und ist nur auf deinem Zug möglich. Ohne Kampf sind Zauber frei wirkbar.
+- **Auflösung:** Der Server würfelt automatisch: Zauberangriff gegen RK, Rettungswurf des Ziels gegen deinen Zauber-SG (mit Grundrettungswurf, wo vorgesehen),
+  Heilung oder Schaden, mit Erfolgsgraden und Anpassung der TP.
+- **Zaubertricks** (Rang 0) kosten keinen Platz und werden automatisch gesteigert.
+- **Fokuszauber** kosten 1 Fokuspunkt.
+- **Spontane Zauberer** wählen beim Wirken den Rang (Knopf im Reiter, nur Ränge mit freiem Platz); der Zauber wird entsprechend gesteigert.
+- **Zauber ohne Daten** (nicht im Katalog): Die Mod verbraucht den Platz; die Wirkung entscheidet der Spielleiter.
+- **Rast:** `/pf2 rest <Spieler|all>` füllt Zauberplätze und Fokuspunkte auf. `/pf2 spells reset <Spieler>` setzt einen einzelnen Spieler zurück.
+- `/pf2 spells grant <Spieler> <Zauber> <Rang>` legt einen Zauber ins Buch (Spielleiter-/Testwerkzeug, funktioniert auch mit eigenen Zaubern).
+
+**Startkatalog (25 Zauber, nur Namen und Zahlen):** Electric Arc, Force Barrage, Heal, Harm, Fireball, Breathe Fire, Ignition, Frostbite,
+Caustic Blast, Needle Darts, Telekinetic Projectile, Divine Lance, Gale Blast, Slashing Gust, Thunderstrike, Chilling Spray, Daze, Fear,
+Shield, Sure Strike, Bless, Lightning Bolt, Horizon Thunder Sphere, Spout, Puff of Poison.
+
+**Eigene Zauber:** Dateien `config/pf2craft/spells/*.json` im Serverordner (beim Serverstart geladen, alphabetisch). Jede Datei ist ein JSON-Array;
+Einträge mit gleicher `id` überschreiben Einträge des Startkatalogs oder früherer Dateien. Fehlerhafte Einträge werden mit einer Meldung im Log übersprungen.
+
+```json
+[
+  {"id": "acid-splash", "name": "Acid Splash", "rank": 0, "actions": 2, "rangeFeet": 30, "maxTargets": 1,
+   "kind": "ATTACK", "damageDice": "2d4", "damageType": "acid", "heightenDice": "1d4", "heightenStep": 1}
+]
+```
+
+| Feld | Bedeutung |
+|---|---|
+| `id` (Pflicht) | eindeutige Kennung, z. B. `acid-splash` |
+| `name` (Pflicht) | Anzeigename, wie im Zauberbuch (Pathbuilder) |
+| `rank` | Zauberrang, 0 = Zaubertrick (0 bis 10) |
+| `actions` | Aktionen 1 bis 3 (Standard 2) |
+| `rangeFeet` | Reichweite in Fuß, 0 = Berührung/selbst |
+| `maxTargets` | 0 = nur du selbst, 1 = ein Ziel, mehr = Mehrfachziel (Bestätigen mit B) |
+| `kind` | `ATTACK` (Zauberangriff), `SAVE` (Rettungswurf), `AUTO` (trifft automatisch), `HEAL`, `UTILITY` (kein Wurf, Spielleiter entscheidet) |
+| `save` | `fortitude`, `reflex` oder `will` (bei `SAVE`) |
+| `basicSave` | `true` = Grundrettungswurf |
+| `damageDice` | Würfel wie `2d4` (W4, W6, W8, W10, W12, W20) |
+| `damageBonus` | fester Zusatzschaden bzw. feste Heilung |
+| `damageType` | Schadensart (z. B. `fire`, `force`, `sonic`; bei `HEAL` leer) |
+| `addAbilityMod` | `true` = Zauberattribut-Modifikator wird auf den Schaden addiert |
+| `heightenDice` | zusätzliche Würfel je Steigerungsschritt |
+| `heightenStep` | Ränge pro Schritt (1 oder 2), 0 = keine Steigerung |
+| `heightenBonus` | zusätzlicher fester Schaden pro Schritt |
+| `extraDice`, `extraType`, `extraHeightenDice` | zweite Schadenskomponente (z. B. Schall bei Thunderstrike) mit eigener Schadensart und Steigerung |
+
 ### Kollision
 Kollision: NPCs und Spieler schieben sich nicht weg. Das gilt immer (nicht nur im Kampf), auch für liegende oder besiegte NPCs.
 
@@ -263,9 +324,9 @@ Kollision: NPCs und Spieler schieben sich nicht weg. Das gilt immer (nicht nur i
 - Taste **C** kollidiert mit der Vanilla-Belegung „Hotbar-Aktivator speichern“; eine der beiden Tasten unter Steuerung umbelegen.
 - Talente werden nur mit Namen geführt, ihre Effekte werden nicht berechnet.
 - Auswahlbasierte Klassenverbesserungen (z. B. Doktrinen, Waffenmeisterschaft, Wissensränge) muss der Spielleiter setzen.
-- Zauber und Inventar gibt es noch nicht.
+- Inventar gibt es noch nicht (Zauber: siehe unten).
 - Kampf: keine Reaktionen (Reaktiver Schlag); der Schild-Block fehlt (der Schild wird gehoben, blockt aber noch nicht).
-  Kein Zauber- und Gegenstandsmenü, keine Zauber.
+  Kein Gegenstandsmenü.
 - Zustände: keine Zustände aus Zaubern oder Monsterfähigkeiten (der Spielleiter setzt sie von Hand); Zustände werden nicht
   über einen Serverneustart gespeichert (der Kampf endet dann ohnehin). Nur Verängstigt hat einen numerischen Statusmalus.
   Verlangsamt, Benommen, Sterbend 4 und kritischer Niederschlag sind nur per Unit-Test geprüft, nicht per Bot. Die Oberfläche (Zustandsliste, HUD) wurde noch nicht vom Nutzer angesehen.
@@ -281,6 +342,15 @@ Kollision: NPCs und Spieler schieben sich nicht weg. Das gilt immer (nicht nur i
   Das Mausrad und die Zahlentasten ändern weiterhin den Hotbar-Slot des Spielleiters. Für einen übernommenen NPC gibt es keine Reichweitenvorschau vor dem Schreiten (nur die verbleibenden Blöcke danach).
   Die Reichweitenanzeige zeigt einen flachen Kreis um die aktuelle Position, unabhängig vom Gelände. Ein Schreiten kann das Limit um bis zu einen Block überschreiten.
   Das Loslassen bei Verbindungsabbruch oder Verlust der GM-Rolle ist nicht getestet. Einen zweiten Befehlsbaum `/npc …` gibt es nicht, alles läuft unter `/pf2 npc …`.
+- Zauber (Phase 5 Teil 1, gebaut, per Unit-Tests in `core` abgedeckt, Client und Dedicated Server starten; **vom Nutzer nicht ingame getestet, die Oberfläche wurde noch nicht auf einem echten Bildschirm gesehen**):
+  - NPCs wirken keine Zauber.
+  - Keine Flächenschablonen und keine Sichtlinienprüfung der Zauberwirkung; bei Flächenzaubern wählst du die Ziele von Hand.
+  - Varianten mit 1 oder 3 Aktionen sind vereinfacht (Force Barrage, Heal, Harm, Horizon Thunder Sphere).
+  - Zusatzwirkungen (anhaltender Schaden, Zustände wie Verängstigt durch Fear) werden nicht automatisch angewendet; der Spielleiter setzt sie von Hand.
+  - Vorbereitete Zauberer führen Plätze pro Rang, nicht pro vorbereitetem Zauber.
+  - Die Anzeige im Menü geht von mindestens 1 Aktion aus; die genauen Kosten prüft der Server.
+  - Angeborene Zauber mit Rang über 0 werden nicht unterstützt.
+  - Die Rangwahl spontaner Zauberer wird nicht gespeichert.
 - Das NPC-Modell ist ein Platzhalter (Dorfbewohner).
 - Angriffsboni (Strikes) lassen sich im Werte-Fenster noch nicht ändern.
 - Zusatzeffekte wie Ergreifen (Grab) oder anhaltender Schaden sind nur Namen bzw. Hinweise, ohne Regelwirkung.
@@ -315,7 +385,7 @@ Der Regelkern wird direkt in die Mod-Jar kompiliert.
    - ✅ Teil 4: Aktionsmenü (Taste V, Grundaktionen, Schild und Deckung; gebaut, Ingame-Test steht aus)
    - ✅ Teil 5: Zustände und Sterbend (gebaut, Ingame-Test steht aus)
 4. ✅ NPC-Steuerung: Schreiten als gewählte Aktion mit Reichweitenanzeige, „Übernehmen“ eines NPCs durch den GM, Dialoge mit Sprechblasen (`/pf2 npc say`); gebaut, Ingame-Test steht aus
-5. Zauber, Gegenstände, mehr Inhalte, physische Würfel
+5. Zauber (✅ Teil 1: Zauberbuch, Reiter, Wirken mit automatischer Auflösung, Rast, eigene Zauber; gebaut, Ingame-Test steht aus), Gegenstände, mehr Inhalte, physische Würfel
 
 ## Lizenzhinweis
 

@@ -62,6 +62,7 @@ Alle Tasten lassen sich unter *Optionen → Steuerung → PF2 Craft* ändern.
 | **R** | Würfelfenster öffnen | alle |
 | **C** | Charakterbogen öffnen (Import, Würfe, Aufstieg) | alle |
 | **V** | Aktionsmenü öffnen (bzw. wartende Aktion abbrechen) | im Kampf |
+| **B** | Zauber mit mehreren Zielen bestätigen | beim Zaubern |
 | **G** | Schreiten (Strecke starten) | im Kampf |
 | **H** | Reichweitenanzeige umschalten | im Kampf |
 | **Enter** | Zug beenden | im Kampf |
@@ -115,6 +116,8 @@ Hinweise:
 | `/pf2 gm add <Spieler>` | Spielleiter-Rolle vergeben (OP-Level 2) |
 | `/pf2 combat action <id>` | Aktion per Befehl (z. B. `stride`, `trip`, `cancel`) |
 | `/pf2 combat condition <player\|npc> <id> <Wert>` | Zustand setzen (GM) |
+| `/pf2 rest <Spieler\|all>` | Rast: Zauberplätze und Fokuspunkte auffüllen (GM) |
+| `/pf2 spells grant <Spieler> <Zauber> <Rang>` | Zauber ins Zauberbuch legen (GM, zum Testen) |
 | `/pf2 npc say <Text>` | den gewählten NPC sprechen lassen (Sprechblase + Chat) |
 | `/pf2 npc control` / `release` | NPC übernehmen / loslassen (GM, Ersatz für J) |
 
@@ -123,3 +126,10 @@ Mehr Details stehen in der `README.md`.
 ---
 
 *Der Entwicklungsstand und bekannte Grenzen stehen in `CLAUDE.md` und `README.md`. Kamera, Sprechblasen und Reichweitenanzeige sind noch nicht ingame geprüft.*
+
+## 7. Zauber
+
+Zauber kommen mit dem Pathbuilder-Import. Im Charakterbogen (**C**) zeigt der Reiter **Zauber** Plätze, Fokuspunkte, Zauberangriff und SG;
+**Wirken** startet einen Zauber (oder Aktionsmenü **V** → Zauber). Ziele klickst du mit dem Fadenkreuz an, mehrere Ziele bestätigst du mit **B**, **V** bricht ab.
+Der Server würfelt Angriff oder Rettungswurf und zieht TP ab. Zaubertricks sind frei, Fokuszauber kosten 1 Fokuspunkt. Der GM füllt mit `/pf2 rest all` nach der Rast auf.
+Eigene Zauber kommen als JSON nach `config/pf2craft/spells/` (Felder siehe README). Die Oberfläche wurde noch nicht ingame getestet.

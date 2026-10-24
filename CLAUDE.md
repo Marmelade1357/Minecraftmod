@@ -41,6 +41,10 @@ core/                       Reines Java ohne Minecraft-Abhängigkeit. Regelkern 
                             DamageResolver/Defenses/RuneDamage, RangeRules, HealthLabel,
                             Condition/ConditionSet/ConditionEffects (Zustände, Mali), DyingRules (Sterbend, Wiederherstellungswurf),
                             BasicActions/BasicAction/ActionKind/ActionDcs (Grundaktionen, SG), CombatEffects (zeitweilige RK-Boni)
+  de.pf2craft.core.spell    Zauber: Spellbook/SpellcastingEntry (Zauberbuch, Plätze, Fokus), SpellbookJson, PathbuilderSpells (Import),
+                            SpellDefinition/SpellCatalog/SpellCatalogParser (tolerant), SpellKind (ATTACK/SAVE/AUTO/HEAL/UTILITY),
+                            SpellResolver (Schaden/Steigern), SpellMath (Angriff/SG), CastingType
+  src/main/resources/pf2craft/spells/  spells.json (25 Startzauber, nur Namen und Zahlen)
   de.pf2craft.core.monster     Monster-Core-Daten (492 Kreaturen, Parser/Katalog), NpcStats, NpcEdit (GM-Änderungen)
   src/main/resources/pf2craft/monsters/  monster-core.json (nur Namen und Zahlen)
   src/main/resources/pf2craft/items/  Player-Core-Waffen, -Rüstungen, -Schilde (nur Namen und Zahlen)
@@ -64,11 +68,13 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
                                   DyingService (Bewusstlos/Sterbend, automatischer Wiederherstellungswurf, „wäre tot“ nur an GMs), AttackService, Enforcement (Einfrieren),
                                   NpcWalk, CombatItem (Kampfglocke), CombatMessages,
                                   ActionService (Grundaktionen, wartende Zielaktionen, Schild per Rechtsklick)
-    command/                      Pf2Commands (/roll, /gmroll, /pf2 gm|hp|sheet|items|tools|npc|character …)
+    spell/                        SpellbookStore (Data Attachment + Sync), SpellData (Jar + config/pf2craft/spells/*.json), SpellService (Wirken,
+                                  Zielwahl, Kosten, Auflösung), SpellMessages
+    command/                      Pf2Commands (/roll, /gmroll, /pf2 gm|hp|sheet|items|tools|npc|character|rest|spells …)
   src/client/java/de/pf2craft/client  nur Client: Pf2CraftClient, DiceScreen, RollHud, ImportScreen,
                                   CharacterScreen (Reiter, Verdeckt, GM-Knöpfe), ConditionEditScreen/ClientConditions (Zustandsliste), LevelUpScreen, ClientSheets,
                                   ActionMenuScreen (Taste V), ClientActions, NpcSpawnScreen, NpcSheetScreen (der NPC-Renderer wird in Pf2CraftClient registriert),
-                                  ClientControl (Kamera/Eingabe bei Übernahme, Taste J), RangeOverlay (Reichweitenkreis, Taste H), SpeechBubbles; Taste G = Schreiten
+                                  ClientSpellbooks/ClientSpells (Zauberbuch-Sync, Wirken, Raycast), ClientControl (Kamera/Eingabe bei Übernahme, Taste J), RangeOverlay (Reichweitenkreis, Taste H), SpeechBubbles; Taste G = Schreiten, Taste B = Zauber bestätigen; neue Payloads CastSpellPayload, SpellTargetPayload, SpellbookSyncPayload
   src/client/resources/pf2craft.client.mixins.json  Client-Mixins (InGameHudMixin: TP statt Herzen/Hunger; ChatHudMixin; KeyboardInputMixin und MinecraftClientMixin für die Übernahme)
   src/main/resources/assets/pf2craft/lang/  en_us.json, de_de.json
 ```
@@ -160,6 +166,12 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
 - Bekannte Grenzen Teil 5: keine Zauber-/Monsterfähigkeits-Zustände; Zustände nur im Speicher (Serverneustart beendet den Kampf);
   nur Verängstigt hat einen numerischen Statusmalus (wirkt auf Angriffe, RK, Aktionsproben und Bogenwürfe im Kampf);
   Verlangsamt/Benommen, Sterbend 4 und kritischer Niederschlag nicht per Bot getestet; Befreien scheitert, wenn die Packer-Entity fehlt, obwohl GRABBED bleibt.
+- Phase 5 Teil 1 (Zauber: Zauberbuch aus Pathbuilder, Reiter im Charakterbogen, Wirken über Reiter/Aktionsmenü, Ziele per Klick/`SpellTargetPayload`, B bestätigt,
+  automatische Auflösung, Rast `/pf2 rest`, `/pf2 spells reset|grant`, Katalog + `config/pf2craft/spells/*.json`) ist gebaut, per Unit-Tests in `core` abgedeckt, Client und Server starten;
+  der Ingame-Test des Nutzers steht aus, die GUI wurde nie auf einem echten Bildschirm gesehen. Bekannte Grenzen: keine NPC-Zauber; keine Flächenschablonen/Sichtlinien;
+  1-/3-Aktionen-Varianten vereinfacht (Force Barrage, Heal, Harm, Horizon Thunder Sphere); Zusatzwirkungen (anhaltender Schaden, Zustände wie bei Fear) nicht automatisch;
+  vorbereitete Zauberer nach Plätzen pro Rang statt pro vorbereitetem Zauber; Client nimmt für die Kosten mindestens 1 Aktion an; angeborene Zauber mit Rang >0 nicht unterstützt;
+  Rangwahl spontaner Zauberer nicht persistent; Neuimport setzt verbrauchte Plätze zurück; GM-Reset im Bogen braucht den Spieler online. Deutsche Texte nutzen „Rang“ (nicht „Grad“).
 - GM-Fernreichweite (`GmReach`): temporäre Attribut-Modifier (+96, `pf2craft:gm_far_reach`; Minecraft begrenzt die Reichweite-Attribute auf 64, effektiv gelten also 64 Blöcke) auf Entity-/Block-Reichweite, solange ein GM Befehlsstab/Kampfglocke hält; `CombatService.RADIUS` = 96, `NpcNetwork.MAX_DISTANCE` = 128. Per Bot geprüft (siehe `.superpowers/sdd/gm-far-reach-report.md`); das Fadenkreuz-Zielen eines echten Clients auf Distanz ist ungetestet.
 - Kollision: `EntityMixin` (gemeinsam, `pf2craft.mixins.json`) bricht `Entity.pushAwayFrom` ab, wenn beide Seiten Spieler oder NPC sind;
   `NpcEntity.isPushable()` ist false. Bewusst kein Scoreboard-Team (kein persistenter Zustand). Per Bot geprüft, nicht mit echten Clients.
@@ -192,7 +204,7 @@ fabric/                     Die Mod (Fabric Loom, splitEnvironmentSourceSets)
    - ✅ Entity mit Werteblock und Spawn-Werkzeug (seit Phase 3 Teil 2).
    - ✅ Schreiten als gewählte Aktion (G) mit Reichweitenkreis (H); Steuerung im Kommandomodus (Befehlsstab) und per „Übernehmen“ (J, Kamera/Steuerung in den NPC).
    - ✅ Dialoge: Chat als NPC, `/pf2 npc say` (kein eigener `/npc`-Baum), Sprechblasen.
-5. **Phase 5:** Zauber, Gegenstände, mehr Inhalte, physische Würfel (werfbares Item mit Rollanimation).
+5. **Phase 5:** ✅ Teil 1 Zauber gebaut (Ingame-Test steht aus); offen: Gegenstände, mehr Inhalte, physische Würfel (werfbares Item mit Rollanimation).
 
 ## Pathfinder-2e-Regeln, die schon feststehen
 
