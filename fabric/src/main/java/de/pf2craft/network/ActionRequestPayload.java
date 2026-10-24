@@ -11,10 +11,13 @@ import net.minecraft.util.Uuids;
 /**
  * Client → server: a basic action chosen in the action menu. Only a wish; the server validates the actor,
  * the turn, the cost and the target. {@code targetEntityId} is -1 for "no target yet" (the action becomes
- * pending). The id {@link #CANCEL} clears the sender's pending action.
+ * pending). The id {@link #CANCEL} clears the sender's pending action (or spell);
+ * {@link #CONFIRM} resolves the sender's pending multi-target spell.
  */
 public record ActionRequestPayload(UUID actorId, String actionId, int targetEntityId) implements CustomPayload {
     public static final String CANCEL = "cancel";
+    /** Confirms a pending multi-target spell with the targets chosen so far. */
+    public static final String CONFIRM = "confirm";
     public static final int MAX_ID = 24;
 
     public static final CustomPayload.Id<ActionRequestPayload> ID =

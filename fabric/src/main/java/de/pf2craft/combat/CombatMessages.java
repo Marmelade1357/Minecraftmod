@@ -88,7 +88,7 @@ public final class CombatMessages {
                 "All players are unable to fight. The combat can be ended.").formatted(Formatting.GOLD);
     }
 
-    static MutableText attackCooldown() {
+    public static MutableText attackCooldown() {
         return Text.translatableWithFallback("pf2craft.combat.attack_cooldown", "Not so fast!");
     }
 
@@ -112,11 +112,11 @@ public final class CombatMessages {
         return Text.translatableWithFallback("pf2craft.combat.not_gm", "Only a game master can do that.");
     }
 
-    static MutableText notYourTurn() {
+    public static MutableText notYourTurn() {
         return Text.translatableWithFallback("pf2craft.combat.not_your_turn", "It is not your turn.");
     }
 
-    static MutableText cannotAct() {
+    public static MutableText cannotAct() {
         return Text.translatableWithFallback("pf2craft.combat.cannot_act", "You cannot act right now.");
     }
 
@@ -266,7 +266,7 @@ public final class CombatMessages {
                 "You can only attack NPCs that are still standing.");
     }
 
-    static MutableText tooFar() {
+    public static MutableText tooFar() {
         return Text.translatableWithFallback("pf2craft.combat.attack.too_far", "The target is too far away.");
     }
 
@@ -328,7 +328,7 @@ public final class CombatMessages {
                 "You cannot choose a lower attack number than the attacks you have already made.");
     }
 
-    static MutableText attackError(String detail) {
+    public static MutableText attackError(String detail) {
         return Text.translatableWithFallback("pf2craft.combat.attack_error",
                 "The attack could not be resolved: %s", detail);
     }
@@ -367,7 +367,7 @@ public final class CombatMessages {
         return Text.translatableWithFallback("pf2craft.combat.action_unknown", "Unknown action.");
     }
 
-    static MutableText actionNotEnough(int cost) {
+    public static MutableText actionNotEnough(int cost) {
         return Text.translatableWithFallback("pf2craft.combat.action_not_enough",
                 "Not enough actions left (%s needed).", cost);
     }

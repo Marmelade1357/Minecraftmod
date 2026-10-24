@@ -89,6 +89,12 @@ public final class Enforcement {
             if (holdsGmItem(player)) {
                 return ActionResult.PASS; // the bell and the staff do their own thing
             }
+            // Outside a combat a pending spell takes the click (inside, the branch below does).
+            if (player instanceof ServerPlayerEntity sp && !CombatService.contains(sp.getUuid())
+                    && hand == Hand.MAIN_HAND && ActionService.hasPending(sp)) {
+                ActionService.executePending(sp, entity);
+                return ActionResult.FAIL;
+            }
             if (player instanceof ServerPlayerEntity sp && CombatService.active()
                     && CombatService.currentId().filter(sp.getUuid().toString()::equals).isPresent()) {
                 if (hand == Hand.MAIN_HAND) {

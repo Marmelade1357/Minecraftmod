@@ -10,6 +10,7 @@ import de.pf2craft.core.dice.DiceParseException;
 import de.pf2craft.npc.NpcControl;
 import de.pf2craft.npc.NpcNetwork;
 import de.pf2craft.roll.RollService;
+import de.pf2craft.spell.SpellService;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -29,6 +30,7 @@ public final class Pf2Networking {
         PayloadTypeRegistry.playC2S().register(SheetRequestPayload.ID, SheetRequestPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(SheetSyncPayload.ID, SheetSyncPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(SpellbookSyncPayload.ID, SpellbookSyncPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(CastSpellPayload.ID, CastSpellPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(CheckRollPayload.ID, CheckRollPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(GmEditPayload.ID, GmEditPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(GrantLevelUpPayload.ID, GrantLevelUpPayload.CODEC);
@@ -63,6 +65,9 @@ public final class Pf2Networking {
                 (payload, context) -> CharacterService.startImport(context.player(), payload.pathbuilderId()));
         ServerPlayNetworking.registerGlobalReceiver(SheetRequestPayload.ID,
                 (payload, context) -> SheetService.request(context.player(), payload.target()));
+        ServerPlayNetworking.registerGlobalReceiver(CastSpellPayload.ID,
+                (payload, context) -> SpellService.cast(context.player(), payload.entry(), payload.spell(),
+                        payload.rank()));
         ServerPlayNetworking.registerGlobalReceiver(CheckRollPayload.ID,
                 (payload, context) -> SheetService.rollCheck(context.player(), payload.checkId(), payload.secret()));
         ServerPlayNetworking.registerGlobalReceiver(GmEditPayload.ID,

@@ -93,6 +93,17 @@ public final class NpcService {
         }
     }
 
+    /** Lets the NPC regain {@code amount} hit points (at most its maximum); above 0 revives a defeated NPC. */
+    public static void heal(NpcEntity npc, int amount) {
+        NpcStats stats = npc.stats();
+        int hp = Math.min(stats.base().hp(), stats.currentHp() + Math.max(0, amount));
+        try {
+            apply(npc, NpcEdit.apply(stats, "hp", String.valueOf(hp)));
+        } catch (InvalidChoiceException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     public static void remove(NpcEntity npc) {
         GmSelection.forget(npc.getUuid());
         NpcControl.releaseNpc(npc.getServer(), npc.getUuid());

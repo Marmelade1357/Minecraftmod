@@ -170,9 +170,7 @@ public final class AttackService {
         NpcEntity npc = p.npc();
         MonsterData base = npc.stats().base();
         boolean agile = AttackMath.isAgile(p.strike().traits());
-        String npcId = npc.getUuid().toString();
-        int ac = base.ac() + CombatService.effects().acBonus(npcId)
-                + ConditionEffects.acPenalty(ConditionService.of(npcId));
+        int ac = armorClassOf(npc);
         int conditionAttack = ConditionEffects.attackPenalty(ConditionService.of(attacker.getUuid().toString()));
         // Everything that can throw is rolled before the action is spent.
         AttackOutcome outcome;
@@ -185,8 +183,7 @@ public final class AttackService {
             if (degree.isSuccess()) {
                 List<DamageInstance> rolled = DamageRoller.roll(StrikeDamage.forStrike(p.sheet(), p.strikeIndex()),
                         degree == DegreeOfSuccess.CRITICAL_SUCCESS, RollService.roller());
-                damage = DamageResolver.resolve(rolled,
-                        new Defenses(base.resistances(), base.weaknesses(), base.immunities()));
+                damage = DamageResolver.resolve(rolled, defensesOf(npc));
             }
         } catch (RuntimeException e) {
             reportError(attacker, e);
@@ -327,34 +324,12 @@ public final class AttackService {
         CombatService.budget().interrupt(); // a Stride cannot be resumed after another action
         try {
             int applied = damage == null ? -1 : Math.max(0, damage.total());
-            int hpBefore;
-            int hpMax;
-            String targetName;
-            if (p.target() instanceof ServerPlayerEntity player) {
-                CharacterSheet sheet = CharacterStore.get(player).orElseThrow();
-                hpBefore = sheet.currentHp();
-                hpMax = CharacterMath.maxHp(sheet);
-                targetName = nameOf(player, sheet);
-            } else {
-                NpcEntity victim = (NpcEntity) p.target();
-                hpBefore = victim.stats().currentHp();
-                hpMax = victim.stats().base().hp();
-                targetName = victim.stats().displayName();
-            }
-            int hpLeft = Math.max(0, hpBefore - Math.max(0, applied));
-            announce(gm, npc.stats().displayName(), targetName, number, outcome, degree, applied, p.ac(),
-                    p.rangePenalty(), damage, hpLeft, hpMax);
+            Vitals vitals = vitals((LivingEntity) p.target());
+            int hpLeft = Math.max(0, vitals.hp() - Math.max(0, applied));
+            announce(gm, npc.stats().displayName(), vitals.name(), number, outcome, degree, applied, p.ac(),
+                    p.rangePenalty(), damage, hpLeft, vitals.max());
             if (applied > 0) {
-                if (p.target() instanceof ServerPlayerEntity player) {
-                    boolean crit = degree == DegreeOfSuccess.CRITICAL_SUCCESS;
-                    if (hpBefore <= 0) {
-                        DyingService.damageWhileDown(player, crit); // already down: dying rises
-                    } else {
-                        SheetService.setCurrentHp(player, hpLeft, crit); // 0 HP: dying
-                    }
-                } else {
-                    NpcService.damage((NpcEntity) p.target(), applied);
-                }
+                applyDamage(p.target(), applied, degree == DegreeOfSuccess.CRITICAL_SUCCESS);
             }
             CombatService.sync(null);
         } catch (RuntimeException e) {
@@ -424,17 +399,12 @@ public final class AttackService {
             if (sheet.isEmpty() || sheet.get().currentHp() <= 0) {
                 return npcFail(gm, CombatMessages.badNpcTarget());
             }
-            String targetId = player.getUuid().toString();
-            ac = CharacterMath.armorClass(sheet.get()) + CombatService.effects().acBonus(targetId)
-                    + ConditionEffects.acPenalty(ConditionService.of(targetId));
+            ac = armorClassOf(player);
             defenses = Defenses.NONE;
         } else if (target instanceof NpcEntity victim && victim != npc && !victim.isRemoved()
                 && victim.stats() != null && !victim.stats().defeated() && victim.getWorld() == npc.getWorld()) {
-            MonsterData base = victim.stats().base();
-            String victimId = victim.getUuid().toString();
-            ac = base.ac() + CombatService.effects().acBonus(victimId)
-                    + ConditionEffects.acPenalty(ConditionService.of(victimId));
-            defenses = new Defenses(base.resistances(), base.weaknesses(), base.immunities());
+            ac = armorClassOf(victim);
+            defenses = defensesOf(victim);
         } else {
             return npcFail(gm, CombatMessages.badNpcTarget());
         }
@@ -467,6 +437,59 @@ public final class AttackService {
     private static NpcPrepared npcFail(ServerPlayerEntity gm, MutableText text) {
         CombatMessages.error(gm, text);
         return null;
+    }
+
+    // ---- shared target helpers (also used by spells) ---------------------------------------------------------
+
+    /** Hit points, maximum and display name of a player (with a character) or an NPC. */
+    public record Vitals(int hp, int max, String name) {
+    }
+
+    public static Vitals vitals(LivingEntity target) {
+        if (target instanceof ServerPlayerEntity player) {
+            CharacterSheet sheet = CharacterStore.get(player).orElseThrow();
+            return new Vitals(sheet.currentHp(), CharacterMath.maxHp(sheet), nameOf(player, sheet));
+        }
+        NpcEntity npc = (NpcEntity) target;
+        return new Vitals(npc.stats().currentHp(), npc.stats().base().hp(), npc.stats().displayName());
+    }
+
+    /** Armor class of a player or NPC including combat effects and conditions. */
+    public static int armorClassOf(Entity target) {
+        String id = target.getUuid().toString();
+        int base = target instanceof ServerPlayerEntity player
+                ? CharacterMath.armorClass(CharacterStore.get(player).orElseThrow())
+                : ((NpcEntity) target).stats().base().ac();
+        return base + CombatService.effects().acBonus(id) + ConditionEffects.acPenalty(ConditionService.of(id));
+    }
+
+    /** Resistances, weaknesses and immunities of an NPC; players have none. */
+    public static Defenses defensesOf(Entity target) {
+        if (target instanceof NpcEntity npc) {
+            MonsterData base = npc.stats().base();
+            return new Defenses(base.resistances(), base.weaknesses(), base.immunities());
+        }
+        return Defenses.NONE;
+    }
+
+    /**
+     * Takes {@code amount} hit points from a player or NPC: a player at 0 HP gets more dying, otherwise HP drop
+     * (0 HP knocks out); an NPC may be defeated and the combat moves on.
+     */
+    public static void applyDamage(Entity target, int amount, boolean critical) {
+        if (amount <= 0) {
+            return;
+        }
+        if (target instanceof ServerPlayerEntity player) {
+            int hpBefore = CharacterStore.get(player).orElseThrow().currentHp();
+            if (hpBefore <= 0) {
+                DyingService.damageWhileDown(player, critical);
+            } else {
+                SheetService.setCurrentHp(player, Math.max(0, hpBefore - amount), critical);
+            }
+        } else {
+            NpcService.damage((NpcEntity) target, amount);
+        }
     }
 
     // ---- validation ------------------------------------------------------------------------------------------
@@ -532,14 +555,14 @@ public final class AttackService {
         return RangeRules.rangePenalty(Math.max(0, distance - EPSILON), incrementFeet);
     }
 
-    static double edgeDistance(Box a, Box b) {
+    public static double edgeDistance(Box a, Box b) {
         double dx = Math.max(0, Math.max(a.minX - b.maxX, b.minX - a.maxX));
         double dy = Math.max(0, Math.max(a.minY - b.maxY, b.minY - a.maxY));
         double dz = Math.max(0, Math.max(a.minZ - b.maxZ, b.minZ - a.maxZ));
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
-    static String nameOf(ServerPlayerEntity player, CharacterSheet sheet) {
+    public static String nameOf(ServerPlayerEntity player, CharacterSheet sheet) {
         return sheet.name() == null || sheet.name().isBlank() ? player.getName().getString() : sheet.name();
     }
 

@@ -23,6 +23,7 @@ import de.pf2craft.network.PendingActionPayload;
 import de.pf2craft.npc.GmSelection;
 import de.pf2craft.npc.NpcEntity;
 import de.pf2craft.roll.RollService;
+import de.pf2craft.spell.SpellService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,13 +81,16 @@ public final class ActionService {
 
     // ---- state -----------------------------------------------------------------------------------------------
 
+    /** True if the sender has an action or a spell waiting for its target. */
     public static boolean hasPending(ServerPlayerEntity sender) {
-        return PENDING.containsKey(sender.getUuid());
+        return PENDING.containsKey(sender.getUuid()) || SpellService.hasPending(sender);
     }
 
-    /** Drops the pending action of one sender and tells their client. */
+    /** Drops the pending action (or spell) of one sender and tells their client. */
     public static void clearPending(UUID sender) {
-        if (PENDING.remove(sender) == null) {
+        boolean hadAction = PENDING.remove(sender) != null;
+        boolean hadSpell = SpellService.dropPending(sender);
+        if (!hadAction && !hadSpell) {
             return;
         }
         MinecraftServer server = CombatService.server();
@@ -105,6 +109,7 @@ public final class ActionService {
     /** A player left the server: nothing to tell them, just forget. */
     public static void forget(UUID sender) {
         PENDING.remove(sender);
+        SpellService.forget(sender);
         LAST_ACTION.remove(sender);
     }
 
@@ -120,6 +125,10 @@ public final class ActionService {
     public static void request(ServerPlayerEntity sender, ActionRequestPayload p) {
         if (ActionRequestPayload.CANCEL.equals(p.actionId())) {
             clearPending(sender.getUuid());
+            return;
+        }
+        if (ActionRequestPayload.CONFIRM.equals(p.actionId())) {
+            SpellService.confirm(sender);
             return;
         }
         Optional<BasicAction> found = BasicActions.byId(p.actionId());
@@ -159,6 +168,9 @@ public final class ActionService {
      *         because it could no longer be performed; false for an invalid target or the cooldown
      */
     public static boolean executePending(ServerPlayerEntity sender, Entity target) {
+        if (SpellService.hasPending(sender)) {
+            return SpellService.executePending(sender, target);
+        }
         Pending pending = PENDING.get(sender.getUuid());
         if (pending == null) {
             return false;
@@ -193,6 +205,10 @@ public final class ActionService {
     public static boolean fallback(ServerPlayerEntity player, String actionId) {
         if (ActionRequestPayload.CANCEL.equals(actionId)) {
             clearPending(player.getUuid());
+            return true;
+        }
+        if (ActionRequestPayload.CONFIRM.equals(actionId)) {
+            SpellService.confirm(player);
             return true;
         }
         Optional<BasicAction> found = BasicActions.byId(actionId);
@@ -420,6 +436,7 @@ public final class ActionService {
     // ---- pending ---------------------------------------------------------------------------------------------
 
     private static void setPending(ServerPlayerEntity sender, Pending pending) {
+        SpellService.dropPending(sender.getUuid()); // only one thing can wait for a target
         PENDING.put(sender.getUuid(), pending);
         sendPending(sender, pending.actionId());
         sender.sendMessage(CombatMessages.actionPending(pending.actionId()), true);

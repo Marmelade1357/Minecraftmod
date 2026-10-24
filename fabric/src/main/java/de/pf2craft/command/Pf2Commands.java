@@ -25,7 +25,11 @@ import de.pf2craft.core.monster.MonsterData;
 import de.pf2craft.core.monster.NpcEdit;
 import de.pf2craft.core.monster.NpcStats;
 import de.pf2craft.core.progression.InvalidChoiceException;
+import de.pf2craft.core.character.Rank;
+import de.pf2craft.core.spell.CastingType;
+import de.pf2craft.core.spell.SpellDefinition;
 import de.pf2craft.core.spell.Spellbook;
+import de.pf2craft.core.spell.SpellcastingEntry;
 import de.pf2craft.item.CharacterItems;
 import de.pf2craft.item.Pf2Items;
 import de.pf2craft.npc.GmSelection;
@@ -35,8 +39,13 @@ import de.pf2craft.npc.NpcEntity;
 import de.pf2craft.npc.NpcService;
 import de.pf2craft.npc.NpcSpeech;
 import de.pf2craft.roll.RollService;
+import de.pf2craft.spell.SpellData;
 import de.pf2craft.spell.SpellbookStore;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import net.minecraft.command.CommandRegistryAccess;
@@ -53,6 +62,9 @@ import net.minecraft.util.math.Vec3d;
  * The dice window is the main way to roll; the commands are a fallback.
  */
 public final class Pf2Commands {
+    /** Name of the spontaneous entry that {@code /pf2 spells grant} creates. */
+    private static final String GM_ENTRY = "GM";
+
     private Pf2Commands() {
     }
 
@@ -119,7 +131,12 @@ public final class Pf2Commands {
                         .requires(Pf2Commands::isGmOrOp)
                         .then(literal("reset")
                                 .then(argument("player", EntityArgumentType.player())
-                                        .executes(Pf2Commands::resetSpells))))
+                                        .executes(Pf2Commands::resetSpells)))
+                        .then(literal("grant")
+                                .then(argument("player", EntityArgumentType.player())
+                                        .then(argument("spell", StringArgumentType.string())
+                                                .then(argument("rank", IntegerArgumentType.integer(0, 10))
+                                                        .executes(Pf2Commands::grantSpell))))))
                 .then(literal("tools")
                         .requires(source -> source.getPlayer() != null && GmRoles.isGm(source.getPlayer()))
                         .executes(Pf2Commands::giveTools))
@@ -478,6 +495,73 @@ public final class Pf2Commands {
         ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.spell.rest_done",
                 "%s player(s) rested.", rested), true);
         return count;
+    }
+
+    /**
+     * {@code /pf2 spells grant <player> <spell> <rank>}: a test/GM tool that adds a catalog spell to the player's
+     * "GM" spontaneous entry (created if missing) and one slot of that rank, so the spell can be cast.
+     */
+    private static int grantSpell(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "player");
+        String name = StringArgumentType.getString(ctx, "spell");
+        int rank = IntegerArgumentType.getInteger(ctx, "rank");
+        Optional<CharacterSheet> sheet = CharacterStore.get(target);
+        if (sheet.isEmpty()) {
+            ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.spell.grant.no_character",
+                    "%s has no character.", target.getDisplayName()));
+            return 0;
+        }
+        Optional<SpellDefinition> def = SpellData.catalog().byName(name);
+        if (def.isEmpty() || rank < Math.max(def.get().rank(), 0)) {
+            ctx.getSource().sendError(Text.translatableWithFallback("pf2craft.spell.grant.bad_spell",
+                    "Unknown spell, or the rank is below the spell's own rank."));
+            return 0;
+        }
+        Spellbook old = SpellbookStore.get(target);
+        List<SpellcastingEntry> entries = new ArrayList<>(old.entries());
+        int index = -1;
+        for (int i = 0; i < entries.size(); i++) {
+            if (GM_ENTRY.equals(entries.get(i).name()) && entries.get(i).type() == CastingType.SPONTANEOUS) {
+                index = i;
+            }
+        }
+        SpellcastingEntry entry = index >= 0 ? entries.get(index) : new SpellcastingEntry(GM_ENTRY, "arcane",
+                CastingType.SPONTANEOUS, sheet.get().keyAbility(), Rank.TRAINED, new int[SpellcastingEntry.RANKS],
+                Map.of());
+        int[] perDay = entry.perDay();
+        if (rank > 0) {
+            perDay[rank]++;
+        }
+        Map<Integer, List<String>> spells = new TreeMap<>();
+        entry.spellsByRank().forEach((k, v) -> spells.put(k, new ArrayList<>(v)));
+        List<String> atRank = spells.computeIfAbsent(def.get().rank(), k -> new ArrayList<>());
+        if (atRank.stream().noneMatch(def.get().name()::equalsIgnoreCase)) {
+            atRank.add(def.get().name());
+        }
+        SpellcastingEntry updated = new SpellcastingEntry(entry.name(), entry.tradition(), entry.type(),
+                entry.ability(), entry.rank(), perDay, spells);
+        if (index >= 0) {
+            entries.set(index, updated);
+        } else {
+            entries.add(updated);
+            index = entries.size() - 1;
+        }
+        int[][] used = new int[entries.size()][];
+        for (int i = 0; i < used.length; i++) {
+            used[i] = new int[SpellcastingEntry.RANKS];
+            if (i < old.entries().size()) {
+                for (int r = 0; r < SpellcastingEntry.RANKS; r++) {
+                    used[i][r] = old.slotsUsed(i, r);
+                }
+            }
+        }
+        SpellbookStore.set(target, new Spellbook(entries, old.focusMax(), old.focusCurrent(), used));
+        SheetService.sendSpellbook(ctx.getSource().getServer(), target);
+        String granted = def.get().name();
+        int entryIndex = index;
+        ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.spell.grant.done",
+                "Granted %s (rank %s, entry %s) to %s.", granted, rank, entryIndex, target.getDisplayName()), true);
+        return 1;
     }
 
     private static int resetSpells(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
