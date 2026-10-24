@@ -130,6 +130,6 @@ Mehr Details stehen in der `README.md`.
 ## 7. Zauber
 
 Zauber kommen mit dem Pathbuilder-Import. Im Charakterbogen (**C**) zeigt der Reiter **Zauber** Plätze, Fokuspunkte, Zauberangriff und SG;
-**Wirken** startet einen Zauber (oder Aktionsmenü **V** → Zauber). Ziele klickst du mit dem Fadenkreuz an, mehrere Ziele bestätigst du mit **B**, **V** bricht ab.
+**Wirken** startet einen Zauber (im Kampf auch über das Aktionsmenü **V** → Zauber; **V** öffnet sich nur im Kampf, außerhalb des Kampfes nutzt du den Reiter). Ziele klickst du mit dem Fadenkreuz an, mehrere Ziele bestätigst du mit **B**, **V** bricht ab.
 Der Server würfelt Angriff oder Rettungswurf und zieht TP ab. Zaubertricks sind frei, Fokuszauber kosten 1 Fokuspunkt. Der GM füllt mit `/pf2 rest all` nach der Rast auf.
 Eigene Zauber kommen als JSON nach `config/pf2craft/spells/` (Felder siehe README). Die Oberfläche wurde noch nicht ingame getestet.

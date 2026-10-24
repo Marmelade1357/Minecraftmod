@@ -183,7 +183,7 @@ Einen Kämpfer an eine andere Stelle setzt der Spielleiter mit `/pf2 combat anch
 ### Aktionsmenü
 
 Auf deinem Zug öffnet Taste **V** (änderbar unter Steuerung → PF2 Craft) das Aktionsmenü. Links stehen die Kategorien
-(Grundaktionen, Klassenfähigkeiten, Zauber, Gegenstände; Zauber und Gegenstände sind noch gesperrt, Klassenfähigkeiten leer), rechts die Aktionen der Kategorie.
+(Grundaktionen, Klassenfähigkeiten, Zauber, Gegenstände; Gegenstände sind noch gesperrt, Klassenfähigkeiten leer), rechts die Aktionen der Kategorie.
 Hinter jeder Aktion steht ihr Preis in Aktionen (◆). Der Stern vor dem Namen macht eine Aktion zum **Favoriten**; Favoriten stehen oben.
 Nicht verfügbare Aktionen sind grau, ein Tooltip nennt den Grund (nicht dran, zu wenig Aktionen, kein Schild).
 
@@ -269,7 +269,7 @@ Ein erneuter Import setzt die verbrauchten Plätze zurück.
 Ein Knopf **Wirken** startet den Zauber; nicht wirkbare Zauber sind ausgegraut, der Mauszeiger nennt den Grund.
 Der Spielleiter sieht bei fremden Bögen die Liste nur lesend plus den Knopf **Plätze zurücksetzen** (der Spieler muss online sein).
 
-**Wirken:** Entweder über den Reiter oder im Aktionsmenü (Taste **V**) → Kategorie **Zauber**.
+**Wirken:** Im Kampf über den Reiter oder das Aktionsmenü (Taste **V**) → Kategorie **Zauber**; das Aktionsmenü öffnet sich nur in einem Kampf. Außerhalb eines Kampfes wirkst du über den Reiter **Zauber** im Charakterbogen (Taste **C**).
 - **Ziele:** Zauber mit Zielen warten danach auf einen Klick. Das Wesen wird per Fadenkreuz angeklickt (Sichtlinie bis 64 Blöcke;
   Blöcke blockieren); der Server prüft die Reichweite des Zaubers selbst. Bei mehreren Zielen mehrere Wesen anklicken und mit **B** bestätigen.
   **V** (oder `/pf2 combat action cancel`) bricht ab. Ein Zauber auf dich selbst wirkt sofort.
@@ -351,6 +351,9 @@ Kollision: NPCs und Spieler schieben sich nicht weg. Das gilt immer (nicht nur i
   - Die Anzeige im Menü geht von mindestens 1 Aktion aus; die genauen Kosten prüft der Server.
   - Angeborene Zauber mit Rang über 0 werden nicht unterstützt.
   - Die Rangwahl spontaner Zauberer wird nicht gespeichert.
+  - Ein erneuter Pathbuilder-Import setzt die verbrauchten Zauberplätze zurück.
+  - `/pf2 rest`, `/pf2 spells reset` und `/pf2 spells grant` können wie die übrigen `/pf2`-Befehle Spielleiter und OPs benutzen.
+  - Übernimmt ein Spielleiter einen NPC, zeigt das V-Menü (Kategorie Zauber) sein eigenes Zauberbuch; NPC-Zauber gibt es nicht.
 - Das NPC-Modell ist ein Platzhalter (Dorfbewohner).
 - Angriffsboni (Strikes) lassen sich im Werte-Fenster noch nicht ändern.
 - Zusatzeffekte wie Ergreifen (Grab) oder anhaltender Schaden sind nur Namen bzw. Hinweise, ohne Regelwirkung.

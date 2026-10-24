@@ -28,6 +28,10 @@ public final class ClientSpellbooks {
         return Optional.ofNullable(BOOKS.get(owner));
     }
 
+    public static void remove(UUID owner) {
+        BOOKS.remove(owner);
+    }
+
     public static void clear() {
         BOOKS.clear();
     }

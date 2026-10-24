@@ -73,6 +73,14 @@ public final class SheetService {
         }
     }
 
+    /** Sends the owner their own sheet and spellbook without opening the window (on join). */
+    public static void sendOwn(ServerPlayerEntity owner) {
+        CharacterStore.get(owner).ifPresent(sheet -> {
+            send(owner, owner, sheet, false);
+            sendSpellbook(owner, owner);
+        });
+    }
+
     /** Opens another player's sheet for {@code viewer}; the caller checks the permission. */
     public static boolean view(ServerPlayerEntity viewer, UUID target) {
         ServerPlayerEntity owner = viewer.getServer().getPlayerManager().getPlayer(target);

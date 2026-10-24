@@ -104,6 +104,7 @@ public class Pf2CraftClient implements ClientModInitializer {
             // The server only asks for an import when there is no character, so a cached one is stale.
             if (client.player != null) {
                 ClientSheets.remove(client.player.getUuid());
+                ClientSpellbooks.remove(client.player.getUuid());
             }
             waitingForOwnSheet = -1;
             show(client, ImportScreen::new);

@@ -28,6 +28,10 @@ public final class CharacterService {
     }
 
     public static void onJoin(ServerPlayerEntity player) {
+        if (CharacterStore.get(player).isPresent()) {
+            // The menus (e.g. the spell list) need the sheet and spellbook before the sheet window is ever opened.
+            SheetService.sendOwn(player);
+        }
         if (GmRoles.isGm(player) || CharacterStore.get(player).isPresent()) {
             return;
         }
