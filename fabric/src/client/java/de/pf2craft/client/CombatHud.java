@@ -79,6 +79,10 @@ public final class CombatHud {
             drawHealth(context, font, own.get().sheet(), anchor, width, height - HEALTH_Y);
         }
         if (combat.isEmpty()) {
+            if (!ClientActions.pending().isEmpty()) {
+                // A spell can be cast outside a combat as well.
+                context.drawCenteredTextWithShadow(font, pendingHint(), width / 2, height - 87, COLOR_WHITE);
+            }
             return;
         }
         CombatSyncPayload state = combat.get();
@@ -223,6 +227,17 @@ public final class CombatHud {
         };
     }
 
+    /** The hint for the action (or spell) that waits for a target. */
+    private static Text pendingHint() {
+        if (ClientActions.pending().equals(ClientSpells.PENDING_ID)) {
+            return Text.translatable("hud.pf2craft.spell.pending", Pf2CraftClient.confirmSpellKeyText())
+                    .formatted(Formatting.YELLOW);
+        }
+        return Text.translatable("hud.pf2craft.action.pending",
+                Text.translatable("pf2craft.combat.action.name." + ClientActions.pending()))
+                .formatted(Formatting.YELLOW);
+    }
+
     private static void drawActions(DrawContext context, TextRenderer font, CombatSyncPayload state, int speedFeet,
                                     ClientActions.HudAnchor anchor, int screenW, int screenH) {
         int total = Math.max(3, state.actionsLeft());
@@ -243,9 +258,7 @@ public final class CombatHud {
         drawAnchored(context, font, line, anchor, screenW, screenH - (centered ? 75 : HEALTH_Y + LINE_STEP),
                 screenW / 2, true);
         if (!ClientActions.pending().isEmpty()) {
-            Text hint = Text.translatable("hud.pf2craft.action.pending",
-                    Text.translatable("pf2craft.combat.action.name." + ClientActions.pending()))
-                    .formatted(Formatting.YELLOW);
+            Text hint = pendingHint();
             drawAnchored(context, font, hint, anchor, screenW, screenH - (centered ? 87 : HEALTH_Y + 2 * LINE_STEP),
                     screenW / 2, true);
         } else if (state.strideBlocksLeft() <= 0 && state.actionsLeft() > 0) {

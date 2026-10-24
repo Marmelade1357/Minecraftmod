@@ -10,13 +10,19 @@ import de.pf2craft.core.character.Rank;
 import de.pf2craft.core.character.Save;
 import de.pf2craft.core.character.Skill;
 import de.pf2craft.core.character.Strike;
+import de.pf2craft.core.spell.CastingType;
+import de.pf2craft.core.spell.SpellMath;
+import de.pf2craft.core.spell.SpellcastingEntry;
+import de.pf2craft.core.spell.Spellbook;
 import de.pf2craft.network.CheckRollPayload;
 import de.pf2craft.network.GmEditPayload;
 import de.pf2craft.network.GrantLevelUpPayload;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -51,7 +57,7 @@ public class CharacterScreen extends Screen {
         renderInGameBackground(context);
     }
 
-    private enum Tab { OVERVIEW, SKILLS, FEATS }
+    private enum Tab { OVERVIEW, SKILLS, FEATS, SPELLS }
 
     private enum Align { LEFT, CENTER, RIGHT }
 
@@ -88,6 +94,8 @@ public class CharacterScreen extends Screen {
 
     private static Tab lastTab = Tab.OVERVIEW;
     private static boolean secret;
+    /** Rank picked for spontaneous spells by the little rank button, keyed by entry and spell. */
+    private static final Map<String, Integer> PICKED_RANK = new HashMap<>();
 
     private final UUID owner;
     private final List<Placed> placed = new ArrayList<>();
@@ -164,6 +172,7 @@ public class CharacterScreen extends Screen {
             case OVERVIEW -> buildOverview(sheet, contentW, gm);
             case SKILLS -> buildSkills(sheet, contentW, gm);
             case FEATS -> buildFeats(sheet, contentW);
+            case SPELLS -> buildSpells(sheet, contentW);
         }
         contentHeight = 0;
         for (Placed p : placed) {
@@ -442,6 +451,154 @@ public class CharacterScreen extends Screen {
         for (int i = 0; i < specials.size(); i++) {
             label(Text.literal(specials.get(i)), (i / rows) * (colW + 6) + 4, y + (i % rows) * TEXT_STEP,
                     colW - 4, Align.LEFT);
+        }
+    }
+
+    // --- spells tab -------------------------------------------------------------------------
+
+    private void buildSpells(CharacterSheet sheet, int contentW) {
+        Optional<Spellbook> found = ClientSpellbooks.get(owner).filter(b -> !b.entries().isEmpty());
+        if (found.isEmpty()) {
+            label(Text.translatable("screen.pf2craft.spells.none").formatted(Formatting.DARK_GRAY), 4, 0,
+                    contentW, Align.LEFT);
+            return;
+        }
+        Spellbook book = found.get();
+        boolean own = isOwnSheet();
+        int y = 0;
+        label(Text.translatable("screen.pf2craft.spells.focus", book.focusCurrent(), book.focusMax())
+                .formatted(Formatting.AQUA), 0, y + 3, contentW - 116, Align.LEFT);
+        if (!own) {
+            String playerName = playerName();
+            ButtonWidget reset = placeWidget(ButtonWidget.builder(
+                            Text.translatable("screen.pf2craft.spells.reset"), b -> resetSlots(playerName))
+                    .dimensions(left + contentW - 110, 0, 110, ROW_H).build(), y);
+            reset.active = playerName != null;
+            if (playerName == null) {
+                reset.setTooltip(Tooltip.of(Text.translatable("screen.pf2craft.spells.reset_offline")));
+            }
+        }
+        y += ROW_STEP + 3;
+        for (int i = 0; i < book.entries().size(); i++) {
+            y = buildSpellEntry(sheet, book, i, contentW, own, y) + 6;
+        }
+    }
+
+    private int buildSpellEntry(CharacterSheet sheet, Spellbook book, int index, int contentW, boolean own, int y) {
+        SpellcastingEntry entry = book.entries().get(index);
+        label(Text.literal(entry.name()).formatted(Formatting.BOLD, Formatting.GOLD), 0, y, contentW, Align.LEFT);
+        y += TEXT_STEP;
+        label(Text.translatable("screen.pf2craft.spells.entry_info", ClientSpells.tradition(entry.tradition()),
+                ClientSpells.type(entry.type()), signed(SpellMath.spellAttack(sheet, entry)),
+                SpellMath.spellDc(sheet, entry)).formatted(Formatting.GRAY), 4, y, contentW - 4, Align.LEFT);
+        y += TEXT_STEP + 2;
+        boolean slotted = entry.type() == CastingType.PREPARED || entry.type() == CastingType.SPONTANEOUS;
+        for (var rankEntry : entry.spellsByRank().entrySet()) {
+            int rank = rankEntry.getKey();
+            if (rank < 0 || rank >= SpellcastingEntry.RANKS || rankEntry.getValue().isEmpty()) {
+                continue;
+            }
+            Text header;
+            if (rank == 0) {
+                header = Text.translatable("screen.pf2craft.spells.cantrips");
+            } else if (slotted) {
+                header = Text.translatable("screen.pf2craft.spells.rank_slots", rank, book.slotsLeft(index, rank),
+                        entry.perDay()[rank]);
+            } else {
+                header = Text.translatable("screen.pf2craft.spells.rank", rank);
+            }
+            label(header.copy().formatted(Formatting.YELLOW), 4, y, contentW - 4, Align.LEFT);
+            y += TEXT_STEP;
+            for (String spell : rankEntry.getValue()) {
+                buildSpellRow(book, index, entry, spell, rank, contentW, own, y);
+                y += ROW_STEP;
+            }
+        }
+        return y;
+    }
+
+    private void buildSpellRow(Spellbook book, int index, SpellcastingEntry entry, String spell, int listedRank,
+                               int contentW, boolean own, int y) {
+        boolean spontaneous = entry.type() == CastingType.SPONTANEOUS && listedRank > 0;
+        int castRank = spontaneous ? pickedRank(book, index, spell, listedRank) : listedRank;
+        int castW = 52;
+        int rankW = 34;
+        int buttonsW = own ? castW + (spontaneous ? rankW + 2 : 0) + 4 : 0;
+        label(Text.literal(spell), 10, y + 3, contentW - buttonsW - 14, Align.LEFT);
+        if (!own) {
+            return;
+        }
+        int x = left + contentW - castW;
+        Optional<Text> reason = client == null ? Optional.empty()
+                : ClientSpells.unavailable(client, book, index, castRank);
+        ButtonWidget cast = placeWidget(ButtonWidget.builder(Text.translatable("screen.pf2craft.spells.cast"),
+                        b -> castSpell(index, spell, castRank))
+                .dimensions(x, 0, castW, ROW_H).build(), y);
+        cast.active = reason.isEmpty();
+        reason.ifPresent(r -> cast.setTooltip(Tooltip.of(r)));
+        if (spontaneous) {
+            placeWidget(ButtonWidget.builder(
+                            Text.translatable("screen.pf2craft.spells.rank_short", castRank),
+                            b -> cycleRank(book, index, spell, listedRank, castRank))
+                    .dimensions(x - rankW - 2, 0, rankW, ROW_H)
+                    .tooltip(Tooltip.of(Text.translatable("screen.pf2craft.spells.rank_pick"))).build(), y);
+        }
+    }
+
+    private static String pickKey(int entry, String spell) {
+        return entry + ":" + spell;
+    }
+
+    /** The picked rank if it still has slots, otherwise the lowest rank (from the listed one) that has some. */
+    private static int pickedRank(Spellbook book, int entry, String spell, int listed) {
+        int picked = PICKED_RANK.getOrDefault(pickKey(entry, spell), listed);
+        if (picked >= listed && book.slotsLeft(entry, picked) > 0) {
+            return picked;
+        }
+        for (int r = listed; r < SpellcastingEntry.RANKS; r++) {
+            if (book.slotsLeft(entry, r) > 0) {
+                return r;
+            }
+        }
+        return listed;
+    }
+
+    /** Steps to the next rank (from the listed one up to 10) that still has slots; wraps around. */
+    private void cycleRank(Spellbook book, int entry, String spell, int listed, int current) {
+        for (int step = 1; step < SpellcastingEntry.RANKS; step++) {
+            int r = listed + (current - listed + step) % (SpellcastingEntry.RANKS - listed);
+            if (book.slotsLeft(entry, r) > 0) {
+                PICKED_RANK.put(pickKey(entry, spell), r);
+                break;
+            }
+        }
+        refresh();
+    }
+
+    private void castSpell(int entry, String spell, int rank) {
+        if (!isOwnSheet()) {
+            return;
+        }
+        if (!ClientSpells.cast(entry, spell, rank) && client != null && client.player != null) {
+            client.player.sendMessage(Text.translatable("screen.pf2craft.dice.server_missing")
+                    .formatted(Formatting.RED), false);
+        }
+        // Close so that the target prompt and the result are visible.
+        close();
+    }
+
+    /** The account name of the sheet's owner if they are online (the reset command needs it). */
+    private String playerName() {
+        if (client == null || client.getNetworkHandler() == null) {
+            return null;
+        }
+        var entry = client.getNetworkHandler().getPlayerListEntry(owner);
+        return entry == null ? null : entry.getProfile().getName();
+    }
+
+    private void resetSlots(String playerName) {
+        if (client != null && client.getNetworkHandler() != null && playerName != null) {
+            client.getNetworkHandler().sendChatCommand("pf2 spells reset " + playerName);
         }
     }
 

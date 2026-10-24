@@ -3,6 +3,9 @@ package de.pf2craft.client;
 import de.pf2craft.core.combat.BasicAction;
 import de.pf2craft.core.combat.BasicActions;
 import de.pf2craft.core.combat.Condition;
+import de.pf2craft.core.spell.CastingType;
+import de.pf2craft.core.spell.SpellcastingEntry;
+import de.pf2craft.core.spell.Spellbook;
 import de.pf2craft.network.ActionRequestPayload;
 import de.pf2craft.network.CombatSyncPayload;
 import java.util.ArrayList;
@@ -40,7 +43,7 @@ public class ActionMenuScreen extends Screen {
     private enum Category {
         BASIC("basic", true),
         CLASS("class", true),
-        SPELLS("spells", false),
+        SPELLS("spells", true),
         ITEMS("items", false);
 
         private final String key;
@@ -52,7 +55,12 @@ public class ActionMenuScreen extends Screen {
         }
     }
 
+    /** One castable line of the spell category: the spell as listed in an entry, at the rank it would be cast. */
+    private record SpellRow(int entry, String spell, int rank) {
+    }
+
     private Category category = Category.BASIC;
+    private int spellScroll;
     private int left;
     private int top;
     private int panelW;
@@ -163,6 +171,47 @@ public class ActionMenuScreen extends Screen {
         return Optional.empty();
     }
 
+    /** The own spells of all entries (only for the player's own character), cantrips first. */
+    private List<SpellRow> spellRows() {
+        if (client.player == null) {
+            return List.of();
+        }
+        Optional<Spellbook> book = ClientSpells.own(client);
+        if (book.isEmpty()) {
+            return List.of();
+        }
+        List<SpellRow> rows = new ArrayList<>();
+        for (int i = 0; i < book.get().entries().size(); i++) {
+            SpellcastingEntry entry = book.get().entries().get(i);
+            for (var byRank : entry.spellsByRank().entrySet()) {
+                int listed = byRank.getKey();
+                if (listed < 0 || listed >= SpellcastingEntry.RANKS) {
+                    continue;
+                }
+                for (String spell : byRank.getValue()) {
+                    rows.add(new SpellRow(i, spell, castRank(book.get(), i, entry, listed)));
+                }
+            }
+        }
+        return rows;
+    }
+
+    /** Spontaneous spells can be heightened: the menu uses the lowest rank (from the listed one) with a slot. */
+    private static int castRank(Spellbook book, int index, SpellcastingEntry entry, int listed) {
+        if (entry.type() == CastingType.SPONTANEOUS && listed > 0) {
+            for (int r = listed; r < SpellcastingEntry.RANKS; r++) {
+                if (book.slotsLeft(index, r) > 0) {
+                    return r;
+                }
+            }
+        }
+        return listed;
+    }
+
+    private int visibleSpellRows() {
+        return (PANEL_H - HEADER - PAD) / (ROW_H + 2);
+    }
+
     private static boolean inside(double mx, double my, int x, int y, int w, int h) {
         return mx >= x && mx < x + w && my >= y && my < y + h;
     }
@@ -223,6 +272,7 @@ public class ActionMenuScreen extends Screen {
                     }
                 }
             }
+            case SPELLS -> tooltip = renderSpells(context, mouseX, mouseY, x, w);
             case CLASS -> context.drawTextWithShadow(textRenderer,
                     Text.translatable("screen.pf2craft.action_menu.none_yet"), x + 4, top + HEADER + 6, COLOR_GREY);
             default -> context.drawTextWithShadow(textRenderer,
@@ -231,6 +281,54 @@ public class ActionMenuScreen extends Screen {
         if (tooltip != null) {
             context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
         }
+    }
+
+    /** Draws the spell rows; returns the tooltip of the hovered row, if any. */
+    private Text renderSpells(DrawContext context, int mouseX, int mouseY, int x, int w) {
+        List<SpellRow> rows = spellRows();
+        Optional<Spellbook> book = ClientSpells.own(client);
+        if (rows.isEmpty() || book.isEmpty()) {
+            context.drawTextWithShadow(textRenderer, Text.translatable("screen.pf2craft.spells.none"), x + 4,
+                    top + HEADER + 6, COLOR_GREY);
+            return null;
+        }
+        Text tooltip = null;
+        int shown = visibleSpellRows();
+        spellScroll = Math.max(0, Math.min(spellScroll, rows.size() - shown));
+        for (int i = 0; i < shown && spellScroll + i < rows.size(); i++) {
+            SpellRow row = rows.get(spellScroll + i);
+            int y = rowY(i);
+            Optional<Text> reason = ClientSpells.unavailable(client, book.get(), row.entry(), row.rank());
+            boolean hover = inside(mouseX, mouseY, x, y, w, ROW_H);
+            if (hover && reason.isEmpty()) {
+                context.fill(x, y, x + w, y + ROW_H, COLOR_HOVER);
+            }
+            context.drawBorder(x, y, w, ROW_H, COLOR_BORDER);
+            int color = reason.isEmpty() ? COLOR_WHITE : COLOR_GREY;
+            String cost = "◆◆";
+            int costW = textRenderer.getWidth(cost);
+            Text rank = row.rank() == 0 ? Text.translatable("screen.pf2craft.spells.cantrip")
+                    : Text.translatable("screen.pf2craft.spells.rank_short", row.rank());
+            int rankW = textRenderer.getWidth(rank);
+            context.drawTextWithShadow(textRenderer,
+                    textRenderer.trimToWidth(row.spell(), w - costW - rankW - 20), x + 4, y + 6, color);
+            context.drawTextWithShadow(textRenderer, rank, x + w - 8 - costW - rankW, y + 6, COLOR_GREY);
+            context.drawTextWithShadow(textRenderer, cost, x + w - 4 - costW, y + 6,
+                    reason.isEmpty() ? COLOR_GOLD : COLOR_GREY);
+            if (hover) {
+                tooltip = reason.orElse(Text.translatable("screen.pf2craft.spells.server_decides"));
+            }
+        }
+        return tooltip;
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (category == Category.SPELLS) {
+            spellScroll = Math.max(0, spellScroll - (int) Math.signum(verticalAmount));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     @Override
@@ -256,6 +354,21 @@ public class ActionMenuScreen extends Screen {
                         choose(a);
                     }
                     return true;
+                }
+            }
+            if (category == Category.SPELLS) {
+                List<SpellRow> rows = spellRows();
+                Optional<Spellbook> book = ClientSpells.own(client);
+                for (int i = 0; i < visibleSpellRows() && spellScroll + i < rows.size(); i++) {
+                    SpellRow row = rows.get(spellScroll + i);
+                    if (inside(mouseX, mouseY, listX(), rowY(i), listW(), ROW_H)) {
+                        if (book.isPresent()
+                                && ClientSpells.unavailable(client, book.get(), row.entry(), row.rank()).isEmpty()) {
+                            ClientSpells.cast(row.entry(), row.spell(), row.rank());
+                            close();
+                        }
+                        return true;
+                    }
                 }
             }
         }

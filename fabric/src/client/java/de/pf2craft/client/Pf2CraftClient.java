@@ -51,6 +51,7 @@ public class Pf2CraftClient implements ClientModInitializer {
     private static KeyBinding strideKey;
     private static KeyBinding rangeToggleKey;
     private static KeyBinding takeOverKey;
+    private static KeyBinding confirmSpellKey;
     /** Ticks left to wait for the own sheet after a C press, or -1. */
     private static int waitingForOwnSheet = -1;
     /** A screen the server asked for while another (e.g. the terrain loading) screen was open. */
@@ -77,6 +78,9 @@ public class Pf2CraftClient implements ClientModInitializer {
         takeOverKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.pf2craft.take_over", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_J, KEY_CATEGORY));
 
+        confirmSpellKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.pf2craft.confirm_spell", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_B, KEY_CATEGORY));
+
         ClientTickEvents.END_CLIENT_TICK.register(Pf2CraftClient::tick);
         RangeOverlay.register();
         SpeechBubbles.register();
@@ -86,7 +90,13 @@ public class Pf2CraftClient implements ClientModInitializer {
             RollHud.show(payload);
         });
         ClientPlayNetworking.registerGlobalReceiver(SpellbookSyncPayload.ID,
-                (payload, context) -> ClientSpellbooks.put(payload));
+                (payload, context) -> {
+                    ClientSpellbooks.put(payload);
+                    if (context.client().currentScreen instanceof CharacterScreen screen
+                            && screen.owner().equals(payload.owner())) {
+                        screen.refresh();
+                    }
+                });
         ClientPlayNetworking.registerGlobalReceiver(SheetSyncPayload.ID,
                 (payload, context) -> onSheetSync(context.client(), payload));
         ClientPlayNetworking.registerGlobalReceiver(OpenImportPayload.ID, (payload, context) -> {
@@ -169,6 +179,11 @@ public class Pf2CraftClient implements ClientModInitializer {
         return takeOverKey.getBoundKeyLocalizedText();
     }
 
+    /** The bound key of the spell confirmation for the HUD hint. */
+    public static Text confirmSpellKeyText() {
+        return confirmSpellKey.getBoundKeyLocalizedText();
+    }
+
     private static void tick(MinecraftClient client) {
         while (openDiceKey.wasPressed()) {
             if (client.currentScreen == null && client.player != null) {
@@ -197,6 +212,11 @@ public class Pf2CraftClient implements ClientModInitializer {
         while (strideKey.wasPressed()) {
             if (client.currentScreen == null && client.player != null) {
                 onStrideKey(client);
+            }
+        }
+        while (confirmSpellKey.wasPressed()) {
+            if (client.currentScreen == null && client.player != null) {
+                ClientSpells.confirm(client);
             }
         }
         while (takeOverKey.wasPressed()) {

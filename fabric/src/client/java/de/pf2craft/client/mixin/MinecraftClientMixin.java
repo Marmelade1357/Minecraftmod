@@ -1,6 +1,7 @@
 package de.pf2craft.client.mixin;
 
 import de.pf2craft.client.ClientControl;
+import de.pf2craft.client.ClientSpells;
 import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -8,11 +9,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** While the GM controls an NPC, attack becomes the NPC's strike and block breaking / using items is off. */
+/** While a spell waits for a target, attack picks it by raycast. While the GM controls an NPC, attack becomes the NPC's strike and block breaking / using items is off. */
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin {
     @Inject(method = "doAttack", at = @At("HEAD"), cancellable = true)
     private void pf2craft$npcAttack(CallbackInfoReturnable<Boolean> cir) {
+        if (ClientSpells.tryTarget((MinecraftClient) (Object) this)) {
+            cir.setReturnValue(false);
+            return;
+        }
         if (ClientControl.isControlling()) {
             ClientControl.sendAttack();
             cir.setReturnValue(false);
