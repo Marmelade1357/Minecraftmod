@@ -3,12 +3,13 @@ package de.pf2craft.core.spell;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.pf2craft.core.check.DegreeOfSuccess;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class SpellResolverTest {
     private static SpellDefinition spell(int rank, String dice, String heighten, int step) {
         return new SpellDefinition("x", "X", rank, 2, 30, 1, SpellKind.SAVE, "reflex", true, dice, 0, "fire",
-                heighten, step, false);
+                heighten, step, false, 0, "", "", "");
     }
 
     @Test
@@ -52,6 +53,29 @@ class SpellResolverTest {
         assertEquals(0, SpellResolver.multiplier(SpellKind.SAVE, false, s));
         assertEquals(1, SpellResolver.multiplier(SpellKind.SAVE, false, f));
         assertEquals(2, SpellResolver.multiplier(SpellKind.SAVE, false, cf));
+    }
+
+    @Test
+    void autoAlwaysFactorOne() {
+        for (DegreeOfSuccess d : DegreeOfSuccess.values()) {
+            assertEquals(1, SpellResolver.multiplier(SpellKind.AUTO, false, d));
+        }
+    }
+
+    @Test
+    void damageAtIncludesHeightenBonusAndExtraComponent() {
+        SpellDefinition barrage = new SpellDefinition("fb", "FB", 1, 2, 120, 1, SpellKind.AUTO, "", false, "2d4", 2,
+                "force", "2d4", 2, false, 2, "", "", "");
+        assertEquals(List.of(new SpellResolver.DamageRoll("2d4", 2, "force")), SpellResolver.damageAt(barrage, 1));
+        assertEquals(List.of(new SpellResolver.DamageRoll("4d4", 4, "force")), SpellResolver.damageAt(barrage, 3));
+        SpellDefinition heal = new SpellDefinition("h", "H", 1, 2, 30, 1, SpellKind.HEAL, "", false, "1d8", 8, "",
+                "1d8", 1, false, 8, "", "", "");
+        assertEquals(List.of(new SpellResolver.DamageRoll("2d8", 16, "")), SpellResolver.damageAt(heal, 2));
+        SpellDefinition ts = new SpellDefinition("t", "T", 1, 2, 120, 1, SpellKind.SAVE, "reflex", true, "1d12", 0,
+                "electricity", "1d12", 1, false, 0, "1d4", "sonic", "1d4");
+        assertEquals(List.of(new SpellResolver.DamageRoll("2d12", 0, "electricity"),
+                new SpellResolver.DamageRoll("2d4", 0, "sonic")), SpellResolver.damageAt(ts, 2));
+        assertEquals(List.of(), SpellResolver.damageAt(spell(1, "", "", 0), 3));
     }
 
     @Test

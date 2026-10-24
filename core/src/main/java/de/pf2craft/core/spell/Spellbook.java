@@ -62,6 +62,10 @@ public final class Spellbook {
         if (rank == 0) {
             return Integer.MAX_VALUE;
         }
+        CastingType type = entries.get(entry).type();
+        if (type == CastingType.FOCUS || type == CastingType.INNATE) {
+            return 0; // focus spells use focus points, innate spells are handled elsewhere
+        }
         return Math.max(0, entries.get(entry).perDay()[rank] - used[entry][rank]);
     }
 

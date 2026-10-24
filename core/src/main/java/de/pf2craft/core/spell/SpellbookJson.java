@@ -61,22 +61,29 @@ public final class SpellbookJson {
             List<SpellcastingEntry> entries = new ArrayList<>();
             List<int[]> usedRows = new ArrayList<>();
             for (JsonElement el : root.getAsJsonArray("entries")) {
-                JsonObject o = el.getAsJsonObject();
-                Map<Integer, List<String>> spells = new LinkedHashMap<>();
-                for (Map.Entry<String, JsonElement> s : o.getAsJsonObject("spells").entrySet()) {
-                    List<String> names = new ArrayList<>();
-                    for (JsonElement n : s.getValue().getAsJsonArray()) {
-                        names.add(n.getAsString());
+                try {
+                    JsonObject o = el.getAsJsonObject();
+                    Map<Integer, List<String>> spells = new LinkedHashMap<>();
+                    for (Map.Entry<String, JsonElement> s : o.getAsJsonObject("spells").entrySet()) {
+                        List<String> names = new ArrayList<>();
+                        for (JsonElement n : s.getValue().getAsJsonArray()) {
+                            names.add(n.getAsString());
+                        }
+                        spells.put(Integer.parseInt(s.getKey()), names);
                     }
-                    spells.put(Integer.parseInt(s.getKey()), names);
+                    SpellcastingEntry entry = new SpellcastingEntry(o.get("name").getAsString(),
+                            o.get("tradition").getAsString(), CastingType.valueOf(o.get("type").getAsString()),
+                            Ability.valueOf(o.get("ability").getAsString()),
+                            Rank.valueOf(o.get("rank").getAsString()), ints(o.getAsJsonArray("perDay")), spells);
+                    int[] used = ints(o.getAsJsonArray("used"));
+                    entries.add(entry);
+                    usedRows.add(used);
+                } catch (RuntimeException ignored) {
+                    // skip only the bad entry
                 }
-                entries.add(new SpellcastingEntry(o.get("name").getAsString(), o.get("tradition").getAsString(),
-                        CastingType.valueOf(o.get("type").getAsString()),
-                        Ability.valueOf(o.get("ability").getAsString()),
-                        Rank.valueOf(o.get("rank").getAsString()), ints(o.getAsJsonArray("perDay")), spells));
-                usedRows.add(ints(o.getAsJsonArray("used")));
             }
-            return new Spellbook(entries, root.get("focusMax").getAsInt(), root.get("focusCurrent").getAsInt(),
+            return new Spellbook(entries, Math.min(3, root.get("focusMax").getAsInt()),
+                    root.get("focusCurrent").getAsInt(),
                     usedRows.toArray(new int[0][]));
         } catch (RuntimeException e) {
             return Spellbook.empty();

@@ -21,6 +21,15 @@ class SpellbookTest {
     }
 
     @Test
+    void focusAndInnateEntriesHaveNoSlotsAboveCantrips() {
+        SpellcastingEntry focus = new SpellcastingEntry("Focus Spells", "focus", CastingType.FOCUS,
+                Ability.INT, Rank.TRAINED, new int[] {0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0}, Map.of());
+        Spellbook b = new Spellbook(List.of(focus), 1);
+        assertEquals(0, b.slotsLeft(0, 1));
+        assertEquals(Integer.MAX_VALUE, b.slotsLeft(0, 0));
+    }
+
+    @Test
     void cantripsAreFree() {
         assertEquals(Integer.MAX_VALUE, book().slotsLeft(0, 0));
     }

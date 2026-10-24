@@ -11,9 +11,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * Modelling notes: Force Barrage auto-hits (modelled as ATTACK with 2 shards, 1d4+1 each, flat bonus not heightened);
- * Heal and Harm use the 2-action single-target variant (Heal 1d8+8); Thunderstrike keeps only the electricity die
- * (the 1d4 sonic part is dropped); persistent damage and critical-failure riders are left to the GM; Bless, Shield,
+ * Modelling notes: Force Barrage auto-hits (kind AUTO) and is modelled as the 2-action use with 2 shards of 1d4+1
+ * (the 1- and 3-action variants are simplified away; +2 ranks adds one shard per action = +2d4+2);
+ * Heal and Harm use the 2-action single-target variant (Heal 1d8+8, +1d8+8 per rank); Thunderstrike has a second
+ * component (1d4 sonic); persistent damage and critical-failure riders are left to the GM; Bless, Shield,
  * Sure Strike are UTILITY.
  */
 class StarterCatalogTest {
@@ -48,6 +49,25 @@ class StarterCatalogTest {
                 assertTrue(DamageResolver.isDamageType(d.damageType()), d.name());
             }
         }
+    }
+
+    @Test
+    void fixedSpellValues() throws IOException {
+        var c = load().catalog();
+        var barrage = c.byName("Force Barrage").orElseThrow();
+        assertEquals(SpellKind.AUTO, barrage.kind());
+        assertEquals("4d4", SpellResolver.damageAt(barrage, 3).get(0).dice());
+        assertEquals(4, SpellResolver.damageAt(barrage, 3).get(0).bonus());
+        var heal = SpellResolver.damageAt(c.byName("Heal").orElseThrow(), 2).get(0);
+        assertEquals("2d8", heal.dice());
+        assertEquals(16, heal.bonus());
+        var ts = SpellResolver.damageAt(c.byName("Thunderstrike").orElseThrow(), 2);
+        assertEquals("2d12", ts.get(0).dice());
+        assertEquals("electricity", ts.get(0).type());
+        assertEquals("2d4", ts.get(1).dice());
+        assertEquals("sonic", ts.get(1).type());
+        assertTrue(c.byName("Gale Blast").orElseThrow().basicSave());
+        assertTrue(c.byName("Chilling Spray").orElseThrow().basicSave());
     }
 
     @Test

@@ -4,6 +4,8 @@ package de.pf2craft.core.spell;
 public enum SpellKind {
     ATTACK,
     SAVE,
+    /** Hits automatically, no roll (e.g. Force Barrage). */
+    AUTO,
     HEAL,
     UTILITY
 }

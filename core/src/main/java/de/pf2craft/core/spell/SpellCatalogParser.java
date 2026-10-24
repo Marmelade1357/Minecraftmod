@@ -102,9 +102,17 @@ public final class SpellCatalogParser {
         if (!dice.isEmpty() && kind != SpellKind.HEAL && !DamageResolver.isDamageType(type)) {
             throw new IllegalArgumentException("bad damage type in '" + id + "'");
         }
+        String extra = str(o, "extraDice", "");
+        String extraHeighten = str(o, "extraHeightenDice", "");
+        String extraType = str(o, "extraType", "").toLowerCase(Locale.ROOT);
+        if ((!extra.isEmpty() && !DICE.matcher(extra).matches())
+                || (!extraHeighten.isEmpty() && !DICE.matcher(extraHeighten).matches())
+                || (!extra.isEmpty() && !DamageResolver.isDamageType(extraType))) {
+            throw new IllegalArgumentException("bad extra damage in '" + id + "'");
+        }
         return new SpellDefinition(id, name, rank, actions, range, targets, kind, save,
                 bool(o, "basicSave"), dice, num(o, "damageBonus", 0), type, heighten, step,
-                bool(o, "addAbilityMod"));
+                bool(o, "addAbilityMod"), num(o, "heightenBonus", 0), extra, extraType, extraHeighten);
     }
 
     private static String str(JsonObject o, String key, String def) {

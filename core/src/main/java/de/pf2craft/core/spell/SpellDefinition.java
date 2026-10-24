@@ -5,8 +5,11 @@ package de.pf2craft.core.spell;
  * maxTargets 0 means self, 1 a single target, more an area or multi-target spell.
  * save is fortitude, reflex, will or empty. damageDice looks like "2d4" or is empty.
  * heightenStep is the number of ranks per heighten step (1 or 2), 0 for none.
+ * heightenBonus is flat damage added per heighten step. The optional extra component (extraDice, extraType,
+ * extraHeightenDice, same step) is a second damage type such as the sonic part of Thunderstrike.
  */
 public record SpellDefinition(String id, String name, int rank, int actions, int rangeFeet, int maxTargets,
         SpellKind kind, String save, boolean basicSave, String damageDice, int damageBonus, String damageType,
-        String heightenDice, int heightenStep, boolean addAbilityMod) {
+        String heightenDice, int heightenStep, boolean addAbilityMod,
+        int heightenBonus, String extraDice, String extraType, String extraHeightenDice) {
 }
