@@ -75,4 +75,11 @@ class PathbuilderSpellsTest {
             assertNotNull(book);
         }
     }
+
+    @Test
+    void parseResponseToleratesGarbage() {
+        assertTrue(PathbuilderSpells.parseResponse("not json").entries().isEmpty());
+        assertTrue(PathbuilderSpells.parseResponse("{\"success\":true}").entries().isEmpty());
+        assertTrue(PathbuilderSpells.parseResponse("{\"build\":{}}").entries().isEmpty());
+    }
 }

@@ -16,7 +16,10 @@ import de.pf2craft.core.progression.InvalidChoiceException;
 import de.pf2craft.core.progression.LevelUp;
 import de.pf2craft.core.progression.LevelUpChoices;
 import de.pf2craft.core.progression.UnsupportedClassException;
+import de.pf2craft.core.spell.SpellbookJson;
 import de.pf2craft.network.SheetSyncPayload;
+import de.pf2craft.network.SpellbookSyncPayload;
+import de.pf2craft.spell.SpellbookStore;
 import de.pf2craft.roll.RollService;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -59,7 +62,10 @@ public final class SheetService {
     public static void request(ServerPlayerEntity requester, UUID target) {
         if (target.equals(requester.getUuid())) {
             Optional<CharacterSheet> sheet = CharacterStore.get(requester);
-            sheet.ifPresent(value -> send(requester, requester, value, true));
+            sheet.ifPresent(value -> {
+                send(requester, requester, value, true);
+                sendSpellbook(requester, requester);
+            });
             return;
         }
         if (GmRoles.isGm(requester)) {
@@ -84,12 +90,14 @@ public final class SheetService {
             VIEWERS.computeIfAbsent(target, k -> new HashSet<>()).add(viewer.getUuid());
         }
         send(viewer, owner, sheet.get(), true);
+        sendSpellbook(viewer, owner);
         return true;
     }
 
     /** Re-sends the sheet (open = false) to its owner and to every GM watching it. */
     public static void broadcast(MinecraftServer server, ServerPlayerEntity owner, CharacterSheet sheet) {
         send(owner, owner, sheet, false);
+        sendSpellbook(server, owner);
         Set<UUID> watchers = VIEWERS.get(owner.getUuid());
         if (watchers == null) {
             return;
@@ -101,6 +109,28 @@ public final class SheetService {
             } else {
                 send(gm, owner, sheet, false);
             }
+        }
+    }
+
+    /** Sends the owner's spellbook to the owner and to every GM watching the sheet. */
+    public static void sendSpellbook(MinecraftServer server, ServerPlayerEntity owner) {
+        sendSpellbook(owner, owner);
+        Set<UUID> watchers = VIEWERS.get(owner.getUuid());
+        if (watchers == null) {
+            return;
+        }
+        for (UUID id : new ArrayList<>(watchers)) {
+            ServerPlayerEntity gm = server.getPlayerManager().getPlayer(id);
+            if (gm != null && GmRoles.isGm(gm)) {
+                sendSpellbook(gm, owner);
+            }
+        }
+    }
+
+    private static void sendSpellbook(ServerPlayerEntity recipient, ServerPlayerEntity owner) {
+        if (ServerPlayNetworking.canSend(recipient, SpellbookSyncPayload.ID)) {
+            ServerPlayNetworking.send(recipient, new SpellbookSyncPayload(owner.getUuid(),
+                    SpellbookJson.write(SpellbookStore.get(owner))));
         }
     }
 

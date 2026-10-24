@@ -5,8 +5,10 @@ import de.pf2craft.Pf2Craft;
 import de.pf2craft.core.character.CharacterImportException;
 import de.pf2craft.core.character.CharacterSheet;
 import de.pf2craft.core.character.PathbuilderId;
+import de.pf2craft.core.spell.Spellbook;
 import de.pf2craft.item.CharacterItems;
 import de.pf2craft.network.OpenImportPayload;
+import de.pf2craft.spell.SpellbookStore;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -51,7 +53,7 @@ public final class CharacterService {
             return;
         }
         MinecraftServer server = player.getServer();
-        PathbuilderFetcher.fetch(id.get()).whenComplete((sheet, failure) -> server.execute(() -> {
+        PathbuilderFetcher.fetch(id.get()).whenComplete((imported, failure) -> server.execute(() -> {
             IN_FLIGHT.remove(uuid);
             ServerPlayerEntity target = server.getPlayerManager().getPlayer(uuid);
             if (target == null) {
@@ -68,13 +70,15 @@ public final class CharacterService {
                         "Import failed: %s", message));
                 return;
             }
-            complete(server, target, sheet);
+            complete(server, target, imported.sheet(), imported.spellbook());
         }));
     }
 
-    private static void complete(MinecraftServer server, ServerPlayerEntity player, CharacterSheet sheet) {
+    private static void complete(MinecraftServer server, ServerPlayerEntity player, CharacterSheet sheet,
+                                 Spellbook spellbook) {
         boolean hadCharacter = CharacterStore.get(player).isPresent();
         CharacterStore.set(player, sheet);
+        SpellbookStore.set(player, spellbook);
         CharacterItems.replace(player, sheet);
         if (!hadCharacter && !GmRoles.isGm(player)) {
             player.changeGameMode(GameMode.SURVIVAL);
@@ -97,6 +101,7 @@ public final class CharacterService {
     /** Removes the character and sends the player back to spectator mode. */
     public static void reset(ServerPlayerEntity target) {
         CharacterStore.remove(target);
+        SpellbookStore.remove(target);
         CharacterItems.remove(target);
         SheetService.forget(target.getUuid());
         if (!GmRoles.isGm(target)) {

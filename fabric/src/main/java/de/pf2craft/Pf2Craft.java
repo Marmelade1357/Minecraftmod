@@ -20,6 +20,8 @@ import de.pf2craft.npc.NpcControl;
 import de.pf2craft.npc.NpcNetwork;
 import de.pf2craft.npc.NpcSpeech;
 import de.pf2craft.npc.Pf2Entities;
+import de.pf2craft.spell.SpellData;
+import de.pf2craft.spell.SpellbookStore;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -44,11 +46,13 @@ public class Pf2Craft implements ModInitializer {
     public void onInitialize() {
         Pf2Components.register();
         CharacterStore.register();
+        SpellbookStore.register();
         Pf2Entities.register();
         Pf2Items.register();
         ServerLifecycleEvents.SERVER_STARTING.register(ClassData::load);
         ServerLifecycleEvents.SERVER_STARTING.register(ItemData::load);
         ServerLifecycleEvents.SERVER_STARTING.register(MonsterDataLoader::load);
+        ServerLifecycleEvents.SERVER_STARTING.register(SpellData::load);
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             NpcControl.releaseAll(server);
             CombatService.reset();

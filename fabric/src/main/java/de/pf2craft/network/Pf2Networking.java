@@ -28,6 +28,7 @@ public final class Pf2Networking {
         PayloadTypeRegistry.playS2C().register(OpenImportPayload.ID, OpenImportPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(SheetRequestPayload.ID, SheetRequestPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(SheetSyncPayload.ID, SheetSyncPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(SpellbookSyncPayload.ID, SpellbookSyncPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(CheckRollPayload.ID, CheckRollPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(GmEditPayload.ID, GmEditPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(GrantLevelUpPayload.ID, GrantLevelUpPayload.CODEC);

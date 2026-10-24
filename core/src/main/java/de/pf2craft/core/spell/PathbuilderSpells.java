@@ -3,6 +3,7 @@ package de.pf2craft.core.spell;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import de.pf2craft.core.character.Ability;
 import de.pf2craft.core.character.Rank;
 import java.util.ArrayList;
@@ -13,6 +14,20 @@ import java.util.Map;
 /** Reads the spellCasters section of a Pathbuilder 2e build. Never throws on bad data. */
 public final class PathbuilderSpells {
     private PathbuilderSpells() {
+    }
+
+    /** Reads the spellbook from a whole Pathbuilder response body ({"success":..,"build":{..}}). */
+    public static Spellbook parseResponse(String body) {
+        try {
+            JsonElement root = JsonParser.parseString(body);
+            if (root.isJsonObject() && root.getAsJsonObject().has("build")
+                    && root.getAsJsonObject().get("build").isJsonObject()) {
+                return parse(root.getAsJsonObject().getAsJsonObject("build"));
+            }
+        } catch (RuntimeException e) {
+            // fall through
+        }
+        return Spellbook.empty();
     }
 
     public static Spellbook parse(JsonObject build) {

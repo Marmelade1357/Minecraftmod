@@ -4,6 +4,8 @@ import de.pf2craft.core.character.CharacterImportException;
 import de.pf2craft.core.character.CharacterSheet;
 import de.pf2craft.core.character.PathbuilderResponse;
 import de.pf2craft.core.item.ItemCatalog;
+import de.pf2craft.core.spell.PathbuilderSpells;
+import de.pf2craft.core.spell.Spellbook;
 import de.pf2craft.item.ItemData;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -22,7 +24,11 @@ public final class PathbuilderFetcher {
     private PathbuilderFetcher() {
     }
 
-    public static CompletableFuture<CharacterSheet> fetch(String id) {
+    /** The imported sheet together with the spellbook of the same Pathbuilder build. */
+    public record Imported(CharacterSheet sheet, Spellbook spellbook) {
+    }
+
+    public static CompletableFuture<Imported> fetch(String id) {
         HttpRequest request = HttpRequest.newBuilder(URI.create("https://pathbuilder2e.com/json.php?id=" + id))
                 .timeout(Duration.ofSeconds(10))
                 .GET()
@@ -35,7 +41,8 @@ public final class PathbuilderFetcher {
                                 new CharacterImportException("Pathbuilder is not reachable", error));
                     }
                     try {
-                        return PathbuilderResponse.toSheet(response.statusCode(), response.body(), catalog);
+                        CharacterSheet sheet = PathbuilderResponse.toSheet(response.statusCode(), response.body(), catalog);
+                        return new Imported(sheet, PathbuilderSpells.parseResponse(response.body()));
                     } catch (CharacterImportException e) {
                         throw new CompletionException(e);
                     }

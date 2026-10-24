@@ -25,6 +25,7 @@ import de.pf2craft.core.monster.MonsterData;
 import de.pf2craft.core.monster.NpcEdit;
 import de.pf2craft.core.monster.NpcStats;
 import de.pf2craft.core.progression.InvalidChoiceException;
+import de.pf2craft.core.spell.Spellbook;
 import de.pf2craft.item.CharacterItems;
 import de.pf2craft.item.Pf2Items;
 import de.pf2craft.npc.GmSelection;
@@ -34,6 +35,7 @@ import de.pf2craft.npc.NpcEntity;
 import de.pf2craft.npc.NpcService;
 import de.pf2craft.npc.NpcSpeech;
 import de.pf2craft.roll.RollService;
+import de.pf2craft.spell.SpellbookStore;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
@@ -106,6 +108,18 @@ public final class Pf2Commands {
                         .then(literal("hp")
                                 .then(argument("value", IntegerArgumentType.integer())
                                         .executes(Pf2Commands::npcHp))))
+                .then(literal("rest")
+                        .requires(Pf2Commands::isGmOrOp)
+                        .then(literal("all")
+                                .executes(ctx -> rest(ctx, ctx.getSource().getServer().getPlayerManager()
+                                        .getPlayerList())))
+                        .then(argument("targets", EntityArgumentType.players())
+                                .executes(ctx -> rest(ctx, EntityArgumentType.getPlayers(ctx, "targets")))))
+                .then(literal("spells")
+                        .requires(Pf2Commands::isGmOrOp)
+                        .then(literal("reset")
+                                .then(argument("player", EntityArgumentType.player())
+                                        .executes(Pf2Commands::resetSpells))))
                 .then(literal("tools")
                         .requires(source -> source.getPlayer() != null && GmRoles.isGm(source.getPlayer()))
                         .executes(Pf2Commands::giveTools))
@@ -444,6 +458,38 @@ public final class Pf2Commands {
         CharacterItems.replace(target, sheet.get());
         ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.items.reissued",
                 "Re-issued the character items of %s.", target.getDisplayName()), true);
+        return 1;
+    }
+
+    /** {@code /pf2 rest}: refreshes spell slots and focus points of the given players. */
+    private static int rest(CommandContext<ServerCommandSource> ctx,
+                            java.util.Collection<ServerPlayerEntity> targets) {
+        int count = 0;
+        for (ServerPlayerEntity target : targets) {
+            Spellbook book = SpellbookStore.get(target).copy();
+            book.rest();
+            SpellbookStore.set(target, book);
+            SheetService.sendSpellbook(ctx.getSource().getServer(), target);
+            target.sendMessage(Text.translatableWithFallback("pf2craft.spell.rested",
+                    "You are rested: spell slots and focus points are restored."), false);
+            count++;
+        }
+        int rested = count;
+        ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.spell.rest_done",
+                "%s player(s) rested.", rested), true);
+        return count;
+    }
+
+    private static int resetSpells(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        ServerPlayerEntity target = EntityArgumentType.getPlayer(ctx, "player");
+        Spellbook book = SpellbookStore.get(target).copy();
+        for (int i = 0; i < book.entries().size(); i++) {
+            book.resetSlots(i);
+        }
+        SpellbookStore.set(target, book);
+        SheetService.sendSpellbook(ctx.getSource().getServer(), target);
+        ctx.getSource().sendFeedback(() -> Text.translatableWithFallback("pf2craft.spell.reset_done",
+                "Used spell slots of %s were reset.", target.getDisplayName()), true);
         return 1;
     }
 

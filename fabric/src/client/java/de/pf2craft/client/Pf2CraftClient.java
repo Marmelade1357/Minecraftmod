@@ -15,6 +15,7 @@ import de.pf2craft.network.PendingActionPayload;
 import de.pf2craft.network.RollResultPayload;
 import de.pf2craft.network.SheetRequestPayload;
 import de.pf2craft.network.SheetSyncPayload;
+import de.pf2craft.network.SpellbookSyncPayload;
 import de.pf2craft.npc.Pf2Entities;
 import de.pf2craft.roll.RollMessages;
 import java.util.Optional;
@@ -84,6 +85,8 @@ public class Pf2CraftClient implements ClientModInitializer {
             context.client().inGameHud.getChatHud().addMessage(RollMessages.chatLine(payload));
             RollHud.show(payload);
         });
+        ClientPlayNetworking.registerGlobalReceiver(SpellbookSyncPayload.ID,
+                (payload, context) -> ClientSpellbooks.put(payload));
         ClientPlayNetworking.registerGlobalReceiver(SheetSyncPayload.ID,
                 (payload, context) -> onSheetSync(context.client(), payload));
         ClientPlayNetworking.registerGlobalReceiver(OpenImportPayload.ID, (payload, context) -> {
@@ -134,6 +137,7 @@ public class Pf2CraftClient implements ClientModInitializer {
             ClientControl.release(null);
             SpeechBubbles.clear();
             ClientSheets.clear();
+            ClientSpellbooks.clear();
             ClientCombat.clear();
             ClientActions.setPending("");
             waitingForOwnSheet = -1;
